@@ -7,27 +7,23 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/signup")
     public ResponseEntity<Long> createUser(@RequestBody @Valid UserRequestDto reqUser){
         String name = reqUser.getName();
         String email = reqUser.getEmail();
-        String password = passwordEncoder.encode(reqUser.getPassword());
+        String password = reqUser.getPassword();
 
         User user = new User(name, email, password);
 

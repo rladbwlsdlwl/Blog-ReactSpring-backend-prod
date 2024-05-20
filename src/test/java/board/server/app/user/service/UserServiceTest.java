@@ -1,4 +1,4 @@
-package board.server.service;
+package board.server.app.user.service;
 
 import board.server.app.user.entity.User;
 import board.server.app.user.service.UserService;

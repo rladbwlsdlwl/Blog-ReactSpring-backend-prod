@@ -1,4 +1,4 @@
-package board.server.repository;
+package board.server.app.user.repository;
 
 import board.server.app.user.entity.User;
 import board.server.app.user.repository.JdbcTemplateUserRepository;
