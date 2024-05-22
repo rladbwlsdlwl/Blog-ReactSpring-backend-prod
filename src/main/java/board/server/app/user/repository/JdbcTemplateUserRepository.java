@@ -62,6 +62,14 @@ public class JdbcTemplateUserRepository implements UserRepository{
     }
 
     @Override
+    public Optional<User> findByIdAndUsername(Long id, String username) {
+        String sql = "select * from USER_TABLE where id = ? and username = ?";
+        List<User> query = jt.query(sql, UserMapper(), id, username);
+
+        return query.stream().findAny();
+    }
+
+    @Override
     public void delete(User user) {
         String query = "delete from USER_TABLE where id = ?";
         jt.update(query, user.getId());
