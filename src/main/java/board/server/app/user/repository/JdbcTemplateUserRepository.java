@@ -81,8 +81,14 @@ public class JdbcTemplateUserRepository implements UserRepository{
             String username = rs.getString("username");
             String email = rs.getString("email");
             String password = rs.getString("password");
+            Long id = rs.getLong("id");
 
-            return new User(username, email, password);
+            return User.builder()
+                    .username(username)
+                    .email(email)
+                    .password(password)
+                    .id(id)
+                    .build();
         });
     }
 

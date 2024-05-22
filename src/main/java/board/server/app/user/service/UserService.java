@@ -28,7 +28,11 @@ public class UserService {
        String name = user.getUsername(), email = user.getEmail(), password = user.getPassword();
        password = passwordEncoder.encode(password);
 
-       User user1 = new User(name, email, password);
+       User user1 = User.builder()
+               .username(name)
+               .password(password)
+               .email(email)
+               .build();
 
        return userRepository.save(user1).getId();
     }
