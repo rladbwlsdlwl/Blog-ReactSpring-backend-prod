@@ -1,7 +1,6 @@
-package board.server.app.user.service;
+package board.server.app.member.service;
 
-import board.server.app.user.entity.User;
-import board.server.app.user.service.UserService;
+import board.server.app.member.entity.Member;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,23 +11,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class UserServiceTest {
+class MemberServiceTest {
 
     @Autowired
-    UserService userService;
+    MemberService memberService;
 
 
     @Test
     public void 중복회원_예외() {
         // GIVEN
-        User user1 = new User("yujin", "yujin@aaa.aaa", "aaa");
-        User user2 = new User("yujin1", "yujin@aaa.aaa", "aaa");
+        Member member1 = new Member("yujin", "yujin@aaa.aaa", "aaa");
+        Member member2 = new Member("yujin1", "yujin@aaa.aaa", "aaa");
 
         // WHEN
-        userService.join(user1);
+        memberService.join(member1);
 
         // THEN
-        IllegalStateException err = assertThrows(IllegalStateException.class, () -> userService.join(user2));
+        IllegalStateException err = assertThrows(IllegalStateException.class, () -> memberService.join(member2));
     }
 
 

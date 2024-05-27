@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.List;
 public interface BoardRepository {
     Board save(Board board);
-    Optional<Board> findByIdAndUsername(Long id, String username);
+    Optional<Board> findByIdAndName(Long id, String name);
     List<Board> findByAuthor(Long author);
     Long update(Board board); // springdataJPA 에는 ORM에의해 find -> save
     void delete(Long id);

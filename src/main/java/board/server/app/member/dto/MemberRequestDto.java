@@ -1,18 +1,17 @@
-package board.server.app.user.dto;
+package board.server.app.member.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class UserRequestDto {
+public class MemberRequestDto {
     private Long id;
     @NotNull
     @Size(min = 3, max = 255)

@@ -31,9 +31,9 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(boardService.getBoardListAll());
     }
 
-    @GetMapping("/{username}/{boardId}")
-    public ResponseEntity<BoardResponseDto> readBoard(@PathVariable String username, @PathVariable Long boardId){
-        Board board = boardService.getBoard(boardId, username);
+    @GetMapping("/{name}/{boardId}")
+    public ResponseEntity<BoardResponseDto> readBoard(@PathVariable String name, @PathVariable Long boardId){
+        Board board = boardService.getBoard(boardId, name);
 
         Long id = board.getId(), author = board.getAuthor();
         String title = board.getTitle(), contents = board.getContents();
@@ -43,15 +43,15 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(boardDto);
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<Object> readBoards(@PathVariable String username){
-        List<Board> boardList = boardService.getBoardList(username);
+    @GetMapping("/{name}")
+    public ResponseEntity<Object> readBoards(@PathVariable String name){
+        List<Board> boardList = boardService.getBoardList(name);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(boardList);
     }
 
-    @PostMapping("/{username}")
-    public ResponseEntity<Object> saveBoard(@RequestBody @Valid BoardRequestDto boardRequestDto, @PathVariable String username){
+    @PostMapping("/{name}")
+    public ResponseEntity<Object> saveBoard(@RequestBody @Valid BoardRequestDto boardRequestDto, @PathVariable String name){
         Long userId = boardRequestDto.getAuthor();
         String title = boardRequestDto.getTitle(), contents = boardRequestDto.getContents();
 
@@ -61,7 +61,7 @@ public class BoardController {
                 .author(userId)
                 .build();
 
-        Long id = boardService.join(board, username);
+        Long id = boardService.join(board, name);
 
         board.setId(id);
         BoardResponseDto boardResponseDto = new BoardResponseDto(id, title, contents, userId);

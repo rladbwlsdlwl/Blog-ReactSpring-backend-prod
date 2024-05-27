@@ -12,5 +12,5 @@ public class BoardResponseDto {
     private Long id;
     private String title;
     private String contents;
-    private Long userId;
+    private Long memberId;
 }

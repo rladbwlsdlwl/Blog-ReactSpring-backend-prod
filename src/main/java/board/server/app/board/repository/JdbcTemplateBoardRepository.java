@@ -26,7 +26,7 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
         HashMap<String, Object> params = new HashMap<>();
         params.put("title", board.getTitle());
         params.put("contents", board.getContents());
-        params.put("user_id", board.getAuthor()); // author to user_id
+        params.put("member_id", board.getAuthor()); // author to member_id
 
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
         board.setId(key.longValue());
@@ -36,9 +36,9 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
 
     // GET - 게시판 글
     @Override
-    public Optional<Board> findByIdAndUsername(Long id, String username) {
-        String sql = "select * from BOARD_TABLE as b join USER_TABLE as u on b.user_id = u.id where b.id = ? and u.username = ?";
-        List<Board> board = jdbcTemplate.query(sql, BoardMapper(), id, username);
+    public Optional<Board> findByIdAndName(Long id, String name) {
+        String sql = "select * from BOARD_TABLE as b join MEMBER_TABLE as m on b.member_id = m.id where b.id = ? and m.name = ?";
+        List<Board> board = jdbcTemplate.query(sql, BoardMapper(), id, name);
 
         return board.stream().findAny();
     }
@@ -46,7 +46,7 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
     // GET - 유저의 모든 게시판 목록
     @Override
     public List<Board> findByAuthor(Long author) {
-        String sql = "select * from BOARD_TABLE where user_id = ?";
+        String sql = "select * from BOARD_TABLE where member_id = ?";
 
         List<Board> query = jdbcTemplate.query(sql, BoardMapper(), author);
 
@@ -77,7 +77,7 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
                     .id(rs.getLong("id"))
                     .title(rs.getString("title"))
                     .contents(rs.getString("contents"))
-                    .author(rs.getLong("user_id"))
+                    .author(rs.getLong("member_id"))
                     .build();
 
             return board;

@@ -49,7 +49,7 @@ class JdbcTemplateBoardRepositoryTest {
 
         //WHEN
         Long id = jdbcTemplateBoardRepository.save(board1).getId();
-        jdbcTemplateBoardRepository.findById(id).orElseThrow(() -> new SQLException("게시판 저장 or 게시판 탐색 에러"));
+        jdbcTemplateBoardRepository.findByIdAndName(id, "").orElseThrow(() -> new SQLException("게시판 저장 or 게시판 탐색 에러"));
 
     }
 

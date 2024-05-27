@@ -2,9 +2,9 @@ package board.server.app.board.service;
 
 import board.server.app.board.entity.Board;
 import board.server.app.board.repository.JdbcTemplateBoardRepository;
-import board.server.app.user.entity.User;
-import board.server.app.user.repository.JdbcTemplateUserRepository;
-import board.server.app.user.service.UserService;
+import board.server.app.member.entity.Member;
+import board.server.app.member.repository.JdbcTemplateMemberRepository;
+import board.server.app.member.service.MemberService;
 import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
 import org.junit.jupiter.api.Assertions;
@@ -14,10 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @SpringBootTest
 @Transactional
@@ -25,17 +21,17 @@ class BoardServiceTest {
     @Autowired
     BoardService boardService;
     @Autowired
-    UserService userService;
+    MemberService memberService;
     @Autowired
-    JdbcTemplateUserRepository jdbcTemplateUserRepository;
+    JdbcTemplateMemberRepository jdbcTemplateMemberRepository;
     @Autowired
     JdbcTemplateBoardRepository jdbcTemplateBoardRepository;
 
     @Test
     void getBoard() throws Exception{
         // GIVEN
-        User user = new User("user123", "user123@aaaa.aaa", "user1111");
-        Long author = userService.join(user);
+        Member member = new Member("user123", "user123@aaaa.aaa", "user1111");
+        Long author = memberService.join(member);
 
         Board board1 = Board.builder()
                 .title("hello")
@@ -54,8 +50,8 @@ class BoardServiceTest {
     @Test
     void getBoardsByAuthor(){
         // GIVEN
-        User user = new User("user123", "user123@aaaa.aaa", "user1111");
-        Long author = userService.join(user);
+        Member member = new Member("user123", "user123@aaaa.aaa", "user1111");
+        Long author = memberService.join(member);
 
         Board board = Board.builder()
                 .author(author)
@@ -71,12 +67,12 @@ class BoardServiceTest {
 //
 //        User user1 = user123.get();
 
-        User user123 = jdbcTemplateUserRepository.findByUsername("user123").orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.USER_NO_PERMISSION));
+        Member member123 = jdbcTemplateMemberRepository.findByName("user123").orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION));
 
 
-        Assertions.assertEquals(user123.getId(), author, "cannot save");
+        Assertions.assertEquals(member123.getId(), author, "cannot save");
 
-        List<Board> author123 = jdbcTemplateBoardRepository.findByAuthor(user123.getId());
+        List<Board> author123 = jdbcTemplateBoardRepository.findByAuthor(member123.getId());
         Assertions.assertEquals(author123.size(), 1, "cannot read");
     }
 }
