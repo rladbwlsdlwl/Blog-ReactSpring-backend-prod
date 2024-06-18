@@ -11,6 +11,7 @@ public interface MemberRepository {
     Optional<Member> findByName(String name);
     Optional<Member> findByEmail(String email);
     Optional<Member> findByIdAndName(Long id, String name);
+    Optional<Member> findByNameAndRole(String name);
     void delete(Member member);
     List<Member> findAll();
 }

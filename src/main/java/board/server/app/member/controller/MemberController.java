@@ -1,8 +1,9 @@
 package board.server.app.member.controller;
 
+import board.server.app.member.dto.request.MemberRequestSigninDto;
 import board.server.app.member.entity.Member;
 import board.server.app.member.service.MemberService;
-import board.server.app.member.dto.MemberRequestDto;
+import board.server.app.member.dto.request.MemberRequestRegisterDto;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,10 +21,10 @@ public class MemberController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Long> createMember(@RequestBody @Valid MemberRequestDto memberRequestDto){
-        String name = memberRequestDto.getName();
-        String email = memberRequestDto.getEmail();
-        String password = memberRequestDto.getPassword();
+    public ResponseEntity<Long> createMember(@RequestBody @Valid MemberRequestRegisterDto memberRequestRegisterDto){
+        String name = memberRequestRegisterDto.getName();
+        String email = memberRequestRegisterDto.getEmail();
+        String password = memberRequestRegisterDto.getPassword();
 
         Member member = new Member(name, email, password);
 

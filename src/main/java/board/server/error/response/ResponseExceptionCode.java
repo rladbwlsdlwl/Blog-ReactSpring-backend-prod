@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class ResponseExceptionCode{
     private int status;
     private String message;
-    private final LocalDateTime date = LocalDateTime.now();
+    private final String date = LocalDateTime.now().toString();
 
     @Getter
     @AllArgsConstructor

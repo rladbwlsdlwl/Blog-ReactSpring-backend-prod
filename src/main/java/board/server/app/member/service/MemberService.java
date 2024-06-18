@@ -23,18 +23,18 @@ public class MemberService {
     }
 
     public Long join(Member member){
-       validateDuplicateMember(member);
+        validateDuplicateMember(member);
 
-       String name = member.getName(), email = member.getEmail(), password = member.getPassword();
-       password = passwordEncoder.encode(password);
+        String name = member.getName(), email = member.getEmail(), password = member.getPassword();
+        password = passwordEncoder.encode(password);
 
-       Member member1 = Member.builder()
-               .name(name)
-               .password(password)
-               .email(email)
-               .build();
+        Member member1 = Member.builder()
+                .name(name)
+                .password(password)
+                .email(email)
+                .build();
 
-       return memberRepository.save(member1).getId();
+        return memberRepository.save(member1).getId();
     }
 
     private void validateDuplicateMember(Member member) {

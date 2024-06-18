@@ -5,11 +5,10 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum CustomExceptionCode implements ExceptionCode{
-    MEMBER_NOT_FOUND(400, "member not found"),
+    MEMBER_NOT_FOUND(400, "유저를 찾을 수 없습니다"),
     MEMBER_DUPLICATE_NICKNAME(400, "이미 존재하는 닉네임입니다"),
     MEMBER_DUPLICATE_EMAIL(400, "이미 존재하는 이메일입니다"),
     MEMBER_NO_PERMISSION(400, "올바른 접근이 아닙니다"),
-
     BOARD_NOT_FOUND(400, "존재하지 않는 게시글입니다");
 
     @Getter

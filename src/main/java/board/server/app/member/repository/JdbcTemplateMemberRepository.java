@@ -1,7 +1,9 @@
 package board.server.app.member.repository;
 
+import board.server.app.enums.RoleType;
 import board.server.app.member.entity.Member;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,18 +14,21 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.util.*;
 
+@Slf4j
 @Repository
 public class JdbcTemplateMemberRepository implements MemberRepository {
-    private final JdbcTemplate jt;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public JdbcTemplateMemberRepository(DataSource dataSource) {
-        this.jt = new JdbcTemplate(dataSource);
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     @Override
     public Member save(Member member) {
-        SimpleJdbcInsert ji = new SimpleJdbcInsert(jt);
+        SimpleJdbcInsert ji = new SimpleJdbcInsert(jdbcTemplate);
+
+        /* insert member table */
         ji.withTableName("MEMBER_TABLE").usingGeneratedKeyColumns("id");
 
         Map<String, Object> params = new HashMap<>();
@@ -34,13 +39,27 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
         Number key = ji.executeAndReturnKey(new MapSqlParameterSource(params));
         member.setId(key.longValue());
 
+
+        /* insert role table */
+        /* default role = "MEMBER" */
+        ji = new SimpleJdbcInsert(jdbcTemplate);
+        ji.withTableName("ROLE_TABLE").usingGeneratedKeyColumns("id");
+
+        Map<String, Object> param = new HashMap<>();
+        param.put("role", "MEMBER");
+        param.put("member_id", key);
+
+        ji.executeAndReturnKey(new MapSqlParameterSource(param));
+        member.setRoleType(RoleType.ROLE_DEFAULT);
+
+
         return member;
     }
 
     @Override
     public Optional<Member> findById(Long id) {
         String sql = "select * from MEMBER_TABLE where id = ?";
-        List<Member> member = jt.query(sql, MemberMapper(), id);
+        List<Member> member = jdbcTemplate.query(sql, MemberMapper(), id);
 
         return member.stream().findAny();
     }
@@ -48,7 +67,7 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
     @Override
     public Optional<Member> findByName(String name) {
         String sql = "select * from MEMBER_TABLE where name = ?";
-        List<Member> query = jt.query(sql, MemberMapper(), name);
+        List<Member> query = jdbcTemplate.query(sql, MemberMapper(), name);
 
         return query.stream().findAny();
     }
@@ -56,7 +75,7 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
     @Override
     public Optional<Member> findByEmail(String email) {
         String sql = "select * from MEMBER_TABLE where email = ?";
-        List<Member> query = jt.query(sql, MemberMapper(), email);
+        List<Member> query = jdbcTemplate.query(sql, MemberMapper(), email);
 
         return query.stream().findAny();
     }
@@ -64,7 +83,16 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
     @Override
     public Optional<Member> findByIdAndName(Long id, String name) {
         String sql = "select * from MEMBER_TABLE where id = ? and name = ?";
-        List<Member> query = jt.query(sql, MemberMapper(), id, name);
+        List<Member> query = jdbcTemplate.query(sql, MemberMapper(), id, name);
+
+        return query.stream().findAny();
+    }
+
+    @Override
+    public Optional<Member> findByNameAndRole(String name) {
+        //m.id, m.name, m.email, m.password, r.role
+        String sql = "select m.id, m.name, m.email, m.password, r.role from MEMBER_TABLE m join ROLE_TABLE r on m.id = r.member_id where m.name = ?";
+        List<Member> query = jdbcTemplate.query(sql, MemberRoleMapper(), name);
 
         return query.stream().findAny();
     }
@@ -72,14 +100,14 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
     @Override
     public void delete(Member member) {
         String query = "delete from MEMBER_TABLE where id = ?";
-        jt.update(query, member.getId());
+        jdbcTemplate.update(query, member.getId());
 
     }
 
     @Override
     public List<Member> findAll() {
         String sql = "select * from MEMBER_TABLE";
-        return jt.query(sql, MemberMapper());
+        return jdbcTemplate.query(sql, MemberMapper());
     }
 
 
@@ -99,5 +127,21 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
                     .build();
         });
     }
+    private RowMapper<Member> MemberRoleMapper() {
+        return ((rs, rowNum) -> {
+            String username = rs.getString("name");
+            String email = rs.getString("email");
+            String password = rs.getString("password");
+            Long id = rs.getLong("id");
+            RoleType role = rs.getString("role").equals("MEMBER") ? RoleType.ROLE_DEFAULT : RoleType.ROLE_ADMIN;
 
+            return Member.builder()
+                    .name(username)
+                    .email(email)
+                    .password(password)
+                    .id(id)
+                    .role(role)
+                    .build();
+        });
+    }
 }
