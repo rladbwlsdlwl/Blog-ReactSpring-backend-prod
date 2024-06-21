@@ -56,6 +56,13 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
         return member;
     }
 
+    // spring data JPA, update -> save
+    @Override
+    public void update(Member member) {
+        String sql = "update member_table set name = ?, password = ? where id = ?";
+        jdbcTemplate.update(sql, member.getName(), member.getPassword(), member.getId());
+    }
+
     @Override
     public Optional<Member> findById(Long id) {
         String sql = "select * from MEMBER_TABLE where id = ?";
@@ -98,10 +105,9 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
     }
 
     @Override
-    public void delete(Member member) {
+    public void deleteById(Long id) {
         String query = "delete from MEMBER_TABLE where id = ?";
-        jdbcTemplate.update(query, member.getId());
-
+        jdbcTemplate.update(query, id);
     }
 
     @Override

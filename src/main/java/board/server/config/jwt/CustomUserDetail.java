@@ -10,18 +10,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CustomUserDetail implements UserDetails {
+    private final Long id;
     private final String name;
+    private final String email;
     private final String password;
     private final String role;
 
-    public CustomUserDetail(String name, String password, String role) {
+    public CustomUserDetail(Long id, String name, String email, String password, String role) {
+        this.id = id;
         this.name = name;
+        this.email = email;
         this.password = password;
         this.role = role;
     }
 
     public CustomUserDetail(Member member) {
+        this.id = member.getId();
         this.name = member.getName();
+        this.email = member.getEmail();
         this.password = member.getPassword();
         this.role = member.getRoleType().getName(); // role = MEMBER
     }
@@ -32,6 +38,14 @@ public class CustomUserDetail implements UserDetails {
         Collection<? extends GrantedAuthority> auth = List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
         return auth; // ROLE_MEMBER
+    }
+
+    public Long getId(){
+        return id;
+    }
+
+    public String getEmail(){
+        return email;
     }
 
     @Override

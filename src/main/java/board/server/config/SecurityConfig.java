@@ -55,13 +55,15 @@ public class SecurityConfig {
         http.addFilterAfter(jwtVerificationFilter, UsernamePasswordAuthenticationFilter.class);
 
         // 글 작성, 수정, 삭제는 회원만 가능
+        // 회원 수정, 탈퇴는 회원만 가능
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/admin").hasRole("ADMIN")
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/signup").permitAll()
 
                 .requestMatchers(HttpMethod.POST, "/api/{user}").hasAnyRole("MEMBER", "ADMIN")
                 .requestMatchers(HttpMethod.PATCH, "/api/{user}/{boardId}").hasAnyRole("MEMBER", "ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "api/{user}/boardId}").hasAnyRole("MEMBER", "ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "api/{user}/{boardId}").hasAnyRole("MEMBER", "ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/{user}/setting").hasAnyRole("MEMBER")
                 .anyRequest().permitAll()
         );
 
