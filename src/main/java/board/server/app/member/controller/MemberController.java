@@ -71,4 +71,12 @@ public class MemberController {
                 .header("Authentication", "barear " + token)
                 .build();
     }
+
+    @DeleteMapping("{username}/setting")
+    public ResponseEntity<Object> deleteMember(@AuthenticationPrincipal CustomUserDetail userDetail,
+                                               @PathVariable String username){
+        memberService.delete(userDetail.getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 }

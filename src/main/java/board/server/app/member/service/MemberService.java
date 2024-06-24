@@ -64,6 +64,9 @@ public class MemberService {
         memberRepository.update(member1);
     }
 
+    public void delete(Long id){
+        memberRepository.deleteById(id);
+    }
     private void checkAvailablePassword(String newPassword) {
         if(newPassword == null || newPassword.length() < 5){
             throw new BusinessLogicException(CustomExceptionCode.MEMBER_AUTH_PASSWORD);
