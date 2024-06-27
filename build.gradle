@@ -35,6 +35,8 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5' // JWT
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // JWT
 
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // spring security - OAUTH2
+
 	runtimeOnly 'com.h2database:h2' // h2 database
 
 	compileOnly 'org.projectlombok:lombok'
