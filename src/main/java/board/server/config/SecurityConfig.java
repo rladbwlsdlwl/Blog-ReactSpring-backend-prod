@@ -1,6 +1,9 @@
 package board.server.config;
 
+import board.server.app.member.repository.JdbcTemplateMemberRepository;
 import board.server.config.jwt.*;
+import board.server.config.oauth.CustomOAuth2UserService;
+import board.server.config.oauth.OAuth2AuthenticationSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -21,11 +25,13 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final CustomUserDetailService customUserDetailService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final JdbcTemplateMemberRepository jdbcTemplateMemberRepository;
 
-    public SecurityConfig(PasswordEncoder passwordEncoder, CustomUserDetailService customUserDetailService, JwtTokenProvider jwtTokenProvider) {
+    public SecurityConfig(PasswordEncoder passwordEncoder, CustomUserDetailService customUserDetailService, JwtTokenProvider jwtTokenProvider, JdbcTemplateMemberRepository jdbcTemplateMemberRepository) {
         this.passwordEncoder = passwordEncoder;
         this.customUserDetailService = customUserDetailService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.jdbcTemplateMemberRepository = jdbcTemplateMemberRepository;
     }
 
     @Bean
@@ -33,6 +39,8 @@ public class SecurityConfig {
         JwtAccessDeniedHandler jwtAccessDeniedHandler = new JwtAccessDeniedHandler();
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenProvider);
         JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenProvider, customUserDetailService, jwtAccessDeniedHandler);
+        OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler = new OAuth2AuthenticationSuccessHandler(jdbcTemplateMemberRepository, jwtTokenProvider);
+
         jwtAuthenticationFilter.setFilterProcessesUrl("/api/signin");
 
         // 위조 확인
@@ -53,6 +61,13 @@ public class SecurityConfig {
 
         http.addFilter(jwtAuthenticationFilter);
         http.addFilterAfter(jwtVerificationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.oauth2Login(oauth ->
+                // OAuth2 로그인 성공 후 처리할 클래스
+                oauth.userInfoEndpoint(c -> c.userService(new CustomOAuth2UserService()))
+                        // 회원가입 리다이렉트 or 로그인 성공 토큰 발급 처리
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+        );
 
         // 글 작성, 수정, 삭제는 회원만 가능
         // 회원 수정, 탈퇴는 회원만 가능
