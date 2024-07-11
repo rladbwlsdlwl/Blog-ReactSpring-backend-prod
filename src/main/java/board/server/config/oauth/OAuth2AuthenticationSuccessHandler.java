@@ -11,8 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
@@ -39,16 +41,16 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
         String email = principal.getEmail();
         String name = principal.getName();
+        final String[] token = {""};
 
         jdbcTemplateMemberRepository.findByEmail(email).ifPresent((member) -> {
-            String token = jwtTokenProvider.generateToken(new CustomMemberResponseDto(member.getName()));
-            response.addHeader("Authentication", "bearer "+token);
+            token[0] = jwtTokenProvider.generateToken(new CustomMemberResponseDto(member.getName()));
         });
 
 
-        if(response.getHeader("Authentication") != null){
-            log.info("홈화면으로 리다이렉트");
-            response.sendRedirect("http://localhost:3000");
+        if(!token[0].isEmpty()){
+            log.info("토큰 발행 성공");
+            response.sendRedirect(String.format("http://localhost:3000?token=bearer %s", token[0]));
         }else{
             log.info("회원가입페이지로 리다이렉트");
             response.sendRedirect(String.format("http://localhost:3000/signup?email=%s", email));
