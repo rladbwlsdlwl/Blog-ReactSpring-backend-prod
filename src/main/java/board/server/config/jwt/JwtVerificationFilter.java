@@ -1,6 +1,5 @@
 package board.server.config.jwt;
 
-import board.server.app.member.dto.response.CustomMemberResponseDto;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,30 +21,36 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailService customUserDetailService;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final JwtTokenBlacklist jwtTokenBlacklist;
 
-    public JwtVerificationFilter(JwtTokenProvider jwtTokenProvider, CustomUserDetailService customUserDetailService, JwtAccessDeniedHandler jwtAccessDeniedHandler) {
+
+    public JwtVerificationFilter(JwtTokenProvider jwtTokenProvider, CustomUserDetailService customUserDetailService, JwtAccessDeniedHandler jwtAccessDeniedHandler, JwtTokenBlacklist jwtTokenBlacklist) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.customUserDetailService = customUserDetailService;
         this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
+        this.jwtTokenBlacklist = jwtTokenBlacklist;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String token = request.getHeader("Authentication");
+            token = token.split(" ")[1];
+
+            // check isBlacklist Token (token 무효화)
+            isBlacklistToken(token);
 
             // check access token
-            String username = isValidateToken(token.split(" ")[1]);
+            String username = isValidateToken(token);
 
             // check available path
             isValidatePath(request, username);
 
-        } catch(AccessDeniedException e){
+        } catch (AccessDeniedException e) {
             log.warn("JwtVerificationFilter - {}", e.getMessage());
             jwtAccessDeniedHandler.handle(request, response, new AccessDeniedException(e.getMessage()));
             return;
-        }
-        catch (ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             log.warn("JwtVerificationFilter - token 만료!!");
             request.setAttribute("exception", e);
         } catch (RuntimeException e) {
@@ -54,6 +59,11 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void isBlacklistToken(String token) {
+        // 토큰 무효화 상태 확인
+        jwtTokenBlacklist.isTokenBlacklisted(token);
     }
 
     private String isValidateToken(String token) {

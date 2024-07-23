@@ -26,19 +26,21 @@ public class SecurityConfig {
     private final CustomUserDetailService customUserDetailService;
     private final JwtTokenProvider jwtTokenProvider;
     private final JdbcTemplateMemberRepository jdbcTemplateMemberRepository;
+    private final JwtTokenBlacklist jwtTokenBlacklist;
 
-    public SecurityConfig(PasswordEncoder passwordEncoder, CustomUserDetailService customUserDetailService, JwtTokenProvider jwtTokenProvider, JdbcTemplateMemberRepository jdbcTemplateMemberRepository) {
+    public SecurityConfig(PasswordEncoder passwordEncoder, CustomUserDetailService customUserDetailService, JwtTokenProvider jwtTokenProvider, JdbcTemplateMemberRepository jdbcTemplateMemberRepository, JwtTokenBlacklist jwtTokenBlacklist) {
         this.passwordEncoder = passwordEncoder;
         this.customUserDetailService = customUserDetailService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.jdbcTemplateMemberRepository = jdbcTemplateMemberRepository;
+        this.jwtTokenBlacklist = jwtTokenBlacklist;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception{
         JwtAccessDeniedHandler jwtAccessDeniedHandler = new JwtAccessDeniedHandler();
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenProvider);
-        JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenProvider, customUserDetailService, jwtAccessDeniedHandler);
+        JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenProvider, customUserDetailService, jwtAccessDeniedHandler, jwtTokenBlacklist);
         OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler = new OAuth2AuthenticationSuccessHandler(jdbcTemplateMemberRepository, jwtTokenProvider);
 
         jwtAuthenticationFilter.setFilterProcessesUrl("/api/signin");
@@ -75,6 +77,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/signup").permitAll()
 
+                .requestMatchers(HttpMethod.GET, "/api/logout").hasAnyRole("MEMBER", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/auth/me").hasAnyRole("MEMBER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/{user}").hasAnyRole("MEMBER", "ADMIN")
                 .requestMatchers(HttpMethod.PATCH, "/api/{user}/{boardId}").hasAnyRole("MEMBER", "ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "api/{user}/{boardId}").hasAnyRole("MEMBER", "ADMIN")

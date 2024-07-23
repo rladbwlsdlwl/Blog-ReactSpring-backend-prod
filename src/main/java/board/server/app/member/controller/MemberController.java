@@ -2,11 +2,14 @@ package board.server.app.member.controller;
 
 import board.server.app.member.dto.request.MemberRequestUpdateDto;
 import board.server.app.member.dto.response.CustomMemberResponseDto;
+import board.server.app.member.dto.response.MemberResponseMeDto;
 import board.server.app.member.entity.Member;
 import board.server.app.member.service.MemberService;
 import board.server.app.member.dto.request.MemberRequestRegisterDto;
 import board.server.config.jwt.CustomUserDetail;
+import board.server.config.jwt.JwtTokenBlacklist;
 import board.server.config.jwt.JwtTokenProvider;
+import board.server.error.errorcode.CommonExceptionCode;
 import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
 import jakarta.validation.Valid;
@@ -14,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,13 +25,34 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenBlacklist jwtTokenBlacklist;
 
     @Autowired
-    public MemberController(MemberService memberService, JwtTokenProvider jwtTokenProvider) {
+    public MemberController(MemberService memberService, JwtTokenProvider jwtTokenProvider, JwtTokenBlacklist jwtTokenBlacklist) {
         this.memberService = memberService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.jwtTokenBlacklist = jwtTokenBlacklist;
     }
 
+    @GetMapping("/auth/me")
+    public ResponseEntity<Object> sendMemberInfo(@AuthenticationPrincipal CustomUserDetail userDetail) {
+        String email = userDetail.getEmail();
+        String username = userDetail.getUsername();
+
+        MemberResponseMeDto memberResponseMeDto = new MemberResponseMeDto(username, email);
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberResponseMeDto);
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<Object> logoutMember(@AuthenticationPrincipal CustomUserDetail userDetail,
+                                               @RequestHeader("Authentication") String token){
+        SecurityContextHolder.clearContext();
+
+        token = token.split(" ")[1];
+        jwtTokenBlacklist.addBlacklist(token);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
     @PostMapping("/signup")
     public ResponseEntity<Long> createMember(@RequestBody @Valid MemberRequestRegisterDto memberRequestRegisterDto){
         String name = memberRequestRegisterDto.getName();
