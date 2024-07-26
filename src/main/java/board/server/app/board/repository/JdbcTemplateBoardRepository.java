@@ -66,9 +66,23 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
 
     @Override
     public List<Board> findAll() {
-        String sql = "select * from board_table";
+        String sql = "select * from board_table b left join member_table m on b.member_id = m.id limit 10";
 
-        return jdbcTemplate.query(sql, BoardMapper());
+        return jdbcTemplate.query(sql, BoardUsernameMapper());
+    }
+
+    private RowMapper<Board> BoardUsernameMapper() {
+        return (rs, rowNum) -> {
+            Board board = Board.builder()
+                    .id(rs.getLong("id"))
+                    .title(rs.getString("title"))
+                    .contents(rs.getString("contents"))
+                    .author(rs.getLong("member_id"))
+                    .username(rs.getString("name"))
+                    .build();
+
+            return board;
+        };
     }
 
     private RowMapper<Board> BoardMapper() {

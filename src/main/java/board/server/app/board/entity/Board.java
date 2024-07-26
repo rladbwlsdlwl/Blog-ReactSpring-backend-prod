@@ -16,4 +16,5 @@ public class Board {
     private String title;
     private String contents;
     private Long author; // user_id - FK
+    private String username;
 }

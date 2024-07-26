@@ -3,6 +3,7 @@ package board.server.app.board.controller;
 
 import board.server.app.board.dto.BoardRequestDto;
 import board.server.app.board.dto.BoardResponseDto;
+import board.server.app.board.dto.BoardResponseHomeDto;
 import board.server.app.board.entity.Board;
 import board.server.app.board.service.BoardService;
 import jakarta.validation.Valid;
@@ -28,7 +29,10 @@ public class BoardController {
 
     @GetMapping
     public ResponseEntity<Object> home(){
-        return ResponseEntity.status(HttpStatus.CREATED).body(boardService.getBoardListAll());
+        List<BoardResponseHomeDto> boardList = boardService.getBoardListAll()
+                .stream().map(BoardResponseHomeDto:: new).toList();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(boardList);
     }
 
     @GetMapping("/{name}/{boardId}")
