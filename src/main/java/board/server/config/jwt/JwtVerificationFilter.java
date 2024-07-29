@@ -14,6 +14,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Collection;
 
 @Slf4j
@@ -85,12 +87,14 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
         return username;
     }
 
-    private void isValidatePath(HttpServletRequest request, String username) {
+    private void isValidatePath(HttpServletRequest request, String username) throws UnsupportedEncodingException {
         // 게시판 작성 수정 삭제
         // uri의 회원과 토큰의 회원이 일치하는지 확인
         String method = request.getMethod();
         String path = request.getRequestURI().split("/")[2];
-        log.info("path: {}, method: {}", path, method);
+
+        path = URLDecoder.decode(path, "UTF-8");
+        log.info("path: {}, method: {}, username: {}", path, method, username);
         if (!username.equals("admin") && !method.equals("GET") && !path.equals(username)) {
             throw new AccessDeniedException("uri와 회원 토큰정보가 일치하지 않습니다");
         }
