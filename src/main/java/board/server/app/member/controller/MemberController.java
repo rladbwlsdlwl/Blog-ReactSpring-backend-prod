@@ -36,10 +36,11 @@ public class MemberController {
 
     @GetMapping("/auth/me")
     public ResponseEntity<Object> sendMemberInfo(@AuthenticationPrincipal CustomUserDetail userDetail) {
+        Long id = userDetail.getId();
         String email = userDetail.getEmail();
         String username = userDetail.getUsername();
 
-        MemberResponseMeDto memberResponseMeDto = new MemberResponseMeDto(username, email);
+        MemberResponseMeDto memberResponseMeDto = new MemberResponseMeDto(id, username, email);
         return ResponseEntity.status(HttpStatus.CREATED).body(memberResponseMeDto);
     }
 
