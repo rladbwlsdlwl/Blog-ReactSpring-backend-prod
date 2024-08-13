@@ -54,6 +54,12 @@ public class BoardService {
         return boardRepository.save(board).getId();
     }
 
+    public Long setBoard(Board board){
+        validatePresentMember(board.getAuthor(), board.getUsername());
+
+        return boardRepository.update(board);
+    }
+
     private void validatePresentMember(Long id, String name) {
         memberRepository.findByIdAndName(id, name).orElseThrow(() ->
                 new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION)

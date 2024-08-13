@@ -73,4 +73,28 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDto);
     }
 
+    @PatchMapping("/{name}/{boardId}")
+    public ResponseEntity<?> changeBoard(@RequestBody @Valid BoardRequestDto boardRequestDto,
+                                         @PathVariable("name") String name,
+                                         @PathVariable("boardId") Long boardId){
+        String title = boardRequestDto.getTitle();
+        String contents = boardRequestDto.getContents();
+        Long author = boardRequestDto.getAuthor();
+
+        Board board = Board.builder()
+                .id(boardId)
+                .username(name)
+                .author(author)
+                .title(title)
+                .contents(contents)
+                .build();
+
+
+        boardId = boardService.setBoard(board);
+
+        BoardResponseDto boardResponseDto = new BoardResponseDto(boardId, title, contents, author);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDto);
+    }
+
 }

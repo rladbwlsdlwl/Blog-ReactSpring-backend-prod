@@ -55,8 +55,12 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
 
     @Override
     public Long update(Board board) {
+        String sql = "update BOARD_TABLE set title = ?, contents = ? where id = ?";
 
-        return null;
+        jdbcTemplate.update(sql, board.getTitle(), board.getContents(), board.getId());
+
+
+        return board.getId();
     }
 
     @Override
