@@ -83,6 +83,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PATCH, "/api/{user}/{boardId}").hasAnyRole("MEMBER", "ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "api/{user}/{boardId}").hasAnyRole("MEMBER", "ADMIN")
                 .requestMatchers(HttpMethod.PATCH, "/api/{user}/setting").hasAnyRole("MEMBER")
+                .requestMatchers(HttpMethod.POST, "/api/{user}/file/{boardId}").hasAnyRole("MEMBER", "ROLE")
+                .requestMatchers(HttpMethod.PATCH, "/api/{user}/file/{boardId}").hasAnyRole("MEMBER", "ROLE")
                 .anyRequest().permitAll()
         );
 

@@ -21,6 +21,8 @@ bin/
 application.properties
 application-oauth.yml
 
+src/main/java/board/server/uploads/*
+
 .idea
 *.iws
 *.iml
