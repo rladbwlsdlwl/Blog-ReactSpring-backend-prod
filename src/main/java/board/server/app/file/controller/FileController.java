@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -25,8 +26,10 @@ public class FileController {
     @PostMapping("/file/{boardId}")
     public ResponseEntity<?> uploadFiles(@PathVariable("username") String username,
                                          @PathVariable("boardId") Long boardId,
-                                         @RequestParam("file") List<MultipartFile> multipartFileList) throws IOException {
-        List<FileEntity> fileEntities = fileService.upload(multipartFileList, boardId, username);
+                                         @RequestParam(value = "file", required = false) List<MultipartFile> multipartFileList) throws IOException {
+
+        List<MultipartFile> filelist = multipartFileList == null ? new ArrayList<>() : multipartFileList;
+        List<FileEntity> fileEntities = fileService.upload(filelist, boardId, username);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(fileEntities);
     }
@@ -43,18 +46,18 @@ public class FileController {
     @PatchMapping("/file/{boardId}")
     public ResponseEntity<?> changeFiles(@PathVariable("username") String username,
                                          @PathVariable("boardId") Long boardId,
-                                         @RequestParam("file") List<MultipartFile> multipartFileList,
-                                         @RequestParam("duplicateFilename") List<MultipartFile> filenameList) throws IOException {
+                                         @RequestParam(value = "file", required = false) List<MultipartFile> multipartFileList,
+                                         @RequestParam(value = "beforeFilenameList", required = false) List<MultipartFile> beforeFilenameList) throws IOException {
 
-//        for(MultipartFile filename : filenameList){
-//            String currentFilename = new String(filename.getBytes());
-//            log.info(currentFilename);
-//        }
-//
-//
-//        for(MultipartFile file : multipartFileList){
-//            log.info(file.getOriginalFilename());
-//        }
+        List<MultipartFile> filelist = multipartFileList == null ? new ArrayList<>() : multipartFileList;
+        List<MultipartFile> beforefilelist = beforeFilenameList == null ? new ArrayList<>() : beforeFilenameList;
+
+        List<String> beforeFilename = new ArrayList<>();
+        for(MultipartFile filename : beforefilelist){
+            beforeFilename.add(new String(filename.getBytes()));
+        }
+
+        fileService.update(beforeFilename, filelist, boardId, username);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

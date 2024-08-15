@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class JdbcTemplateFileRepository implements FileRepository{
@@ -21,7 +22,7 @@ public class JdbcTemplateFileRepository implements FileRepository{
 
 
     @Override
-    public List<FileEntity> save(List<FileEntity> fileEntities) {
+    public List<FileEntity> saveAll(List<FileEntity> fileEntities) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
 
         simpleJdbcInsert.withTableName("FILE_TABLE").usingGeneratedKeyColumns("id");
@@ -50,6 +51,22 @@ public class JdbcTemplateFileRepository implements FileRepository{
         List<FileEntity> query = jdbcTemplate.query(sql, FileMapper(), postId);
 
         return query;
+    }
+
+    @Override
+    public Optional<FileEntity> findByOriginalFilenameAndCurrentFilename(String originalFilename, String currentFilename) {
+        String sql = "select * from FILE_TABLE where originalFilename = ? and currentFilename = ?";
+
+        return jdbcTemplate.query(sql, FileMapper(), originalFilename, currentFilename).stream().findAny();
+    }
+
+    @Override
+    public void deleteAll(List<FileEntity> fileEntities) {
+        String sql = "delete from FILE_TABLE where currentFilename = ?";
+
+        for(FileEntity fileEntity : fileEntities){
+            jdbcTemplate.update(sql, fileEntity.getCurrentFilename());
+        }
     }
 
     private RowMapper<FileEntity> FileMapper() {

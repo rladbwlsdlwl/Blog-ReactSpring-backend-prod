@@ -34,18 +34,10 @@ public class FileService {
         List<FileEntity> fileEntityList = new ArrayList<>();
 
         for(MultipartFile multipartFile: multipartFileList){
-            /*
-                current file name =>
-                boardId_UUID.확장자
-            */
-
-
             // DB 저장 - 파일 정보
-            String uid = UUID.randomUUID().toString();
 
             String originalFilename = multipartFile.getOriginalFilename();
-            String currentFilename = boardId.toString() + "_" + uid.concat(originalFilename.substring(originalFilename.indexOf(".")));
-
+            String currentFilename = createCurrentFilename(boardId, originalFilename);
 
             log.info(originalFilename, currentFilename);
             FileEntity fileEntity = FileEntity.builder()
@@ -65,10 +57,12 @@ public class FileService {
                 file.mkdir();
             }
 
-            Files.copy(multipartFile.getInputStream(), Path.of(memberUploadDirectory + File.separator + currentFilename));
+
+            String path = getMemberUploadPath(username, currentFilename);
+            Files.copy(multipartFile.getInputStream(), Path.of(path));
         }
 
-        List<FileEntity> fileEntities = jdbcTemplateFileRepository.save(fileEntityList);
+        List<FileEntity> fileEntities = jdbcTemplateFileRepository.saveAll(fileEntityList);
 
         return fileEntities;
     }
@@ -79,13 +73,13 @@ public class FileService {
 
         List<FileResponseDto> fileResponseDtoList = new ArrayList<>();
         for (FileEntity fileEntity : fileEntityList) {
+            String originalFilename = fileEntity.getOriginalFilename();
             String filename = fileEntity.getCurrentFilename();
 
-            String path = uploadDirectory + File.separator + username + File.separator + filename;
+            String path = getMemberUploadPath(username, filename);
             byte[] bytes = Files.readAllBytes(Path.of(path));
 
 
-            String originalFilename = fileEntity.getOriginalFilename();
             fileResponseDtoList.add(
                     FileResponseDto.builder()
                             .file(bytes)
@@ -98,5 +92,97 @@ public class FileService {
 
         return fileResponseDtoList;
     }
+
+    public Long update(List<String>beforeFilenameList, List<MultipartFile> afterFileList, Long boardId, String username) throws IOException {
+
+        List<FileEntity> uploadFileList = new ArrayList<>();
+
+        for(MultipartFile multipartFile : afterFileList){
+
+            // 포스팅 이전에 기록한 파일인지 확인
+            // 이미 등록한 파일은 생성하지 않음
+            // 중복 파일 허용
+            // case
+            // A B A 파일 업로드하는 상황, A B는 이미 업로드되어있는 상태
+            // => A파일만 추가 업로드
+
+            String originalFilename = multipartFile.getOriginalFilename();
+            String duplicatedFilename = findDuplicateFile(originalFilename, beforeFilenameList);
+
+            if(!duplicatedFilename.equals("")){
+                beforeFilenameList = beforeFilenameList.stream().filter(filename -> !filename.equals(duplicatedFilename)).toList();
+                continue;
+            }
+
+            // 파일 생성 로직
+            // DB 저장 - 파일 정보
+            String currentFilename = createCurrentFilename(boardId, originalFilename);
+            String path = getMemberUploadPath(username, currentFilename);
+            log.info("파일 생성 " + currentFilename, originalFilename);
+
+
+            FileEntity fileEntity = FileEntity.builder()
+                    .currentFilename(currentFilename)
+                    .originalFilename(originalFilename)
+                    .postId(boardId)
+                    .build();
+
+            uploadFileList.add(fileEntity);
+
+
+
+            // 서버 저장 - 파일
+            Files.copy(multipartFile.getInputStream(), Path.of(path));
+        }
+        jdbcTemplateFileRepository.saveAll(uploadFileList);
+
+
+        // 파일 삭제 로직
+        // DB 삭제
+        List<FileEntity> fileEntityList = beforeFilenameList.stream().map(filename -> FileEntity.builder().currentFilename(filename).build()).toList();
+        jdbcTemplateFileRepository.deleteAll(fileEntityList);
+
+
+        // 서버 삭제
+        for(String removeFileName : beforeFilenameList){
+            String path = getMemberUploadPath(username, removeFileName);
+
+            Files.delete(Path.of(path));
+            log.info("파일 삭제 " + removeFileName);
+        }
+
+
+        return boardId;
+    }
+
+    // 파일 업로드 경로
+    private String getMemberUploadPath(String username, String filename) {
+        return uploadDirectory + File.separator + username + File.separator + filename;
+    }
+
+    // 파일 이름
+    private String createCurrentFilename(Long boardId, String originalFilename) {
+        /*
+                current file name =>
+                boardId_UUID.확장자
+         */
+        String uid = UUID.randomUUID().toString();
+        return boardId.toString() + "_" + uid.concat(originalFilename.substring(originalFilename.indexOf(".")));
+    }
+
+    // 중복 파일 검증
+    private String findDuplicateFile(String originalFilename, List<String> beforeFilenameList) {
+
+        for(String filename : beforeFilenameList){
+            boolean duplicatedFile = jdbcTemplateFileRepository.findByOriginalFilenameAndCurrentFilename(originalFilename, filename).isPresent();
+
+            if(duplicatedFile){
+                return filename;
+            }
+        }
+
+        return "";
+    }
+
 
 }
