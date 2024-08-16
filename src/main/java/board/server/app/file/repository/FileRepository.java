@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface FileRepository {
     public List<FileEntity> saveAll(List<FileEntity> fileEntities);
     public List<FileEntity> findByPostId(Long postId);
+    public Optional<FileEntity> findByPostIdOne(Long postId);
     public Optional<FileEntity> findByOriginalFilenameAndCurrentFilename(String originalFilename, String currentFilename);
     public void deleteAll(List<FileEntity> fileEntities);
 }

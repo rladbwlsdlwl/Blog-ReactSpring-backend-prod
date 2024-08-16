@@ -54,6 +54,13 @@ public class JdbcTemplateFileRepository implements FileRepository{
     }
 
     @Override
+    public Optional<FileEntity> findByPostIdOne(Long postId) {
+        String sql = "select * from FILE_TABLE where board_id = ? limit 1";
+
+        return jdbcTemplate.query(sql, FileMapper(), postId).stream().findAny();
+    }
+
+    @Override
     public Optional<FileEntity> findByOriginalFilenameAndCurrentFilename(String originalFilename, String currentFilename) {
         String sql = "select * from FILE_TABLE where originalFilename = ? and currentFilename = ?";
 

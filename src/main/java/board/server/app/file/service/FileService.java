@@ -3,6 +3,8 @@ package board.server.app.file.service;
 import board.server.app.file.dto.FileResponseDto;
 import board.server.app.file.entity.FileEntity;
 import board.server.app.file.repository.JdbcTemplateFileRepository;
+import board.server.error.errorcode.CommonExceptionCode;
+import board.server.error.exception.BusinessLogicException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +69,7 @@ public class FileService {
         return fileEntities;
     }
 
-    public List<FileResponseDto> read(Long boardId, String username) throws IOException {
+    public List<FileResponseDto> readAll(Long boardId, String username) throws IOException {
         List<FileEntity> fileEntityList = jdbcTemplateFileRepository.findByPostId(boardId);
 
 
@@ -91,6 +93,38 @@ public class FileService {
 
 
         return fileResponseDtoList;
+    }
+
+    public List<FileResponseDto> read(List<Long> boardIdList, String username){
+        List<FileResponseDto> fileEntityList = new ArrayList<>();
+
+        boardIdList.forEach(id ->
+            jdbcTemplateFileRepository.findByPostIdOne(id).ifPresent(fileEntity -> {
+                String originalFilename = fileEntity.getOriginalFilename();
+                String currentFilename = fileEntity.getCurrentFilename();
+
+                String path = getMemberUploadPath(username, currentFilename);
+
+                // 파일값 읽어오기
+                try {
+                    byte[] bytes = Files.readAllBytes(Path.of(path));
+
+                    FileResponseDto fileResponseDto = FileResponseDto.builder()
+                            .originalFilename(originalFilename)
+                            .currentFilename(currentFilename)
+                            .file(bytes)
+                            .postId(id)
+                            .build();
+
+                    fileEntityList.add(fileResponseDto);
+                } catch (IOException e) {
+                    throw new BusinessLogicException(CommonExceptionCode.FILE_NOT_VALID);
+                }
+
+            })
+        );
+
+        return fileEntityList;
     }
 
     public Long update(List<String>beforeFilenameList, List<MultipartFile> afterFileList, Long boardId, String username) throws IOException {

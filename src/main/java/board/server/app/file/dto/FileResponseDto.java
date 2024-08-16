@@ -13,4 +13,5 @@ public class FileResponseDto {
     private byte[] file;
     private String originalFilename;
     private String currentFilename;
+    private Long postId;
 }

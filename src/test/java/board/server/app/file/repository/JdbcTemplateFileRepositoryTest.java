@@ -40,7 +40,7 @@ class JdbcTemplateFileRepositoryTest {
         fileEntityList.add(fileEntity2);
 
         // WHEN
-        List<FileEntity> fileEntities = jdbcTemplateFileRepository.save(fileEntityList);
+        List<FileEntity> fileEntities = jdbcTemplateFileRepository.saveAll(fileEntityList);
 
 
         // THEN

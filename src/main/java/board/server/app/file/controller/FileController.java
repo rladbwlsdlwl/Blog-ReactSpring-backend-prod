@@ -1,6 +1,5 @@
 package board.server.app.file.controller;
 
-import board.server.app.file.dto.FileRequestDto;
 import board.server.app.file.dto.FileResponseDto;
 import board.server.app.file.entity.FileEntity;
 import board.server.app.file.service.FileService;
@@ -38,9 +37,19 @@ public class FileController {
     public ResponseEntity<List<FileResponseDto>> readFiles(@PathVariable("username") String username,
                                                      @PathVariable("boardId") Long boardId) throws IOException {
 
-        List<FileResponseDto> fileResponseDtoList = fileService.read(boardId, username);
+        List<FileResponseDto> fileResponseDtoList = fileService.readAll(boardId, username);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(fileResponseDtoList);
+    }
+
+    @GetMapping("/file")
+    public ResponseEntity<List<FileResponseDto>> readFile(@PathVariable String username,
+                                                    @RequestParam(name = "postIdList", required = false) List<Long> postIdList){
+
+        postIdList = postIdList == null ? new ArrayList<>() : postIdList;
+        List<FileResponseDto> fileEntityList = fileService.read(postIdList, username);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(fileEntityList);
     }
 
     @PatchMapping("/file/{boardId}")
