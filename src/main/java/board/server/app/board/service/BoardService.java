@@ -60,6 +60,14 @@ public class BoardService {
         return boardRepository.update(board);
     }
 
+    public Long removeBoard(String username, Long boardId){
+        validatePresentMember(username);
+
+        boardRepository.delete(boardId);
+
+        return boardId;
+    }
+
     private void validatePresentMember(Long id, String name) {
         memberRepository.findByIdAndName(id, name).orElseThrow(() ->
                 new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION)

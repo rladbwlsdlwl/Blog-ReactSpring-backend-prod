@@ -97,4 +97,11 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDto);
     }
 
+    @DeleteMapping("/{name}/{boardId}")
+    public ResponseEntity<?> deleteBoard(@PathVariable("name") String name, @PathVariable("boardId") Long boardId){
+        Long removeBoardId = boardService.removeBoard(name, boardId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
 }
