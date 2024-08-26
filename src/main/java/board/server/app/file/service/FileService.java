@@ -127,6 +127,43 @@ public class FileService {
         return fileEntityList;
     }
 
+    public List<FileResponseDto> read(List<Long> boardIdList, List<String> usernameList){
+        List<FileResponseDto> fileResponseDtoList = new ArrayList<>();
+
+        for(var i = 0; i < boardIdList.size(); i++){
+            Long boardId = boardIdList.get(i);
+            String username = usernameList.get(i);
+
+            jdbcTemplateFileRepository.findByPostIdOne(boardId).ifPresent(fileEntity -> {
+                String originalFilename = fileEntity.getOriginalFilename();
+                String currentFilename = fileEntity.getCurrentFilename();
+                String path = getMemberUploadPath(username, currentFilename);
+
+                // 파일값 읽어오기
+                try {
+                    byte[] bytes = Files.readAllBytes(Path.of(path));
+
+                    FileResponseDto fileResponseDto = FileResponseDto.builder()
+                            .file(bytes)
+                            .currentFilename(currentFilename)
+                            .originalFilename(originalFilename)
+                            .postId(boardId)
+                            .build();
+
+
+                    fileResponseDtoList.add(fileResponseDto);
+
+                } catch (IOException e) {
+                    throw new BusinessLogicException(CommonExceptionCode.FILE_NOT_VALID);
+                }
+
+            });
+        }
+
+        return fileResponseDtoList;
+    }
+
+
     public Long update(List<String>beforeFilenameList, List<MultipartFile> afterFileList, Long boardId, String username) throws IOException {
 
         List<FileEntity> uploadFileList = new ArrayList<>();

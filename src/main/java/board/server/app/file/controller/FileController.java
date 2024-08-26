@@ -26,7 +26,7 @@ public class FileController {
     public ResponseEntity<?> uploadFiles(@PathVariable("username") String username,
                                          @PathVariable("boardId") Long boardId,
                                          @RequestParam(value = "file", required = false) List<MultipartFile> multipartFileList) throws IOException {
-
+        // 회원 게시판 - 최초 게시글 작성
         List<MultipartFile> filelist = multipartFileList == null ? new ArrayList<>() : multipartFileList;
         List<FileEntity> fileEntities = fileService.upload(filelist, boardId, username);
 
@@ -36,7 +36,7 @@ public class FileController {
     @GetMapping("/file/{boardId}")
     public ResponseEntity<List<FileResponseDto>> readFiles(@PathVariable("username") String username,
                                                      @PathVariable("boardId") Long boardId) throws IOException {
-
+        // 회원 게시판 - id에 해당하는 파일 모두 읽어오기
         List<FileResponseDto> fileResponseDtoList = fileService.readAll(boardId, username);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(fileResponseDtoList);
@@ -44,10 +44,21 @@ public class FileController {
 
     @GetMapping("/file")
     public ResponseEntity<List<FileResponseDto>> readFile(@PathVariable String username,
-                                                    @RequestParam(name = "postIdList", required = false) List<Long> postIdList){
-
+                                                    @RequestParam(name = "postIdList", required = false) List<Long> postIdList,
+                                                    @RequestParam(name = "usernameList", required = false) List<String> usernameList){
+        // 회원 게시판 - id에 해당하는 파일 1개씩 읽어오기
+        // 홈 화면 - id에 해당하는 파일 1개씩 읽어오기
+        usernameList = usernameList == null ? new ArrayList<>() : usernameList;
         postIdList = postIdList == null ? new ArrayList<>() : postIdList;
-        List<FileResponseDto> fileEntityList = fileService.read(postIdList, username);
+
+
+
+        List<FileResponseDto> fileEntityList = new ArrayList<>();
+        if(usernameList.isEmpty()){ // 회원 게시판
+            fileEntityList = fileService.read(postIdList, username);
+        }else{ // 홈 화면
+            fileEntityList = fileService.read(postIdList, usernameList);
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(fileEntityList);
     }
@@ -57,7 +68,7 @@ public class FileController {
                                          @PathVariable("boardId") Long boardId,
                                          @RequestParam(value = "file", required = false) List<MultipartFile> multipartFileList,
                                          @RequestParam(value = "beforeFilenameList", required = false) List<MultipartFile> beforeFilenameList) throws IOException {
-
+        // 회원 게시판 - 게시글 수정
         List<MultipartFile> filelist = multipartFileList == null ? new ArrayList<>() : multipartFileList;
         List<MultipartFile> beforefilelist = beforeFilenameList == null ? new ArrayList<>() : beforeFilenameList;
 
