@@ -187,6 +187,14 @@ public class FileService {
 
             // 파일 생성 로직
             // DB 저장 - 파일 정보
+            String memberUploadDirectory = uploadDirectory + File.separator + username;
+            File file = new File(memberUploadDirectory);
+
+            if(!file.exists()){
+                file.mkdir();
+            }
+
+
             String currentFilename = createCurrentFilename(boardId, originalFilename);
             String path = getMemberUploadPath(username, currentFilename);
             log.info("파일 생성 " + currentFilename, originalFilename);
