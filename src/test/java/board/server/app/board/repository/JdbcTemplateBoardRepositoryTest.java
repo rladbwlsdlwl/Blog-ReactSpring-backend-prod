@@ -8,6 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,5 +60,32 @@ class JdbcTemplateBoardRepositoryTest {
         List<Board> byAuthor = jdbcTemplateBoardRepository.findByAuthor(38L);
 
         Assertions.assertThat(byAuthor.size()).isEqualTo(3);
+    }
+
+    @Test
+    void 게시판디폴드값정상작동확인(){
+        // GIVEN
+        Board board = Board.builder()
+                .title("hello")
+                .contents("world")
+                .author(80L)
+                .build();
+
+        // WHEN
+        Board saved = jdbcTemplateBoardRepository.save(board);
+        Long boardId = saved.getId();
+        String username = "rladbwlsldlwl";
+
+        // THEN
+        jdbcTemplateBoardRepository.findByIdAndName(boardId, username).ifPresentOrElse((board1) -> {
+            LocalDateTime created_at = board1.getCreated_at();
+            Long views = board1.getViews();
+
+            Assertions.assertThat(created_at.getYear()).isEqualTo(2024);
+            Assertions.assertThat(views).isEqualTo(0L);
+        }, () -> {
+            Assertions.fail("error!! 값이 널입니다");
+        });
+
     }
 }

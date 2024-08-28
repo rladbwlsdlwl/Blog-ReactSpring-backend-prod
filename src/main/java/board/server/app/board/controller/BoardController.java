@@ -39,19 +39,22 @@ public class BoardController {
     public ResponseEntity<BoardResponseDto> readBoard(@PathVariable String name, @PathVariable Long boardId){
         Board board = boardService.getBoard(boardId, name);
 
-        Long id = board.getId(), author = board.getAuthor();
-        String title = board.getTitle(), contents = board.getContents();
+        // 조회수 올리기
+        Long views = board.getViews();
+        board.setViews(views + 1);
+        boardService.setBoard(board);
 
-        BoardResponseDto boardDto = new BoardResponseDto(id, title, contents, author);
+        BoardResponseDto boardDto = new BoardResponseDto(board);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(boardDto);
     }
 
     @GetMapping("/{name}")
     public ResponseEntity<Object> readBoards(@PathVariable String name){
-        List<Board> boardList = boardService.getBoardList(name);
+        List<BoardResponseDto> boardResponseDtoList = boardService.getBoardList(name)
+                .stream().map(BoardResponseDto::new).toList();
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(boardList);
+        return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDtoList);
     }
 
     @PostMapping("/{name}")
@@ -65,10 +68,9 @@ public class BoardController {
                 .author(userId)
                 .build();
 
-        Long id = boardService.join(board, name);
+        Board savedBoard = boardService.join(board, name);
 
-        board.setId(id);
-        BoardResponseDto boardResponseDto = new BoardResponseDto(id, title, contents, userId);
+        BoardResponseDto boardResponseDto = new BoardResponseDto(savedBoard);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDto);
     }
@@ -80,6 +82,7 @@ public class BoardController {
         String title = boardRequestDto.getTitle();
         String contents = boardRequestDto.getContents();
         Long author = boardRequestDto.getAuthor();
+        Long views = boardRequestDto.getViews();
 
         Board board = Board.builder()
                 .id(boardId)
@@ -87,12 +90,15 @@ public class BoardController {
                 .author(author)
                 .title(title)
                 .contents(contents)
+                .views(views)
                 .build();
 
 
         boardId = boardService.setBoard(board);
 
-        BoardResponseDto boardResponseDto = new BoardResponseDto(boardId, title, contents, author);
+        BoardResponseDto boardResponseDto = BoardResponseDto.builder()
+                .id(boardId)
+                .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDto);
     }

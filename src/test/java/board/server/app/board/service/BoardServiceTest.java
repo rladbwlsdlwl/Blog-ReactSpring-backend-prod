@@ -40,11 +40,11 @@ class BoardServiceTest {
                 .build();
 
         // when
-        Long join = boardService.join(board1, "user123");
-        Board board = boardService.getBoard(join, "user123");
+        Board newBoard = boardService.join(board1, "user123");
+        Board board = boardService.getBoard(newBoard.getId(), "user123");
 
         // THEN
-        Assertions.assertEquals(join, board.getId());
+        Assertions.assertEquals(newBoard.getId(), board.getId());
     }
 
     @Test
@@ -58,7 +58,7 @@ class BoardServiceTest {
                 .title("zzzz")
                 .contents("zzzz??")
                 .build();
-        Long board_id = boardService.join(board, "user123");
+        Board board_id = boardService.join(board, "user123");
 
 
         // WHEN

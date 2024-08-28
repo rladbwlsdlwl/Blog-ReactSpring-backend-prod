@@ -47,15 +47,16 @@ public class BoardService {
         return boardRepository.findAll();
     }
 
-    public Long join(Board board, String name){
+    public Board join(Board board, String name){
 //        validatePresentMember(board.getAuthor());
         validatePresentMember(board.getAuthor(), name);
 
-        return boardRepository.save(board).getId();
+        return boardRepository.save(board);
     }
 
     public Long setBoard(Board board){
-        validatePresentMember(board.getAuthor(), board.getUsername());
+//        validatePresentMember(board.getAuthor(), board.getUsername());
+        validatePresentMember(board.getAuthor());
 
         return boardRepository.update(board);
     }

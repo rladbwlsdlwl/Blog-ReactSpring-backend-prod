@@ -8,8 +8,11 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -23,13 +26,21 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         jdbcInsert.withTableName("BOARD_TABLE").usingGeneratedKeyColumns("id");
 
-        HashMap<String, Object> params = new HashMap<>();
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        Map<String, Object> params = new HashMap<>();
         params.put("title", board.getTitle());
         params.put("contents", board.getContents());
         params.put("member_id", board.getAuthor()); // author to member_id
+        params.put("views", 0L);
+        params.put("created_at", currentTime);
 
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
+
         board.setId(key.longValue());
+        board.setViews(0L);
+        board.setCreated_at(currentTime);
+
 
         return board;
     }
@@ -55,9 +66,9 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
 
     @Override
     public Long update(Board board) {
-        String sql = "update BOARD_TABLE set title = ?, contents = ? where id = ?";
+        String sql = "update BOARD_TABLE set title = ?, contents = ?, views = ? where id = ?";
 
-        jdbcTemplate.update(sql, board.getTitle(), board.getContents(), board.getId());
+        jdbcTemplate.update(sql, board.getTitle(), board.getContents(), board.getViews(), board.getId());
 
 
         return board.getId();
@@ -85,6 +96,8 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
                     .contents(rs.getString("contents"))
                     .author(rs.getLong("member_id"))
                     .username(rs.getString("name"))
+                    .views(rs.getLong("views"))
+                    .created_at(rs.getTimestamp("created_at").toLocalDateTime())
                     .build();
 
             return board;
@@ -98,6 +111,8 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
                     .title(rs.getString("title"))
                     .contents(rs.getString("contents"))
                     .author(rs.getLong("member_id"))
+                    .views(rs.getLong("views"))
+                    .created_at(rs.getTimestamp("created_at").toLocalDateTime())
                     .build();
 
             return board;
