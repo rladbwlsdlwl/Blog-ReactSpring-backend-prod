@@ -51,7 +51,7 @@ class JdbcTemplateBoardRepositoryTest {
 
         //WHEN
         Long id = jdbcTemplateBoardRepository.save(board1).getId();
-        jdbcTemplateBoardRepository.findByIdAndName(id, "").orElseThrow(() -> new SQLException("게시판 저장 or 게시판 탐색 에러"));
+        jdbcTemplateBoardRepository.findByIdAndUsername(id, "").orElseThrow(() -> new SQLException("게시판 저장 or 게시판 탐색 에러"));
 
     }
 
@@ -77,7 +77,7 @@ class JdbcTemplateBoardRepositoryTest {
         String username = "rladbwlsldlwl";
 
         // THEN
-        jdbcTemplateBoardRepository.findByIdAndName(boardId, username).ifPresentOrElse((board1) -> {
+        jdbcTemplateBoardRepository.findByIdAndUsername(boardId, username).ifPresentOrElse((board1) -> {
             LocalDateTime created_at = board1.getCreated_at();
             Long views = board1.getViews();
 

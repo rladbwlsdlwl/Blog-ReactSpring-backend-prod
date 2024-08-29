@@ -32,7 +32,7 @@ public class BoardService {
     public Board getBoard(Long id, String name){
         validatePresentMember(name);
 
-        return boardRepository.findByIdAndName(id, name).orElseThrow(() ->
+        return boardRepository.findByIdAndUsername(id, name).orElseThrow(() ->
             new BusinessLogicException(CustomExceptionCode.BOARD_NOT_FOUND)
         );
     }

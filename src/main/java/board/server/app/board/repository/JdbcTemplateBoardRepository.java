@@ -47,9 +47,9 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
 
     // GET - 게시판 글
     @Override
-    public Optional<Board> findByIdAndName(Long id, String name) {
+    public Optional<Board> findByIdAndUsername(Long id, String username) {
         String sql = "select * from BOARD_TABLE as b join MEMBER_TABLE as m on b.member_id = m.id where b.id = ? and m.name = ?";
-        List<Board> board = jdbcTemplate.query(sql, BoardMapper(), id, name);
+        List<Board> board = jdbcTemplate.query(sql, BoardMapper(), id, username);
 
         return board.stream().findAny();
     }
