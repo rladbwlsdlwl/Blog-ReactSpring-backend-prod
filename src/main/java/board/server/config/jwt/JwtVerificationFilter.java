@@ -89,13 +89,14 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
 
     private void isValidatePath(HttpServletRequest request, String username) throws UnsupportedEncodingException {
         // 게시판 작성 수정 삭제
+        // 좋아요 path는 검사 pass
         // uri의 회원과 토큰의 회원이 일치하는지 확인
         String method = request.getMethod();
         String path = request.getRequestURI().split("/")[2];
 
         path = URLDecoder.decode(path, "UTF-8");
         log.info("path: {}, method: {}, username: {}", path, method, username);
-        if (!username.equals("admin") && !method.equals("GET") && !path.equals(username)) {
+        if (!username.equals("admin") && !path.equals("likes") && !method.equals("GET") && !path.equals(username)) {
             throw new AccessDeniedException("uri와 회원 토큰정보가 일치하지 않습니다");
         }
     }

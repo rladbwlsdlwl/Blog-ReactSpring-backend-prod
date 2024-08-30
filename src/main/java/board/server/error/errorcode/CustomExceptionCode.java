@@ -11,7 +11,8 @@ public enum CustomExceptionCode implements ExceptionCode{
     MEMBER_NO_PERMISSION(400, "올바른 접근이 아닙니다"),
     MEMBER_AUTH_NICKNAME(400, "5자 이상의 닉네임을 입력하세요"),
     MEMBER_AUTH_PASSWORD(400, "5자 이상의 패스워드를 입력하세요"),
-    BOARD_NOT_FOUND(400, "존재하지 않는 게시글입니다");
+    BOARD_NOT_FOUND(400, "존재하지 않는 게시글입니다"),
+    LIKES_NO_PERMISSION(400, "올바른 접근이 아닙니다");
 
     @Getter
     private final int status;
