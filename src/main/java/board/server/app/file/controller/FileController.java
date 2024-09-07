@@ -53,12 +53,7 @@ public class FileController {
 
 
 
-        List<FileResponseDto> fileEntityList = new ArrayList<>();
-        if(usernameList.isEmpty()){ // 회원 게시판
-            fileEntityList = fileService.read(postIdList, username);
-        }else{ // 홈 화면
-            fileEntityList = fileService.read(postIdList, usernameList);
-        }
+        List<FileResponseDto> fileEntityList = fileService.read(postIdList, usernameList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(fileEntityList);
     }

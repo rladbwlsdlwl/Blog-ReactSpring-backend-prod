@@ -95,38 +95,6 @@ public class FileService {
         return fileResponseDtoList;
     }
 
-    public List<FileResponseDto> read(List<Long> boardIdList, String username){
-        List<FileResponseDto> fileEntityList = new ArrayList<>();
-
-        boardIdList.forEach(id ->
-            jdbcTemplateFileRepository.findByPostIdOne(id).ifPresent(fileEntity -> {
-                String originalFilename = fileEntity.getOriginalFilename();
-                String currentFilename = fileEntity.getCurrentFilename();
-
-                String path = getMemberUploadPath(username, currentFilename);
-
-                // 파일값 읽어오기
-                try {
-                    byte[] bytes = Files.readAllBytes(Path.of(path));
-
-                    FileResponseDto fileResponseDto = FileResponseDto.builder()
-                            .originalFilename(originalFilename)
-                            .currentFilename(currentFilename)
-                            .file(bytes)
-                            .postId(id)
-                            .build();
-
-                    fileEntityList.add(fileResponseDto);
-                } catch (IOException e) {
-                    throw new BusinessLogicException(CommonExceptionCode.FILE_NOT_VALID);
-                }
-
-            })
-        );
-
-        return fileEntityList;
-    }
-
     public List<FileResponseDto> read(List<Long> boardIdList, List<String> usernameList){
         List<FileResponseDto> fileResponseDtoList = new ArrayList<>();
 
