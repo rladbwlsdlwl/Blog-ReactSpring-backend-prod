@@ -33,6 +33,8 @@ public class FileService {
 
     public List<FileEntity> upload(List<MultipartFile> multipartFileList, Long boardId, String username) throws IOException {
 
+        validateFilesType(multipartFileList);
+
         List<FileEntity> fileEntityList = new ArrayList<>();
 
         for(MultipartFile multipartFile: multipartFileList){
@@ -134,6 +136,8 @@ public class FileService {
 
     public Long update(List<String>beforeFilenameList, List<MultipartFile> afterFileList, Long boardId, String username) throws IOException {
 
+        validateFilesType(afterFileList);
+
         List<FileEntity> uploadFileList = new ArrayList<>();
 
         for(MultipartFile multipartFile : afterFileList){
@@ -200,6 +204,17 @@ public class FileService {
 
 
         return boardId;
+    }
+
+    // 파일 타입 확인
+    private void validateFilesType(List<MultipartFile> multipartFileList) {
+        for(MultipartFile multipartFile: multipartFileList){
+            String filename = multipartFile.getOriginalFilename();
+
+            if(!(filename.endsWith(".png") || filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".heif"))){
+                throw new BusinessLogicException(CommonExceptionCode.FILE_TYPE_NOT_VALID);
+            }
+        }
     }
 
     // 파일 업로드 경로
