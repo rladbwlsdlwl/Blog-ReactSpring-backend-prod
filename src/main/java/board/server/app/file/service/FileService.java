@@ -31,6 +31,7 @@ public class FileService {
     @Autowired
     private JdbcTemplateFileRepository jdbcTemplateFileRepository;
 
+    // 파일 작성
     public List<FileEntity> upload(List<MultipartFile> multipartFileList, Long boardId, String username) throws IOException {
 
         validateFilesType(multipartFileList);
@@ -71,6 +72,7 @@ public class FileService {
         return fileEntities;
     }
 
+    // 게시글에 해당하는 모든 파일 읽기
     public List<FileResponseDto> readAll(Long boardId, String username) throws IOException {
         List<FileEntity> fileEntityList = jdbcTemplateFileRepository.findByPostId(boardId);
 
@@ -97,6 +99,7 @@ public class FileService {
         return fileResponseDtoList;
     }
 
+    // 게시글에 해당하는 파일 1개씩 읽기
     public List<FileResponseDto> read(List<Long> boardIdList, List<String> usernameList){
         List<FileResponseDto> fileResponseDtoList = new ArrayList<>();
 
@@ -133,7 +136,7 @@ public class FileService {
         return fileResponseDtoList;
     }
 
-
+    // 파일 수정
     public Long update(List<String>beforeFilenameList, List<MultipartFile> afterFileList, Long boardId, String username) throws IOException {
 
         validateFilesType(afterFileList);
@@ -204,6 +207,20 @@ public class FileService {
 
 
         return boardId;
+    }
+
+    // 게시글에 해당하는 모든파일 삭제
+    // DB 제약조건에 의해 파일 자동 삭제 (서버에 저장된 파일 삭제)
+    public void delete(String username, Long boardId) throws IOException {
+        String dir = uploadDirectory + File.separator + username;
+
+        for (Path path : Files.newDirectoryStream(Path.of(dir), boardId + "_*")) {
+            log.info("삭제: " + path.getFileName());
+
+            // 삭제로직 추가
+            Files.delete(path);
+        }
+
     }
 
     // 파일 타입 확인

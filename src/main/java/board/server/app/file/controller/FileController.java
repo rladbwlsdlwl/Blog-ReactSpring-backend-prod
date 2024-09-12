@@ -77,5 +77,12 @@ public class FileController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @DeleteMapping("/file/{boardId}")
+    public ResponseEntity<?> deleteFile(@PathVariable("username") String username,
+                                        @PathVariable("boardId") Long boardId) throws IOException {
+        fileService.delete(username, boardId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 }
 
