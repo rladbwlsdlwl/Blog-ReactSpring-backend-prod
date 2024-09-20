@@ -20,7 +20,7 @@ class JdbcTemplateLikesRepositoryTest {
     @Test
     void 해당되는값이없을때반환되는값은() {
         // given when
-        int size = likesRepository.findByAuthorAndPostId(3L, 5L).size();
+        int size = likesRepository.findByPostId(3L).size();
 
         //then
 

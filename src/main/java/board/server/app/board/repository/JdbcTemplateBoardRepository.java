@@ -45,6 +45,13 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
         return board;
     }
 
+    @Override
+    public Optional<Board> findById(Long id) {
+        String sql = "select * from BOARD_TABLE where id = ?";
+
+        return jdbcTemplate.query(sql, BoardMapper(), id).stream().findAny();
+    }
+
     // GET - 게시판 글
     @Override
     public Optional<Board> findByIdAndUsername(Long id, String username) {

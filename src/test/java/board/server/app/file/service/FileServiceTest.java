@@ -27,7 +27,7 @@ class FileServiceTest {
     @Test
     void 게시판아이디로이미지파일불러오기(){
         List<Long> boardIdList = new ArrayList<>();
-        String username = "rladbwlsldlwl";
+        List<String> usernameList = List.of("rladbwlsldlwl");
 
         // GIVEN
         for(Long i = 100L; i<110; i++){
@@ -35,7 +35,7 @@ class FileServiceTest {
         }
 
         //WHEN
-        List<FileResponseDto> fileEntityList = fileService.read(boardIdList, username);
+        List<FileResponseDto> fileEntityList = fileService.read(boardIdList, usernameList);
 
 
         // THEN
