@@ -1,6 +1,7 @@
 package board.server.app.comments.service;
 
 import board.server.app.board.repository.JdbcTemplateBoardRepository;
+import board.server.app.comments.dto.CommentsResponseDto;
 import board.server.app.comments.entity.Comments;
 import board.server.app.comments.repository.JdbcTemplateCommentsRepository;
 import board.server.app.member.repository.JdbcTemplateMemberRepository;
@@ -30,7 +31,12 @@ public class CommentsService {
         Map<Long, List> commentsMapList = new HashMap<>();
 
         for(Long boardId: boardIdList){
-            commentsMapList.put(boardId, jdbcTemplateCommentsRepository.findByBoardId(boardId));
+            List<CommentsResponseDto> responseDtoList = jdbcTemplateCommentsRepository.findByBoardId(boardId)
+                    .stream()
+                    .map(CommentsResponseDto::new)
+                    .toList();
+
+            commentsMapList.put(boardId, responseDtoList);
         }
 
         return commentsMapList;

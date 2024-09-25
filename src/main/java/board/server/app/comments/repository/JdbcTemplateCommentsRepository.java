@@ -26,31 +26,9 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
 
     @Override
     public List<Comments> findByBoardId(Long boardId) {
-        String sql = "select * from COMMENT_TABLE where board_id = ? order by created_at";
+        String sql = "select * from COMMENT_TABLE c left join MEMBER_TABLE m on c.member_id = m.id where c.board_id = ? order by created_at";
 
         return jdbcTemplate.query(sql, CommentsMapper(), boardId);
-    }
-
-    private RowMapper<Comments> CommentsMapper() {
-        return ((rs, rowNum) -> {
-            Long id = rs.getLong("id");
-            Long boardId = rs.getLong("board_id");
-            Long memberId = rs.getLong("member_id");
-            Long parentId = rs.getLong("parent_id");
-            String contents = rs.getString("comments");
-            LocalDateTime createdAt = rs.getTimestamp("created_at").toLocalDateTime();
-
-            Comments comments = Comments.builder()
-                    .id(id)
-                    .parentId(parentId)
-                    .author(memberId)
-                    .boardId(boardId)
-                    .contents(contents)
-                    .createdAt(createdAt)
-                    .build();
-
-            return comments;
-        });
     }
 
     @Override
@@ -81,5 +59,29 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
         String sql = "delete from COMMENT_TABLE where id = ?";
 
         jdbcTemplate.update(sql, id);
+    }
+
+    private RowMapper<Comments> CommentsMapper() {
+        return ((rs, rowNum) -> {
+            Long id = rs.getLong("id");
+            Long boardId = rs.getLong("board_id");
+            Long memberId = rs.getLong("member_id");
+            String name = rs.getString("name");
+            Long parentId = rs.getLong("parent_id");
+            String contents = rs.getString("comments");
+            LocalDateTime createdAt = rs.getTimestamp("created_at").toLocalDateTime();
+
+            Comments comments = Comments.builder()
+                    .id(id)
+                    .parentId(parentId)
+                    .author(memberId)
+                    .authorName(name)
+                    .boardId(boardId)
+                    .contents(contents)
+                    .createdAt(createdAt)
+                    .build();
+
+            return comments;
+        });
     }
 }
