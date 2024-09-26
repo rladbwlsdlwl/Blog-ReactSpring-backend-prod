@@ -28,11 +28,11 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
     public List<Comments> findByBoardId(Long boardId) {
         String sql = "select * from COMMENT_TABLE c left join MEMBER_TABLE m on c.member_id = m.id where c.board_id = ? order by created_at";
 
-        return jdbcTemplate.query(sql, CommentsMapper(), boardId);
+        return jdbcTemplate.query(sql, CommentsNameMapper(), boardId);
     }
 
     @Override
-    public Long save(Comments comments) {
+    public Comments save(Comments comments) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
 
         simpleJdbcInsert.withTableName("COMMENT_TABLE").usingGeneratedKeyColumns("id");
@@ -51,7 +51,7 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
         comments.setId(number.longValue());
         comments.setCreatedAt(date);
 
-        return number.longValue();
+        return comments;
     }
 
     @Override
@@ -62,6 +62,28 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
     }
 
     private RowMapper<Comments> CommentsMapper() {
+        return ((rs, rowNum) -> {
+            Long id = rs.getLong("id");
+            Long boardId = rs.getLong("board_id");
+            Long memberId = rs.getLong("member_id");
+            Long parentId = rs.getLong("parent_id");
+            String contents = rs.getString("comments");
+            LocalDateTime createdAt = rs.getTimestamp("created_at").toLocalDateTime();
+
+            Comments comments = Comments.builder()
+                    .id(id)
+                    .parentId(parentId)
+                    .author(memberId)
+                    .boardId(boardId)
+                    .contents(contents)
+                    .createdAt(createdAt)
+                    .build();
+
+            return comments;
+        });
+    }
+
+    private RowMapper<Comments> CommentsNameMapper() {
         return ((rs, rowNum) -> {
             Long id = rs.getLong("id");
             Long boardId = rs.getLong("board_id");

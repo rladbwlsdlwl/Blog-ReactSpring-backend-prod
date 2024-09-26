@@ -16,6 +16,9 @@ public class CommentsRequestDto {
     private Long boardId;
     @NotNull
     private Long author;
+    @NotNull
+    private String authorName;
+    @NotNull
     private Long parentId;
     @NotNull
     private String contents;
@@ -24,7 +27,8 @@ public class CommentsRequestDto {
         return Comments.builder()
                 .boardId(commentsRequestDto.getBoardId())
                 .author(commentsRequestDto.getAuthor())
-                .parentId(commentsRequestDto.getParentId())
+                .authorName(commentsRequestDto.getAuthorName())
+                .parentId(commentsRequestDto.getParentId() == 0? null: commentsRequestDto.getParentId())
                 .contents(commentsRequestDto.getContents())
                 .build();
     }

@@ -43,14 +43,12 @@ public class CommentsService {
     }
 
     // 댓글 추가
-    public Long setComments(Comments comments){
+    public Comments setComments(Comments comments){
         validatePresentBoardId(comments.getBoardId());
         validatePresentMemberId(comments.getAuthor());
         validatePresentId(comments.getParentId());
 
-        Long id = jdbcTemplateCommentsRepository.save(comments);
-
-        return id;
+        return jdbcTemplateCommentsRepository.save(comments);
     }
 
     // 댓글 삭제
@@ -68,7 +66,7 @@ public class CommentsService {
     // 대댓글 존재 여부 확인 - 무결성 제약 조건, id <- parent_id
     // 댓글 존재 여부 확인
     private Comments validatePresentId(Long id) {
-        if(id != null){
+        if(id != null && id != 0){
             return jdbcTemplateCommentsRepository.findById(id).orElseThrow(() ->
                     new BusinessLogicException(CustomExceptionCode.COMMENTS_NO_PERMISSION)
             );

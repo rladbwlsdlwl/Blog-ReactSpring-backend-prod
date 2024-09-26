@@ -9,6 +9,6 @@ import java.util.Optional;
 public interface CommentsRepository {
     Optional<Comments> findById(Long id);
     List<Comments> findByBoardId(Long boardId);
-    Long save(Comments comments);
+    Comments save(Comments comments);
     void delete(Long id);
 }

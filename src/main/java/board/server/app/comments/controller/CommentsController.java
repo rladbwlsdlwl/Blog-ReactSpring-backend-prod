@@ -1,11 +1,14 @@
 package board.server.app.comments.controller;
 
 import board.server.app.comments.dto.CommentsRequestDto;
+import board.server.app.comments.dto.CommentsResponseDto;
+import board.server.app.comments.entity.Comments;
 import board.server.app.comments.service.CommentsService;
 import board.server.config.jwt.CustomUserDetail;
 import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/comments")
+@Slf4j
 public class CommentsController {
 
     @Autowired
@@ -36,12 +40,15 @@ public class CommentsController {
 
         Long userId = userDetail.getId();
         Long reqUserId = commentsRequestDto.getAuthor();
-        if(userId != reqUserId) throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);
+        String username = userDetail.getUsername();
+        String reqUsername = commentsRequestDto.getAuthorName();
+        if(!userId.equals(reqUserId) || !username.equals(reqUsername)) throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);
 
 
-        Long id = commentsService.setComments(CommentsRequestDto.of(commentsRequestDto));
+        Comments comments = commentsService.setComments(CommentsRequestDto.of(commentsRequestDto));
+        CommentsResponseDto commentsResponseDto = new CommentsResponseDto(comments);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentsResponseDto);
     }
 
     @DeleteMapping("/{commentId}")

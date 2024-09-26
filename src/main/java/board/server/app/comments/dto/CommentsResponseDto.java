@@ -20,7 +20,7 @@ public class CommentsResponseDto {
 
     public CommentsResponseDto(Comments comments){
         this.id = comments.getId();
-        this.parent_id = comments.getParentId();
+        this.parent_id = comments.getParentId() == null? 0: comments.getParentId();
         this.author = comments.getAuthor();
         this.name = comments.getAuthorName();
         this.board_id = comments.getBoardId();
