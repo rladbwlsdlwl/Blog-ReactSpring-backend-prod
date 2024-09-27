@@ -1,5 +1,6 @@
 package board.server.app.comments.service;
 
+import board.server.app.board.entity.Board;
 import board.server.app.board.repository.JdbcTemplateBoardRepository;
 import board.server.app.comments.dto.CommentsResponseDto;
 import board.server.app.comments.entity.Comments;
@@ -51,15 +52,26 @@ public class CommentsService {
         return jdbcTemplateCommentsRepository.save(comments);
     }
 
-    // 댓글 삭제
-    public void removeComments(Long boardId, Long userId){
-        Long author = validatePresentId(boardId).getAuthor();
-        
-        // 작성자만 댓글 삭제 가능
-        if(author != userId) throw new BusinessLogicException(CustomExceptionCode.COMMENTS_NO_PERMISSION);
+    // 댓글 수정
+    public void updateComments(Comments comments){
+        validatePresentId(comments.getId());
 
-        
-        jdbcTemplateCommentsRepository.delete(boardId);
+        jdbcTemplateCommentsRepository.update(comments);
+    }
+
+    // 댓글 삭제
+    public void removeComments(Long commentsId, Long userId){
+        validatePresentMemberId(userId);
+        Comments comments = validatePresentId(commentsId);
+        Long boardId = comments.getBoardId(), commentsAuthor = comments.getAuthor();
+        Long author = validatePresentBoardId(boardId).getAuthor();
+
+        // 댓글 작성자 또는 게시글 작성자만 허용
+        if(author != userId && commentsAuthor != userId)
+            throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);
+
+
+        jdbcTemplateCommentsRepository.delete(commentsId);
     }
 
 
@@ -82,8 +94,8 @@ public class CommentsService {
     }
 
     // 게시글 확인
-    private void validatePresentBoardId(Long boardId) {
-        jdbcTemplateBoardRepository.findById(boardId).orElseThrow(() ->
+    private Board validatePresentBoardId(Long boardId) {
+        return jdbcTemplateBoardRepository.findById(boardId).orElseThrow(() ->
                 new BusinessLogicException(CustomExceptionCode.BOARD_NOT_FOUND)
         );
     }

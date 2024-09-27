@@ -90,6 +90,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/likes/{boardId}").hasAnyRole("MEMBER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/comments/{boardId}").hasAnyRole("MEMBER", "ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "api/comments/{commentsId}").hasAnyRole("MEMBER", "ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/comments/{commentsId}").hasAnyRole("MEMBER", "ADMIN")
                 .anyRequest().permitAll()
         );
 

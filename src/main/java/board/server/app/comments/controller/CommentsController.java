@@ -1,6 +1,7 @@
 package board.server.app.comments.controller;
 
 import board.server.app.comments.dto.CommentsRequestDto;
+import board.server.app.comments.dto.CommentsRequestPatchDto;
 import board.server.app.comments.dto.CommentsResponseDto;
 import board.server.app.comments.entity.Comments;
 import board.server.app.comments.service.CommentsService;
@@ -51,10 +52,27 @@ public class CommentsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(commentsResponseDto);
     }
 
+    @PatchMapping("/{commentId}")
+    public ResponseEntity<?> changeComments(@PathVariable("commentId") Long commentId,
+                                            @RequestBody @Valid CommentsRequestPatchDto commentsRequestPatchDto,
+                                            @AuthenticationPrincipal CustomUserDetail customUserDetail){
+
+        // 댓글 작성자만 수정할 수 있음
+        if(customUserDetail.getId() != commentsRequestPatchDto.getAuthor())
+            throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);
+
+        commentsRequestPatchDto.setId(commentId);
+        Comments comments = CommentsRequestPatchDto.of(commentsRequestPatchDto);
+
+        commentsService.updateComments(comments);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
     @DeleteMapping("/{commentId}")
     public ResponseEntity<?> deleteComments(@PathVariable("commentId") Long commentId,
                                             @AuthenticationPrincipal CustomUserDetail customUserDetail){
 
+        // 댓글 작성자나 게시글 작성자만 삭제할 수 있음
         Long userId = customUserDetail.getId();
 
         commentsService.removeComments(commentId, userId);

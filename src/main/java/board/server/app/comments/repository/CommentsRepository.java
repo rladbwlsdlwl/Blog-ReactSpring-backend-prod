@@ -10,5 +10,6 @@ public interface CommentsRepository {
     Optional<Comments> findById(Long id);
     List<Comments> findByBoardId(Long boardId);
     Comments save(Comments comments);
+    void update(Comments comments);
     void delete(Long id);
 }

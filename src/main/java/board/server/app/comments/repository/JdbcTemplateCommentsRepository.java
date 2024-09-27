@@ -55,6 +55,13 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
     }
 
     @Override
+    public void update(Comments comments) {
+        String sql = "update COMMENT_TABLE set comments = ? where id = ?";
+
+        jdbcTemplate.update(sql, comments.getContents(), comments.getId());
+    }
+
+    @Override
     public void delete(Long id) {
         String sql = "delete from COMMENT_TABLE where id = ?";
 
