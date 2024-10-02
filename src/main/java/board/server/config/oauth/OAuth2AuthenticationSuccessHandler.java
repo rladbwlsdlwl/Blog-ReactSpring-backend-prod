@@ -53,7 +53,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             response.sendRedirect(String.format("http://localhost:3000?token=bearer %s", token[0]));
         }else{
             log.info("회원가입페이지로 리다이렉트");
-            response.sendRedirect(String.format("http://localhost:3000/signup?email=%s", email));
+            response.sendRedirect(String.format("http://localhost:3000/auth/signup?email=%s", email));
         }
     }
 }
