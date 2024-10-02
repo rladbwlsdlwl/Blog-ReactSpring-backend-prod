@@ -13,8 +13,17 @@ public class CustomOAuth2UserSocial {
     public static CustomOAuth2User of(String registrationId, Map<String, Object> attributes){
         return switch (registrationId) {
             case "google" -> ofGoogle(attributes);
+            case "naver" -> ofNaver(attributes);
             default -> throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);
         };
+    }
+
+    private static CustomOAuth2User ofNaver(Map<String, Object> attributes) {
+        return CustomOAuth2User.builder()
+                .email((String)((Map)attributes.get("response")).get("email"))
+                .name((String)((Map)attributes.get("response")).get("name"))
+                .attributes((Map)attributes.get("response"))
+                .build();
     }
 
     private static CustomOAuth2User ofGoogle(Map<String, Object> attributes) {
