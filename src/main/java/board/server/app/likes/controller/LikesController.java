@@ -24,9 +24,11 @@ public class LikesController {
     private LikesService likesService;
 
     @GetMapping
-    public ResponseEntity<Object> readLikes(@RequestParam("boardId") List<Long> boardIdList){
+    public ResponseEntity<Object> readLikes(@RequestParam(value = "boardId", required = false) List<Long> boardIdList){
         // 해당 게시판의 좋아요 목록 반환
         // 홈 화면, 회원 홈 게시판
+        boardIdList = boardIdList == null ? new ArrayList<>() : boardIdList;
+
         Map<Long, List<Likes>> likesList = likesService.getLikesList(boardIdList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(likesList);

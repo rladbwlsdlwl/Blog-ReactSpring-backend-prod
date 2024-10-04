@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,8 +29,10 @@ public class CommentsController {
     private CommentsService commentsService;
 
     @GetMapping
-    public ResponseEntity<?> readComments(@RequestParam List<Long> boardId){
-        Map<Long, List> commentsList = commentsService.getComments(boardId);
+    public ResponseEntity<?> readComments(@RequestParam(value = "boardId", required = false) List<Long> boardIdList){
+        boardIdList = boardIdList == null ? new ArrayList<>() : boardIdList;
+
+        Map<Long, List> commentsList = commentsService.getComments(boardIdList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(commentsList);
     }
