@@ -13,6 +13,7 @@ import board.server.error.errorcode.CommonExceptionCode;
 import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+@Slf4j
 public class MemberController {
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
@@ -67,10 +69,11 @@ public class MemberController {
     }
 
     @PatchMapping("/{username}/setting")
-    public ResponseEntity<Object> updateMember(@AuthenticationPrincipal CustomUserDetail userDetails,
-                                               @PathVariable String username,
+    public ResponseEntity<Object> updateMember(@PathVariable String username,
                                                @RequestParam(name = "mode") String mode,
-                                               @RequestBody @Valid MemberRequestUpdateDto memberRequestUpdateDto){
+                                               @RequestBody @Valid MemberRequestUpdateDto memberRequestUpdateDto,
+                                               @AuthenticationPrincipal CustomUserDetail userDetails,
+                                               @RequestHeader("Authentication") String token){
 
         Member originMember = Member.builder()
                 .id(userDetails.getId())
@@ -84,21 +87,25 @@ public class MemberController {
             memberService.updateUsername(originMember, name);
             tokenUsername = name;
         }else if(mode.equals("changePassword")){
-            String password = memberRequestUpdateDto.getPassword();
-            memberService.updatePassword(originMember, password);
+            String originalPw = memberRequestUpdateDto.getOriginalPassword(), password = memberRequestUpdateDto.getPassword();
+            memberService.updatePassword(originMember, originalPw, password);
             tokenUsername = originMember.getName();
         }else{
             throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);
         }
 
+        // 기존 토큰 블랙리스트 추가
+        token = token.split(" ")[1];
+        jwtTokenBlacklist.addBlacklist(token);
+
         // header에 새 토큰 발급한거 넣기
-        String token = jwtTokenProvider.generateToken(new CustomMemberResponseDto(tokenUsername));
+        String newToken = jwtTokenProvider.generateToken(new CustomMemberResponseDto(tokenUsername));
         return ResponseEntity.status(HttpStatus.OK)
-                .header("Authentication", "barear " + token)
+                .header("Authentication", "bearer " + newToken)
                 .build();
     }
 
-    @DeleteMapping("{username}/setting")
+    @DeleteMapping("/{username}/setting")
     public ResponseEntity<Object> deleteMember(@AuthenticationPrincipal CustomUserDetail userDetail,
                                                @PathVariable String username){
         memberService.delete(userDetail.getId());

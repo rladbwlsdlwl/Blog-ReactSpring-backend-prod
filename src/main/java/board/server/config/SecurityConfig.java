@@ -76,13 +76,13 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/signup").permitAll()
-
                 .requestMatchers(HttpMethod.GET, "/api/logout").hasAnyRole("MEMBER", "ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/auth/me").hasAnyRole("MEMBER", "ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/{user}/setting").hasAnyRole("MEMBER")
+                .requestMatchers(HttpMethod.DELETE, "/api/{user}/setting").hasAnyRole("MEMBER")
                 .requestMatchers(HttpMethod.POST, "/api/{user}").hasAnyRole("MEMBER", "ADMIN")
                 .requestMatchers(HttpMethod.PATCH, "/api/{user}/{boardId}").hasAnyRole("MEMBER", "ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "api/{user}/{boardId}").hasAnyRole("MEMBER", "ADMIN")
-                .requestMatchers(HttpMethod.PATCH, "/api/{user}/setting").hasAnyRole("MEMBER")
                 .requestMatchers(HttpMethod.POST, "/api/{user}/file/{boardId}").hasAnyRole("MEMBER", "ADMIN")
                 .requestMatchers(HttpMethod.PATCH, "/api/{user}/file/{boardId}").hasAnyRole("MEMBER", "ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/{user}/file/{boardId}").hasAnyRole("MEMBER", "ADMIN")
