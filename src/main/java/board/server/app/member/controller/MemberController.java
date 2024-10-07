@@ -79,6 +79,7 @@ public class MemberController {
                 .id(userDetails.getId())
                 .name(userDetails.getUsername())
                 .password(userDetails.getPassword())
+                .email(userDetails.getEmail())
                 .build();
 
         String tokenUsername = "";
@@ -89,6 +90,10 @@ public class MemberController {
         }else if(mode.equals("changePassword")){
             String originalPw = memberRequestUpdateDto.getOriginalPassword(), password = memberRequestUpdateDto.getPassword();
             memberService.updatePassword(originMember, originalPw, password);
+            tokenUsername = originMember.getName();
+        }else if(mode.equals("changeEmail")){
+            String email = memberRequestUpdateDto.getEmail();
+            memberService.updateEmail(originMember, email);
             tokenUsername = originMember.getName();
         }else{
             throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);

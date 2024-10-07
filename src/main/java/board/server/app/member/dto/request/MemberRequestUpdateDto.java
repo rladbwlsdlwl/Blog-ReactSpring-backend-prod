@@ -13,6 +13,8 @@ import lombok.Setter;
 public class MemberRequestUpdateDto {
     @Size(min = 3, max = 255)
     private String name;
+    @Email
+    private String email;
     @Size(min = 3, max = 255)
     private String originalPassword;
     @Size(min = 3, max = 255)

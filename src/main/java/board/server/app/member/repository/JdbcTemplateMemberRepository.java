@@ -59,8 +59,8 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
     // spring data JPA, update -> save
     @Override
     public void update(Member member) {
-        String sql = "update member_table set name = ?, password = ? where id = ?";
-        jdbcTemplate.update(sql, member.getName(), member.getPassword(), member.getId());
+        String sql = "update member_table set name = ?, password = ?, email = ? where id = ?";
+        jdbcTemplate.update(sql, member.getName(), member.getPassword(), member.getEmail(), member.getId());
     }
 
     @Override
