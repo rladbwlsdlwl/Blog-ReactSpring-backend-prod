@@ -96,7 +96,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
 
         path = URLDecoder.decode(path, "UTF-8");
         log.info("path: {}, method: {}, username: {}", path, method, username);
-        if (!username.equals("admin") && !path.equals("likes") && !path.equals("comments") && !method.equals("GET") && !path.equals(username)) {
+        if (!username.equals("admin") && !path.equals("likes") && !path.equals("comments") && !path.equals("logout") && !path.equals("auth") && !path.equals(username)) {
             throw new AccessDeniedException("uri와 회원 토큰정보가 일치하지 않습니다");
         }
     }
