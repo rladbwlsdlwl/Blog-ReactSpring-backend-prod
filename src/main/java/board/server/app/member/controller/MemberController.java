@@ -21,6 +21,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/api")
 @Slf4j
@@ -70,10 +74,12 @@ public class MemberController {
 
     @PatchMapping("/{username}/setting")
     public ResponseEntity<Object> updateMember(@PathVariable String username,
-                                               @RequestParam(name = "mode") String mode,
+                                               @RequestParam(name = "mode", required = false) List<String> mode,
                                                @RequestBody @Valid MemberRequestUpdateDto memberRequestUpdateDto,
                                                @AuthenticationPrincipal CustomUserDetail userDetails,
                                                @RequestHeader("Authentication") String token){
+
+        mode = mode == null? new ArrayList<>(): mode;
 
         Member originMember = Member.builder()
                 .id(userDetails.getId())
@@ -82,29 +88,30 @@ public class MemberController {
                 .email(userDetails.getEmail())
                 .build();
 
-        String tokenUsername = "";
-        if(mode.equals("changeNickname")){
+        boolean flag = false;
+        if(mode.contains("changeNickname")){
             String name = memberRequestUpdateDto.getName();
-            memberService.updateUsername(originMember, name);
-            tokenUsername = name;
-        }else if(mode.equals("changePassword")){
+            originMember.setName(memberService.updateUsername(originMember, name));
+            flag = true;
+        }if(mode.contains("changePassword")){
             String originalPw = memberRequestUpdateDto.getOriginalPassword(), password = memberRequestUpdateDto.getPassword();
-            memberService.updatePassword(originMember, originalPw, password);
-            tokenUsername = originMember.getName();
-        }else if(mode.equals("changeEmail")){
+            originMember.setPassword(memberService.updatePassword(originMember, originalPw, password));
+            flag = true;
+        }if(mode.contains("changeEmail")){
             String email = memberRequestUpdateDto.getEmail();
-            memberService.updateEmail(originMember, email);
-            tokenUsername = originMember.getName();
-        }else{
-            throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);
+            originMember.setEmail(memberService.updateEmail(originMember, email));
+            flag = true;
         }
+
+        if(!flag) throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);
+
 
         // 기존 토큰 블랙리스트 추가
         token = token.split(" ")[1];
         jwtTokenBlacklist.addBlacklist(token);
 
         // header에 새 토큰 발급한거 넣기
-        String newToken = jwtTokenProvider.generateToken(new CustomMemberResponseDto(tokenUsername));
+        String newToken = jwtTokenProvider.generateToken(new CustomMemberResponseDto(originMember.getName()));
         return ResponseEntity.status(HttpStatus.OK)
                 .header("Authentication", "bearer " + newToken)
                 .build();

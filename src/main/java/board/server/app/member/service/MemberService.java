@@ -42,7 +42,7 @@ public class MemberService {
     }
 
     // 닉네임 변경
-    public void updateUsername(Member member, String newUsername){
+    public String updateUsername(Member member, String newUsername){
         checkAvailableNickname(newUsername);
         checkDuplicateUsername(member.getName(), newUsername);
         validateDuplicateUsername(newUsername);
@@ -55,10 +55,12 @@ public class MemberService {
                 .build();
 
         memberRepository.update(member1);
+
+        return newUsername;
     }
 
     // 비밀번호 변경
-    public void updatePassword(Member member, String currPassword, String newPassword){
+    public String updatePassword(Member member, String currPassword, String newPassword){
         // 기존 암호 매칭 확인
         // 기존 암호와 동일한 암호로 변경할 수 없음
         checkAvailablePassword(newPassword);
@@ -75,10 +77,12 @@ public class MemberService {
                 .build();
 
         memberRepository.update(member1);
+
+        return pwd;
     }
 
     // 이메일 변경
-    public void updateEmail(Member member, String email){
+    public String updateEmail(Member member, String email){
         checkAvailableEmail(email);
         checkDuplicateEmail(member.getEmail(), email);
         validateDuplicateEmail(email);
@@ -91,6 +95,8 @@ public class MemberService {
                 .build();
 
         memberRepository.update(member1);
+
+        return email;
     }
 
     // 계정 삭제
