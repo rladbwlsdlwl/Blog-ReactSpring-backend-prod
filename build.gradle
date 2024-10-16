@@ -37,7 +37,8 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // spring security - OAUTH2
 
-	runtimeOnly 'com.h2database:h2' // h2 database
+	runtimeOnly 'com.h2database:h2' // h2 database - test
+	runtimeOnly 'com.mysql:mysql-connector-j' // mysql database - production(deployment)
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
