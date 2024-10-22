@@ -90,7 +90,7 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
 
     @Override
     public List<Board> findAll() {
-        String sql = "select * from board_table b left join member_table m on b.member_id = m.id limit 10";
+        String sql = "select * from board_table b left join MEMBER_TABLE m on b.member_id = m.id limit 10";
 
         return jdbcTemplate.query(sql, BoardUsernameMapper());
     }
