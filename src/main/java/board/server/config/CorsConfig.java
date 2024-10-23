@@ -15,7 +15,7 @@ public class CorsConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of("http://thisblogproject.vercel.app"));
+        corsConfiguration.setAllowedOrigins(List.of("https://thisblogproject.vercel.app"));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
         corsConfiguration.setAllowedHeaders(List.of("Content-Type", "Authentication"));
         corsConfiguration.setExposedHeaders(List.of("Authentication"));
