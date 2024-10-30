@@ -66,7 +66,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
 
         log.info("토큰 발행 성공");
-        response.sendRedirect(String.format("http://localhost:3000?token=bearer %s", token[0]));
+        response.sendRedirect(String.format("https://thisblogproject.vercel.app?token=bearer %s", token[0]));
 
     }
 
