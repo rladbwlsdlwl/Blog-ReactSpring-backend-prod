@@ -40,9 +40,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             // 권한 없는 Authentication 객체 생성
             return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        }catch (IOException | InternalAuthenticationServiceException e){
+        }catch (IOException | InternalAuthenticationServiceException e){ // cannot find username
             log.warn(e.toString());
-            failedAuthentication(request, response, e);
+            failedUsernameAuthentication(request, response, e);
+        }catch(IllegalArgumentException e){ // cannot do login (no password set, password is null)
+            log.warn(e.toString());
+            failedNoPasswordAuthentication(request, response, e);
         }
 
         return null;
@@ -58,9 +61,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.addHeader("Authentication", "bearer" + " " + token);
     }
 
+    // 닉네임 찾기 실패
     // 인증 실패 - InternalAuthenticationServiceException의 BusinessLogicException
     // 회원 name Exception - overriding한 loadUserByUsername 별도 처리
-    private void failedAuthentication(HttpServletRequest request, HttpServletResponse response, Exception e) {
+    private void failedUsernameAuthentication(HttpServletRequest request, HttpServletResponse response, Exception e){
         log.warn("JwtAuthenticationFilter - Failed to Authentication: loadUserByUsername");
 
         ExceptionCode exceptionCode = CustomExceptionCode.MEMBER_NOT_FOUND;
@@ -80,13 +84,35 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
     }
 
+    // 소셜 로그인 - 패스워드 설정하지 않은 계정
+    private void failedNoPasswordAuthentication(HttpServletRequest request, HttpServletResponse response, IllegalArgumentException e){
+        log.warn("JwtAuthenticationFilter - Failed to Authentication: Do not setting password, password is NULL, passwordEncoder Error!");
+
+        ExceptionCode exceptionCode = CustomExceptionCode.MEMBER_NO_SETTING_PASSWORD;
+
+        response.setContentType("application/json; charset=UTF-8");
+        response.setStatus(exceptionCode.getStatus());
+
+        ResponseExceptionCode responseExceptionCode = ResponseExceptionCode.builder()
+                .status(exceptionCode.getStatus())
+                .message(exceptionCode.getMessage())
+                .build();
+
+        try {
+            response.getWriter().write(new ObjectMapper().writeValueAsString(responseExceptionCode));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    // 패스워드 불일치
     // 인증 실패
     // 내부적으로 실행, AuthenticationProvider -> failed to password matching, password = null ....
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         log.warn("JwtAuthenticationFilter - Failed to Authentication: not match password, field error...");
 
-        ExceptionCode exceptionCode = CustomExceptionCode.MEMBER_NOT_FOUND;
+        ExceptionCode exceptionCode = CustomExceptionCode.MEMBER_NO_MATCH_PASSWORD;
         response.setContentType("application/json; charset=UTF-8");
         response.setStatus(exceptionCode.getStatus());
 

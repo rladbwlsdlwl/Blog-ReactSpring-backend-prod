@@ -24,7 +24,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         // 인증 후 리소스 서버에서 사용자 정보 로드
         Map<String, Object> attributes = super.loadUser(userRequest).getAttributes();
 
-        // registrationId - GOOGLE
+        // registrationId - GOOGLE, NAVER
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
 
         // attributes에 접근하기 위한 키 값

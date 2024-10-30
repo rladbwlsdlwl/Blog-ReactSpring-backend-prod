@@ -21,7 +21,8 @@ public class CustomOAuth2UserSocial {
     private static CustomOAuth2User ofNaver(Map<String, Object> attributes) {
         return CustomOAuth2User.builder()
                 .email((String)((Map)attributes.get("response")).get("email"))
-                .name((String)((Map)attributes.get("response")).get("name"))
+                /*.name((String)((Map)attributes.get("response")).get("name"))*/
+                .name("임시닉네임")
                 .attributes((Map)attributes.get("response"))
                 .build();
     }
@@ -29,7 +30,8 @@ public class CustomOAuth2UserSocial {
     private static CustomOAuth2User ofGoogle(Map<String, Object> attributes) {
         return CustomOAuth2User.builder()
                 .email((String) attributes.get("email"))
-                .name(String.valueOf(attributes.get("name")))
+                /*.name(String.valueOf(attributes.get("name")))*/
+                .name("임시닉네임")
                 .attributes(attributes)
                 .build();
     }

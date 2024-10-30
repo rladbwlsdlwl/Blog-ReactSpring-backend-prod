@@ -45,8 +45,15 @@ public class MemberController {
         Long id = userDetail.getId();
         String email = userDetail.getEmail();
         String username = userDetail.getUsername();
+        boolean isNotSettingPassword = userDetail.getPassword() == null;
 
-        MemberResponseMeDto memberResponseMeDto = new MemberResponseMeDto(id, username, email);
+        MemberResponseMeDto memberResponseMeDto = MemberResponseMeDto.builder()
+                .id(id)
+                .email(email)
+                .username(username)
+                .isNotSettingPassword(isNotSettingPassword)
+                .build();
+
         return ResponseEntity.status(HttpStatus.CREATED).body(memberResponseMeDto);
     }
 
@@ -79,31 +86,17 @@ public class MemberController {
                                                @AuthenticationPrincipal CustomUserDetail userDetails,
                                                @RequestHeader("Authentication") String token){
 
-        mode = mode == null? new ArrayList<>(): mode;
+        if(mode == null) throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);
 
-        Member originMember = Member.builder()
+        Member member = Member.builder()
                 .id(userDetails.getId())
                 .name(userDetails.getUsername())
                 .password(userDetails.getPassword())
                 .email(userDetails.getEmail())
                 .build();
 
-        boolean flag = false;
-        if(mode.contains("changeNickname")){
-            String name = memberRequestUpdateDto.getName();
-            originMember.setName(memberService.updateUsername(originMember, name));
-            flag = true;
-        }if(mode.contains("changePassword")){
-            String originalPw = memberRequestUpdateDto.getOriginalPassword(), password = memberRequestUpdateDto.getPassword();
-            originMember.setPassword(memberService.updatePassword(originMember, originalPw, password));
-            flag = true;
-        }if(mode.contains("changeEmail")){
-            String email = memberRequestUpdateDto.getEmail();
-            originMember.setEmail(memberService.updateEmail(originMember, email));
-            flag = true;
-        }
-
-        if(!flag) throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);
+        // 계정정보 업데이트
+        memberService.update(mode, memberRequestUpdateDto, member);
 
 
         // 기존 토큰 블랙리스트 추가
@@ -111,7 +104,7 @@ public class MemberController {
         jwtTokenBlacklist.addBlacklist(token);
 
         // header에 새 토큰 발급한거 넣기
-        String newToken = jwtTokenProvider.generateToken(new CustomMemberResponseDto(originMember.getName()));
+        String newToken = jwtTokenProvider.generateToken(new CustomMemberResponseDto(member.getName()));
         return ResponseEntity.status(HttpStatus.OK)
                 .header("Authentication", "bearer " + newToken)
                 .build();
