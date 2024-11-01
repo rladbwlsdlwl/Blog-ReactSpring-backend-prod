@@ -2,7 +2,7 @@ package board.server.app.file.service;
 
 import board.server.app.file.dto.FileResponseDto;
 import board.server.app.file.entity.FileEntity;
-import board.server.app.file.repository.JdbcTemplateFileRepository;
+import board.server.app.file.repository.FileRepository;
 import board.server.error.errorcode.CommonExceptionCode;
 import board.server.error.exception.BusinessLogicException;
 import lombok.Getter;
@@ -29,7 +29,7 @@ public class FileService {
     @Value("${images.upload.directory}")
     private String uploadDirectory;
     @Autowired
-    private JdbcTemplateFileRepository jdbcTemplateFileRepository;
+    private FileRepository fileRepository;
 
     // 파일 작성
     public List<FileEntity> upload(List<MultipartFile> multipartFileList, Long boardId, String username) throws IOException {
@@ -67,14 +67,14 @@ public class FileService {
             Files.copy(multipartFile.getInputStream(), Path.of(path));
         }
 
-        List<FileEntity> fileEntities = jdbcTemplateFileRepository.saveAll(fileEntityList);
+        List<FileEntity> fileEntities = fileRepository.saveAll(fileEntityList);
 
         return fileEntities;
     }
 
     // 게시글에 해당하는 모든 파일 읽기
     public List<FileResponseDto> readAll(Long boardId, String username) throws IOException {
-        List<FileEntity> fileEntityList = jdbcTemplateFileRepository.findByPostId(boardId);
+        List<FileEntity> fileEntityList = fileRepository.findByPostId(boardId);
 
 
         List<FileResponseDto> fileResponseDtoList = new ArrayList<>();
@@ -107,7 +107,7 @@ public class FileService {
             Long boardId = boardIdList.get(i);
             String username = usernameList.get(i);
 
-            jdbcTemplateFileRepository.findByPostIdOne(boardId).ifPresent(fileEntity -> {
+            fileRepository.findByPostIdOne(boardId).ifPresent(fileEntity -> {
                 String originalFilename = fileEntity.getOriginalFilename();
                 String currentFilename = fileEntity.getCurrentFilename();
                 String path = getMemberUploadPath(username, currentFilename);
@@ -188,13 +188,13 @@ public class FileService {
             // 서버 저장 - 파일
             Files.copy(multipartFile.getInputStream(), Path.of(path));
         }
-        jdbcTemplateFileRepository.saveAll(uploadFileList);
+        fileRepository.saveAll(uploadFileList);
 
 
         // 파일 삭제 로직
         // DB 삭제
         List<FileEntity> fileEntityList = beforeFilenameList.stream().map(filename -> FileEntity.builder().currentFilename(filename).build()).toList();
-        jdbcTemplateFileRepository.deleteAll(fileEntityList);
+        fileRepository.deleteAll(fileEntityList);
 
 
         // 서버 삭제
@@ -253,7 +253,7 @@ public class FileService {
     private String findDuplicateFile(String originalFilename, List<String> beforeFilenameList) {
 
         for(String filename : beforeFilenameList){
-            boolean duplicatedFile = jdbcTemplateFileRepository.findByOriginalFilenameAndCurrentFilename(originalFilename, filename).isPresent();
+            boolean duplicatedFile = fileRepository.findByOriginalFilenameAndCurrentFilename(originalFilename, filename).isPresent();
 
             if(duplicatedFile){
                 return filename;

@@ -23,8 +23,8 @@ public class BoardService {
     private final MemberRepository memberRepository;
 
     @Autowired
-    public BoardService(JdbcTemplateBoardRepository jdbcTemplateBoardRepository, JdbcTemplateMemberRepository memberRepository) {
-        this.boardRepository = jdbcTemplateBoardRepository;
+    public BoardService(BoardRepository boardRepository, MemberRepository memberRepository) {
+        this.boardRepository = boardRepository;
         this.memberRepository = memberRepository;
     }
 

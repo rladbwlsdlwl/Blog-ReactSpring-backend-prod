@@ -1,11 +1,11 @@
 package board.server.app.comments.service;
 
 import board.server.app.board.entity.Board;
-import board.server.app.board.repository.JdbcTemplateBoardRepository;
+import board.server.app.board.repository.BoardRepository;
 import board.server.app.comments.dto.CommentsResponseDto;
 import board.server.app.comments.entity.Comments;
-import board.server.app.comments.repository.JdbcTemplateCommentsRepository;
-import board.server.app.member.repository.JdbcTemplateMemberRepository;
+import board.server.app.comments.repository.CommentsRepository;
+import board.server.app.member.repository.MemberRepository;
 import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +20,11 @@ import java.util.Map;
 @Transactional
 public class CommentsService {
     @Autowired
-    private JdbcTemplateCommentsRepository jdbcTemplateCommentsRepository;
+    private CommentsRepository commentsRepository;
     @Autowired
-    private JdbcTemplateBoardRepository jdbcTemplateBoardRepository;
+    private BoardRepository boardRepository;
     @Autowired
-    private JdbcTemplateMemberRepository jdbcTemplateMemberRepository;
+    private MemberRepository memberRepository;
 
 
     // 댓글 읽기
@@ -32,7 +32,7 @@ public class CommentsService {
         Map<Long, List> commentsMapList = new HashMap<>();
 
         for(Long boardId: boardIdList){
-            List<CommentsResponseDto> responseDtoList = jdbcTemplateCommentsRepository.findByBoardId(boardId)
+            List<CommentsResponseDto> responseDtoList = commentsRepository.findByBoardId(boardId)
                     .stream()
                     .map(CommentsResponseDto::new)
                     .toList();
@@ -49,14 +49,14 @@ public class CommentsService {
         validatePresentMemberId(comments.getAuthor());
         validatePresentId(comments.getParentId());
 
-        return jdbcTemplateCommentsRepository.save(comments);
+        return commentsRepository.save(comments);
     }
 
     // 댓글 수정
     public void updateComments(Comments comments){
         validatePresentId(comments.getId());
 
-        jdbcTemplateCommentsRepository.update(comments);
+        commentsRepository.update(comments);
     }
 
     // 댓글 삭제
@@ -71,7 +71,7 @@ public class CommentsService {
             throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);
 
 
-        jdbcTemplateCommentsRepository.delete(commentsId);
+        commentsRepository.delete(commentsId);
     }
 
 
@@ -79,7 +79,7 @@ public class CommentsService {
     // 댓글 존재 여부 확인
     private Comments validatePresentId(Long id) {
         if(id != null && id != 0){
-            return jdbcTemplateCommentsRepository.findById(id).orElseThrow(() ->
+            return commentsRepository.findById(id).orElseThrow(() ->
                     new BusinessLogicException(CustomExceptionCode.COMMENTS_NO_PERMISSION)
             );
         }
@@ -88,14 +88,14 @@ public class CommentsService {
 
     // 유저 확인
     private void validatePresentMemberId(Long author) {
-        jdbcTemplateMemberRepository.findById(author).orElseThrow(() ->
+        memberRepository.findById(author).orElseThrow(() ->
                 new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND)
         );
     }
 
     // 게시글 확인
     private Board validatePresentBoardId(Long boardId) {
-        return jdbcTemplateBoardRepository.findById(boardId).orElseThrow(() ->
+        return boardRepository.findById(boardId).orElseThrow(() ->
                 new BusinessLogicException(CustomExceptionCode.BOARD_NOT_FOUND)
         );
     }
