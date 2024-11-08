@@ -3,6 +3,7 @@ package board.server.app.member.repository;
 import board.server.app.enums.RoleType;
 import board.server.app.member.entity.Member;
 
+import board.server.app.role.entity.Role;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -49,8 +50,11 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
         param.put("role", "MEMBER");
         param.put("member_id", key);
 
-        ji.executeAndReturnKey(new MapSqlParameterSource(param));
-        member.setRoleType(RoleType.ROLE_DEFAULT);
+        key = ji.executeAndReturnKey(new MapSqlParameterSource(param));
+        member.setRole(Role.builder()
+                .id(key.longValue())
+                .roleType(RoleType.ROLE_DEFAULT)
+                .build());
 
 
         return member;
@@ -96,7 +100,7 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
     }
 
     @Override
-    public Optional<Member> findByNameAndRole(String name) {
+    public Optional<Member> findByNameWithRole(String name) {
         //m.id, m.name, m.email, m.password, r.role
         String sql = "select m.id, m.name, m.email, m.password, r.role from MEMBER_TABLE m join ROLE_TABLE r on m.id = r.member_id where m.name = ?";
         List<Member> query = jdbcTemplate.query(sql, MemberRoleMapper(), name);
@@ -139,7 +143,10 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
             String email = rs.getString("email");
             String password = rs.getString("password");
             Long id = rs.getLong("id");
-            RoleType role = rs.getString("role").equals("MEMBER") ? RoleType.ROLE_DEFAULT : RoleType.ROLE_ADMIN;
+            RoleType roleType = rs.getString("role").equals("MEMBER") ? RoleType.ROLE_DEFAULT : RoleType.ROLE_ADMIN;
+            Role role = Role.builder()
+                    .roleType(roleType)
+                    .build();
 
             return Member.builder()
                     .name(username)

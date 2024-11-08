@@ -1,9 +1,7 @@
 package board.server.config.jwt;
 
-import board.server.app.member.entity.Member;
 import board.server.app.member.repository.JdbcTemplateMemberRepository;
 import board.server.error.errorcode.CustomExceptionCode;
-import board.server.error.errorcode.ExceptionCode;
 import board.server.error.exception.BusinessLogicException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +20,7 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return jdbcTemplateMemberRepository.findByNameAndRole(username)
+        return jdbcTemplateMemberRepository.findByNameWithRole(username)
                 .map(CustomUserDetail:: new)
                 .orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND));
     }

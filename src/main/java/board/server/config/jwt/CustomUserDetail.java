@@ -29,7 +29,7 @@ public class CustomUserDetail implements UserDetails {
         this.name = member.getName();
         this.email = member.getEmail();
         this.password = member.getPassword();
-        this.role = member.getRoleType().getName(); // role = MEMBER
+        this.role = member.getRole().getRoleType().getName(); // role = MEMBER
     }
 
     @Override
