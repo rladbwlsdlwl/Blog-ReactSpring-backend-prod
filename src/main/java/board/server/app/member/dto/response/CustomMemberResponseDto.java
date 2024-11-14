@@ -8,5 +8,5 @@ import lombok.Getter;
 @Getter
 public class CustomMemberResponseDto {
     private String name;
-    private final RoleType roleType = RoleType.ROLE_DEFAULT;
+    private final RoleType roleType = RoleType.MEMBER;
 }

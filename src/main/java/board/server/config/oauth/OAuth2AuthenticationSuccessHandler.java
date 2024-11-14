@@ -3,6 +3,7 @@ package board.server.config.oauth;
 import board.server.app.member.dto.response.CustomMemberResponseDto;
 import board.server.app.member.entity.Member;
 import board.server.app.member.repository.JdbcTemplateMemberRepository;
+import board.server.app.member.repository.MemberRepository;
 import board.server.config.jwt.JwtTokenProvider;
 import io.jsonwebtoken.Jwt;
 import jakarta.servlet.ServletException;
@@ -21,12 +22,12 @@ import java.util.UUID;
 
 @Slf4j
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-    private final JdbcTemplateMemberRepository jdbcTemplateMemberRepository;
+    private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    public OAuth2AuthenticationSuccessHandler(JdbcTemplateMemberRepository jdbcTemplateMemberRepository, JwtTokenProvider jwtTokenProvider) {
-        this.jdbcTemplateMemberRepository = jdbcTemplateMemberRepository;
+    public OAuth2AuthenticationSuccessHandler(MemberRepository memberRepository, JwtTokenProvider jwtTokenProvider) {
+        this.memberRepository = memberRepository;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
@@ -48,7 +49,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         String name = getRandomUsername();
         final String[] token = {""};
 
-        jdbcTemplateMemberRepository.findByEmail(email).ifPresentOrElse(member -> {
+        memberRepository.findByEmail(email).ifPresentOrElse(member -> {
             // 토큰 발행
             token[0] = jwtTokenProvider.generateToken(new CustomMemberResponseDto(member.getName()));
         }, () -> {
@@ -59,7 +60,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                     .name(name)
                     .build();
 
-            jdbcTemplateMemberRepository.save(member);
+            memberRepository.save(member);
 
             token[0] = jwtTokenProvider.generateToken(new CustomMemberResponseDto(member.getName()));
         });

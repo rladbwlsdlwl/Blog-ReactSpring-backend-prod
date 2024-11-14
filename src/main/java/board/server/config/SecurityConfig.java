@@ -1,6 +1,7 @@
 package board.server.config;
 
 import board.server.app.member.repository.JdbcTemplateMemberRepository;
+import board.server.app.member.repository.MemberRepository;
 import board.server.config.jwt.*;
 import board.server.config.oauth.CustomOAuth2UserService;
 import board.server.config.oauth.OAuth2AuthenticationSuccessHandler;
@@ -25,14 +26,14 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final CustomUserDetailService customUserDetailService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final JdbcTemplateMemberRepository jdbcTemplateMemberRepository;
+    private final MemberRepository memberRepository;
     private final JwtTokenBlacklist jwtTokenBlacklist;
 
-    public SecurityConfig(PasswordEncoder passwordEncoder, CustomUserDetailService customUserDetailService, JwtTokenProvider jwtTokenProvider, JdbcTemplateMemberRepository jdbcTemplateMemberRepository, JwtTokenBlacklist jwtTokenBlacklist) {
+    public SecurityConfig(PasswordEncoder passwordEncoder, CustomUserDetailService customUserDetailService, JwtTokenProvider jwtTokenProvider, MemberRepository memberRepository, JwtTokenBlacklist jwtTokenBlacklist) {
         this.passwordEncoder = passwordEncoder;
         this.customUserDetailService = customUserDetailService;
         this.jwtTokenProvider = jwtTokenProvider;
-        this.jdbcTemplateMemberRepository = jdbcTemplateMemberRepository;
+        this.memberRepository = memberRepository;
         this.jwtTokenBlacklist = jwtTokenBlacklist;
     }
 
@@ -41,7 +42,7 @@ public class SecurityConfig {
         JwtAccessDeniedHandler jwtAccessDeniedHandler = new JwtAccessDeniedHandler();
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenProvider);
         JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenProvider, customUserDetailService, jwtAccessDeniedHandler, jwtTokenBlacklist);
-        OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler = new OAuth2AuthenticationSuccessHandler(jdbcTemplateMemberRepository, jwtTokenProvider);
+        OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler = new OAuth2AuthenticationSuccessHandler(memberRepository, jwtTokenProvider);
 
         jwtAuthenticationFilter.setFilterProcessesUrl("/api/signin");
 

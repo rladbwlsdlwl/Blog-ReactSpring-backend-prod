@@ -15,8 +15,8 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.util.*;
 
-@Slf4j
-@Repository
+//@Slf4j
+//@Repository
 public class JdbcTemplateMemberRepository implements MemberRepository {
     private final JdbcTemplate jdbcTemplate;
 
@@ -53,7 +53,7 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
         key = ji.executeAndReturnKey(new MapSqlParameterSource(param));
         member.setRole(Role.builder()
                 .id(key.longValue())
-                .roleType(RoleType.ROLE_DEFAULT)
+                .roleType(RoleType.MEMBER)
                 .build());
 
 
@@ -109,6 +109,11 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
     }
 
     @Override
+    public void delete(Member member) {
+        deleteById(member.getId());
+    }
+
+    @Override
     public void deleteById(Long id) {
         String query = "delete from MEMBER_TABLE where id = ?";
         jdbcTemplate.update(query, id);
@@ -143,7 +148,7 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
             String email = rs.getString("email");
             String password = rs.getString("password");
             Long id = rs.getLong("id");
-            RoleType roleType = rs.getString("role").equals("MEMBER") ? RoleType.ROLE_DEFAULT : RoleType.ROLE_ADMIN;
+            RoleType roleType = rs.getString("role").equals("MEMBER") ? RoleType.MEMBER : RoleType.ADMIN;
             Role role = Role.builder()
                     .roleType(roleType)
                     .build();

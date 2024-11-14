@@ -5,20 +5,22 @@ import board.server.app.role.entity.Role;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-//@Entity
-//@Table(name = "MEMBER_TABLE")
+@NoArgsConstructor
+@Entity
+@Table(name = "MEMBER_TABLE")
 public class Member {
-//    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String email;
     private String password;
 
-//    @OneToOne(mappedBy = "member")
+    @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE)
     private Role role;
 
     @Builder

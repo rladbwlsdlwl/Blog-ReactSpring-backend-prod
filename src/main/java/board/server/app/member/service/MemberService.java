@@ -20,7 +20,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public MemberService(JdbcTemplateMemberRepository memberRepository, PasswordEncoder passwordEncoder) {
+    public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -68,16 +68,10 @@ public class MemberService {
         checkDuplicateUsername(member.getName(), newUsername);
         validateDuplicateUsername(newUsername);
 
-        Member member1 = Member.builder()
-                .id(member.getId())
-                .name(newUsername)
-                .password(member.getPassword())
-                .email(member.getEmail())
-                .build();
-
-        memberRepository.update(member1);
-
-        member.setName(newUsername);
+        // 영속 컨택스트 update
+        Member findMember = memberRepository.findById(member.getId()).orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND));
+        findMember.setName(newUsername);
+        member.setName(newUsername); // 비영속 객체, 토큰 발급으로 인한 닉네임 세팅
     }
 
     // 비밀번호 변경
@@ -86,16 +80,10 @@ public class MemberService {
         checkAvailablePassword(newPassword);
 
         String pwd = passwordEncoder.encode(newPassword);
-        Member member1 = Member.builder()
-                .id(member.getId())
-                .name(member.getName())
-                .password(pwd)
-                .email(member.getEmail())
-                .build();
 
-        memberRepository.update(member1);
-
-        member.setPassword(pwd);
+        // 양속 컨택스트 update
+        Member findMember = memberRepository.findById(member.getId()).orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND));
+        findMember.setPassword(pwd);
     }
     private void updatePassword(Member member, String currPassword, String newPassword){
         // 기존 암호 매칭 확인
@@ -106,16 +94,10 @@ public class MemberService {
         checkDuplicatePassword(member.getPassword(), newPassword);
 
         String pwd = passwordEncoder.encode(newPassword);
-        Member member1 = Member.builder()
-                .id(member.getId())
-                .name(member.getName())
-                .password(pwd)
-                .email(member.getEmail())
-                .build();
 
-        memberRepository.update(member1);
-
-        member.setPassword(pwd);
+        // 양속 컨택스트 update
+        Member findMember = memberRepository.findById(member.getId()).orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND));
+        findMember.setPassword(pwd);
     }
 
     // 이메일 변경
@@ -124,16 +106,9 @@ public class MemberService {
         checkDuplicateEmail(member.getEmail(), email);
         validateDuplicateEmail(email);
 
-        Member member1 = Member.builder()
-                .id(member.getId())
-                .name(member.getName())
-                .password(member.getPassword())
-                .email(email)
-                .build();
-
-        memberRepository.update(member1);
-
-        member.setEmail(email);
+        // 양속 컨택스트 update
+        Member findMember = memberRepository.findById(member.getId()).orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND));
+        findMember.setEmail(email);
     }
 
     // RequestDto 값 확인
