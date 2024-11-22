@@ -20,10 +20,10 @@ public class CommentsResponseDto {
 
     public CommentsResponseDto(Comments comments){
         this.id = comments.getId();
-        this.parent_id = comments.getParentId() == null? 0: comments.getParentId();
-        this.author = comments.getAuthor();
-        this.name = comments.getAuthorName();
-        this.board_id = comments.getBoardId();
+        this.parent_id = comments.getComments() != null? comments.getComments().getId(): 0;
+        this.author = comments.getMember().getId();
+        this.name = comments.getMember().getName();
+        this.board_id = comments.getBoard().getId();
         this.contents = comments.getContents();
         this.created_at = dateFormatter(comments.getCreatedAt());
     }

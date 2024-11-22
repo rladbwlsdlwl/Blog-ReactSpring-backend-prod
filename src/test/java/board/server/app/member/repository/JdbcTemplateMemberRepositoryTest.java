@@ -48,7 +48,7 @@ class JdbcTemplateMemberRepositoryTest {
 
         String name = null;
         // WHEN
-        CustomUserDetail customUserDetail = jdbcTemplateMemberRepository.findByNameAndRole("user")
+        CustomUserDetail customUserDetail = jdbcTemplateMemberRepository.findByNameWithRole("user")
                 .map(CustomUserDetail:: new)
                 .orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND));
         name = customUserDetail.getUsername();

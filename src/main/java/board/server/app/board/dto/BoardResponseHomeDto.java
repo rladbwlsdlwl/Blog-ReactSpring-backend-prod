@@ -28,8 +28,8 @@ public class BoardResponseHomeDto {
         this.contents = board.getContents();
         this.views = board.getViews();
         this.created_at = dateFormatter(board.getCreated_at());
-        this.memberId = board.getAuthor();
-        this.username = board.getUsername();
+        this.memberId = board.getMember().getId();
+        this.username = board.getMember().getName();
     }
 
     private String dateFormatter(LocalDateTime localDateTime){

@@ -1,6 +1,7 @@
 package board.server.app.comments.dto;
 
 import board.server.app.comments.entity.Comments;
+import board.server.app.member.entity.Member;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,9 +17,13 @@ public class CommentsRequestPatchDto {
 
 
     public static Comments of(CommentsRequestPatchDto commentsRequestPatchDto){
+        Member member = Member.builder()
+                .id(commentsRequestPatchDto.getAuthor())
+                .build();
+
         return Comments.builder()
                 .id(commentsRequestPatchDto.getId())
-                .author(commentsRequestPatchDto.getAuthor())
+                .member(member)
                 .contents(commentsRequestPatchDto.getContents())
                 .build();
     }

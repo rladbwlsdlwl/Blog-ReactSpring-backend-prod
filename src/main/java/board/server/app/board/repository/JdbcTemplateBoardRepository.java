@@ -1,6 +1,7 @@
 package board.server.app.board.repository;
 
 import board.server.app.board.entity.Board;
+import board.server.app.member.entity.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -31,7 +32,7 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
         Map<String, Object> params = new HashMap<>();
         params.put("title", board.getTitle());
         params.put("contents", board.getContents());
-        params.put("member_id", board.getAuthor()); // author to member_id
+        params.put("member_id", board.getMember().getId()); // author to member_id
         params.put("views", 0L);
         params.put("created_at", currentTime);
 
@@ -52,23 +53,11 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
         return jdbcTemplate.query(sql, BoardMapper(), id).stream().findAny();
     }
 
-    // GET - 게시판 글
     @Override
-    public Optional<Board> findByIdAndUsername(Long id, String username) {
-        String sql = "select * from BOARD_TABLE as b join MEMBER_TABLE as m on b.member_id = m.id where b.id = ? and m.name = ?";
-        List<Board> board = jdbcTemplate.query(sql, BoardMapper(), id, username);
+    public List<Board> findByMember_name(String name) {
+        String sql = "select * from BOARD_TABLE b left join MEMBER_TABLE m on b.member_id = m.id where m.name = ?";
 
-        return board.stream().findAny();
-    }
-
-    // GET - 유저의 모든 게시판 목록
-    @Override
-    public List<Board> findByAuthor(Long author) {
-        String sql = "select * from BOARD_TABLE where member_id = ?";
-
-        List<Board> query = jdbcTemplate.query(sql, BoardMapper(), author);
-
-        return query;
+        return jdbcTemplate.query(sql, BoardNameMapper(), name);
     }
 
     @Override
@@ -77,34 +66,42 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
 
         jdbcTemplate.update(sql, board.getTitle(), board.getContents(), board.getViews(), board.getId());
 
-
         return board.getId();
     }
 
     @Override
-    public void delete(Long id) {
+    public void deleteById(Long id) {
         String sql = "delete from BOARD_TABLE where id = ?";
 
         jdbcTemplate.update(sql, id);
     }
 
     @Override
-    public List<Board> findAll() {
-        String sql = "select * from BOARD_TABLE b left join MEMBER_TABLE m on b.member_id = m.id limit 10";
-
-        return jdbcTemplate.query(sql, BoardUsernameMapper());
+    public void delete(Board board) {
+        deleteById(board.getId());
     }
 
-    private RowMapper<Board> BoardUsernameMapper() {
+    @Override
+    public List<Board> findTop10ByOrderByCreatedAtDesc() {
+        String sql = "select * from BOARD_TABLE b left join MEMBER_TABLE m on b.member_id = m.id limit 10";
+
+        return jdbcTemplate.query(sql, BoardNameMapper());
+    }
+
+    private RowMapper<Board> BoardNameMapper() {
         return (rs, rowNum) -> {
+            Member member = Member.builder()
+                    .name(rs.getString("name"))
+                    .id(rs.getLong("member_id"))
+                    .build();
+
             Board board = Board.builder()
                     .id(rs.getLong("id"))
                     .title(rs.getString("title"))
                     .contents(rs.getString("contents"))
-                    .author(rs.getLong("member_id"))
-                    .username(rs.getString("name"))
                     .views(rs.getLong("views"))
                     .created_at(rs.getTimestamp("created_at").toLocalDateTime())
+                    .member(member)
                     .build();
 
             return board;
@@ -113,14 +110,19 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
 
     private RowMapper<Board> BoardMapper() {
         return (rs, rowNum) -> {
+            Member member = Member.builder()
+                    .id(rs.getLong("member_id"))
+                    .build();
+
             Board board = Board.builder()
                     .id(rs.getLong("id"))
                     .title(rs.getString("title"))
                     .contents(rs.getString("contents"))
-                    .author(rs.getLong("member_id"))
                     .views(rs.getLong("views"))
                     .created_at(rs.getTimestamp("created_at").toLocalDateTime())
+                    .member(member)
                     .build();
+
 
             return board;
         };

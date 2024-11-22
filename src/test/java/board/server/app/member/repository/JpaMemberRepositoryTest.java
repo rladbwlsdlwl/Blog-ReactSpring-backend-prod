@@ -156,4 +156,29 @@ class JpaMemberRepositoryTest {
         
         // => 변경 감지로 값은 변하지만 외래키를 갖고 있지 않은 연관관계 주인이 아닌 엔티티는 읽기 전용 권장
     }
+
+    @Test
+    void 비영속객체쿼리테스트(){
+        // GIVEN
+        Member m = Member.builder()
+                .email("dsad")
+                .name("dsad")
+                .password("sadasdasd")
+                .build();
+
+        memberRepository.save(m);
+
+        // m 비영속화
+        em.flush();
+        em.clear();
+
+
+
+        // WHEN query - 1
+        Member member = memberRepository.findById(m.getId()).orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND));
+
+        // THEN query - 1
+        Assertions.assertThat(member.getRole().getRoleType().toString()).isEqualTo("MEMBER");
+
+    }
 }

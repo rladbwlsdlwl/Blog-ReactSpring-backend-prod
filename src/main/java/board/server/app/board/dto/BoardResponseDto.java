@@ -24,7 +24,7 @@ public class BoardResponseDto {
         this.contents = board.getContents();
         this.views = board.getViews();
         this.created_at = dateFormatter(board.getCreated_at());
-        this.memberId = board.getAuthor();
+        this.memberId = board.getMember().getId();
     }
 
     private String dateFormatter(LocalDateTime localDateTime){

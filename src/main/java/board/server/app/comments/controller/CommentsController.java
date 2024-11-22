@@ -32,7 +32,7 @@ public class CommentsController {
     public ResponseEntity<?> readComments(@RequestParam(value = "boardId", required = false) List<Long> boardIdList){
         boardIdList = boardIdList == null ? new ArrayList<>() : boardIdList;
 
-        Map<Long, List> commentsList = commentsService.getComments(boardIdList);
+        Map<Long, List<CommentsResponseDto>> commentsList = commentsService.getComments(boardIdList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(commentsList);
     }

@@ -1,6 +1,8 @@
 package board.server.app.comments.repository;
 
+import board.server.app.board.entity.Board;
 import board.server.app.comments.entity.Comments;
+import board.server.app.member.entity.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Repository
@@ -25,10 +28,16 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
     }
 
     @Override
-    public List<Comments> findByBoardId(Long boardId) {
-        String sql = "select * from COMMENT_TABLE c left join MEMBER_TABLE m on c.member_id = m.id where c.board_id = ? order by created_at";
+    public List<Comments> findByBoard_IdInWithMemberOrderByCreatedAtAsc(List<Long> idList) {
+//        String sql = "select * from COMMENT_TABLE c left join MEMBER_TABLE m on c.member_id = m.id where c.board_id = ? order by created_at";
+//        return jdbcTemplate.query(sql, CommentsNameMapper(), boardId);
 
-        return jdbcTemplate.query(sql, CommentsNameMapper(), boardId);
+        String sql = "select * from COMMENT_TABLE c join MEMBER_TABLE m on c.member_id = m.id where c.board_id in ";
+        String sqlIdFilter = idList.stream().map(id -> "?").collect(Collectors.joining(", "));
+        String sqlOrderby = " order by created_at asc";
+
+        String SQL = sql + '(' + sqlIdFilter + ')' + sqlOrderby;
+        return jdbcTemplate.query(SQL, CommentsNameMapper(), idList.toArray());
     }
 
     @Override
@@ -40,9 +49,9 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
         Map<String, Object> param = new HashMap<>();
 
         LocalDateTime date = LocalDateTime.now();
-        param.put("parent_id", comments.getParentId());
-        param.put("board_id", comments.getBoardId());
-        param.put("member_id", comments.getAuthor());
+        param.put("parent_id", comments.getComments() != null ? comments.getComments().getId(): null);
+        param.put("board_id", comments.getBoard().getId());
+        param.put("member_id", comments.getMember().getId());
         param.put("comments", comments.getContents());
         param.put("created_at", date);
 
@@ -62,7 +71,7 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
     }
 
     @Override
-    public void delete(Long id) {
+    public void deleteById(Long id) {
         String sql = "delete from COMMENT_TABLE where id = ?";
 
         jdbcTemplate.update(sql, id);
@@ -77,16 +86,26 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
             String contents = rs.getString("comments");
             LocalDateTime createdAt = rs.getTimestamp("created_at").toLocalDateTime();
 
-            Comments comments = Comments.builder()
+            Board board = Board.builder()
+                    .id(boardId)
+                    .build();
+
+            Member member = Member.builder()
+                    .id(memberId)
+                    .build();
+
+            Comments commentsParent = parentId != null ? Comments.builder()
+                    .id(parentId)
+                    .build() : null;
+
+            return Comments.builder()
                     .id(id)
-                    .parentId(parentId)
-                    .author(memberId)
-                    .boardId(boardId)
+                    .board(board)
+                    .member(member)
+                    .comments(commentsParent)
                     .contents(contents)
                     .createdAt(createdAt)
                     .build();
-
-            return comments;
         });
     }
 
@@ -100,17 +119,27 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
             String contents = rs.getString("comments");
             LocalDateTime createdAt = rs.getTimestamp("created_at").toLocalDateTime();
 
-            Comments comments = Comments.builder()
+            Board board = Board.builder()
+                    .id(boardId)
+                    .build();
+
+            Member member = Member.builder()
+                    .id(memberId)
+                    .name(name)
+                    .build();
+
+            Comments commentsParent = parentId != null ? Comments.builder()
+                    .id(parentId)
+                    .build() : null;
+
+            return Comments.builder()
                     .id(id)
-                    .parentId(parentId)
-                    .author(memberId)
-                    .authorName(name)
-                    .boardId(boardId)
+                    .board(board)
+                    .member(member)
+                    .comments(commentsParent)
                     .contents(contents)
                     .createdAt(createdAt)
                     .build();
-
-            return comments;
         });
     }
 }

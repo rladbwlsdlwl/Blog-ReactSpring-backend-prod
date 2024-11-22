@@ -8,8 +8,8 @@ import java.util.Optional;
 
 public interface CommentsRepository {
     Optional<Comments> findById(Long id);
-    List<Comments> findByBoardId(Long boardId);
+    List<Comments> findByBoard_IdInWithMemberOrderByCreatedAtAsc(List<Long> idList);
     Comments save(Comments comments);
     void update(Comments comments);
-    void delete(Long id);
+    void deleteById(Long id);
 }
