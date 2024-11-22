@@ -6,6 +6,7 @@ import board.server.app.board.dto.BoardResponseDto;
 import board.server.app.board.dto.BoardResponseHomeDto;
 import board.server.app.board.entity.Board;
 import board.server.app.board.service.BoardService;
+import board.server.app.member.entity.Member;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,14 +40,9 @@ public class BoardController {
     public ResponseEntity<BoardResponseDto> readBoard(@PathVariable String name, @PathVariable Long boardId){
         Board board = boardService.getBoard(boardId, name);
 
-        // 조회수 올리기
-        Long views = board.getViews();
-        board.setViews(views + 1);
-        boardService.setBoard(board);
+        BoardResponseDto boardResponseDto = new BoardResponseDto(board);
 
-        BoardResponseDto boardDto = new BoardResponseDto(board);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(boardDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDto);
     }
 
     @GetMapping("/{name}")
@@ -62,10 +58,14 @@ public class BoardController {
         Long userId = boardRequestDto.getAuthor();
         String title = boardRequestDto.getTitle(), contents = boardRequestDto.getContents();
 
+        Member member = Member.builder()
+                .id(userId)
+                .build();
+
         Board board = Board.builder()
                 .title(title)
                 .contents(contents)
-                .author(userId)
+                .member(member)
                 .build();
 
         Board savedBoard = boardService.join(board, name);
@@ -79,18 +79,21 @@ public class BoardController {
     public ResponseEntity<?> changeBoard(@RequestBody @Valid BoardRequestDto boardRequestDto,
                                          @PathVariable("name") String name,
                                          @PathVariable("boardId") Long boardId){
+
         String title = boardRequestDto.getTitle();
         String contents = boardRequestDto.getContents();
-        Long author = boardRequestDto.getAuthor();
         Long views = boardRequestDto.getViews();
+
+        Member member = Member.builder()
+                .id(boardRequestDto.getAuthor())
+                .build();
 
         Board board = Board.builder()
                 .id(boardId)
-                .username(name)
-                .author(author)
                 .title(title)
                 .contents(contents)
                 .views(views)
+                .member(member)
                 .build();
 
 

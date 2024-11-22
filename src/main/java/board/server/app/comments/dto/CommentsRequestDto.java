@@ -1,7 +1,9 @@
 package board.server.app.comments.dto;
 
 
+import board.server.app.board.entity.Board;
 import board.server.app.comments.entity.Comments;
+import board.server.app.member.entity.Member;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -24,11 +26,21 @@ public class CommentsRequestDto {
     private String contents;
 
     public static Comments of(CommentsRequestDto commentsRequestDto){
+        Board board = Board.builder()
+                .id(commentsRequestDto.getBoardId())
+                .build();
+        Member member = Member.builder()
+                .id(commentsRequestDto.getAuthor())
+                .name(commentsRequestDto.getAuthorName())
+                .build();
+        Comments comments = Comments.builder()
+                .id(commentsRequestDto.getParentId())
+                .build();
+
         return Comments.builder()
-                .boardId(commentsRequestDto.getBoardId())
-                .author(commentsRequestDto.getAuthor())
-                .authorName(commentsRequestDto.getAuthorName())
-                .parentId(commentsRequestDto.getParentId() == 0? null: commentsRequestDto.getParentId())
+                .board(board)
+                .member(member)
+                .comments(commentsRequestDto.getParentId() != 0? comments: null)
                 .contents(commentsRequestDto.getContents())
                 .build();
     }

@@ -3,9 +3,6 @@ package board.server.app.board.service;
 
 import board.server.app.board.entity.Board;
 import board.server.app.board.repository.BoardRepository;
-import board.server.app.board.repository.JdbcTemplateBoardRepository;
-import board.server.app.member.entity.Member;
-import board.server.app.member.repository.JdbcTemplateMemberRepository;
 import board.server.app.member.repository.MemberRepository;
 import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
@@ -28,61 +25,67 @@ public class BoardService {
         this.memberRepository = memberRepository;
     }
 
-
-    public Board getBoard(Long id, String name){
-        validatePresentMember(name);
-
-        return boardRepository.findByIdAndUsername(id, name).orElseThrow(() ->
-            new BusinessLogicException(CustomExceptionCode.BOARD_NOT_FOUND)
-        );
-    }
-
-    public List<Board> getBoardList(String name){
-        Long author = validatePresentMember(name).getId();
-
-        return boardRepository.findByAuthor(author);
-    }
-
-    public List<Board> getBoardListAll(){
-        return boardRepository.findAll();
-    }
-
+    // 게시글 작성
     public Board join(Board board, String name){
-//        validatePresentMember(board.getAuthor());
-        validatePresentMember(board.getAuthor(), name);
+        validatePresentMemberId(board.getMember().getId());
 
         return boardRepository.save(board);
     }
 
+    // 게시글 읽기
+    public Board getBoard(Long id, String name){
+        validatePresentMemberName(name);
+
+        Board board = boardRepository.findById(id).orElseThrow(() ->
+            new BusinessLogicException(CustomExceptionCode.BOARD_NOT_FOUND)
+        );
+
+        // 조회수 올리기
+        Long views = board.getViews();
+        board.setViews(views + 1);
+        setBoard(board);
+
+        return board;
+    }
+
+    // 게시글 리스트 읽기 - 유저 1명
+    public List<Board> getBoardList(String name){
+        validatePresentMemberName(name);
+
+        return boardRepository.findByMember_name(name);
+    }
+
+    // 게시글 리스트 읽기 - 모든 유저
+    public List<Board> getBoardListAll(){
+        return boardRepository.findTop10ByOrderByCreatedAtDesc();
+    }
+
+    
+    // 게시글 수정
     public Long setBoard(Board board){
-//        validatePresentMember(board.getAuthor(), board.getUsername());
-        validatePresentMember(board.getAuthor());
+        validatePresentMemberId(board.getMember().getId());
 
         return boardRepository.update(board);
     }
 
+    // 게시글 삭제
     public Long removeBoard(String username, Long boardId){
-        validatePresentMember(username);
+        validatePresentMemberName(username);
 
-        boardRepository.delete(boardId);
+        boardRepository.deleteById(boardId);
 
         return boardId;
     }
 
-    private void validatePresentMember(Long id, String name) {
-        memberRepository.findByIdAndName(id, name).orElseThrow(() ->
-                new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION)
-        );
-    }
 
-    // POST, GET - 글 작성 전 or 읽어오기 전, 유효한 계정인지 체크 (Integrity Consrtrait)
-    private void validatePresentMember(Long author) {
+    // POST, GET - 글 작성 전 or 읽어오기 전, 유효한 계정인지 체크 (Integrity Constraint)
+    private void validatePresentMemberId(Long author) {
         memberRepository.findById(author).orElseThrow(() ->
                 new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION)
         );
     }
-    private Member validatePresentMember(String name) {
-        return memberRepository.findByName(name).orElseThrow(() ->
+    private void validatePresentMemberName(String name) {
+        memberRepository.findByName(name).orElseThrow(() ->
                 new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION)
         );
     }

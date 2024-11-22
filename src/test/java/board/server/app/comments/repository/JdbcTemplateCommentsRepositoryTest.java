@@ -1,8 +1,13 @@
 package board.server.app.comments.repository;
 
+import board.server.app.board.entity.Board;
+import board.server.app.board.repository.BoardRepository;
 import board.server.app.comments.entity.Comments;
+import board.server.app.member.entity.Member;
+import board.server.app.member.repository.MemberRepository;
+import board.server.error.errorcode.CustomExceptionCode;
+import board.server.error.exception.BusinessLogicException;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,36 +15,48 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
 
 
 @SpringBootTest
 @Transactional
 class JdbcTemplateCommentsRepositoryTest {
-
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private CommentsRepository commentsRepository;
     @Autowired
-    private JdbcTemplateCommentsRepository jdbcTemplateCommentsRepository;
+    private BoardRepository boardRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Test
     void 댓글저장확인(){
         // GIVEN
+        Member member = Member.builder()
+                .name("dsdsd")
+                .email("sdasd")
+                .password("DSad")
+                .build();
+        Board board = Board.builder()
+                .title("sds")
+                .contents("sdsdsd")
+                .member(member)
+                .build();
         Comments comments = Comments.builder()
-                .boardId(3L)
-                .parentId(null)
+                .board(board)
+                .member(member)
+//                .comments(null)
                 .contents("hello world")
-                .author(83L)
                 .createdAt(LocalDateTime.now())
                 .build();
 
+        member.setId(memberRepository.save(member).getId());
+        board.setId(boardRepository.save(board).getId());
+        comments.setId(commentsRepository.save(comments).getId());
+
         //WHEN
-        Long save = jdbcTemplateCommentsRepository.save(comments);
-        int size = jdbcTemplateCommentsRepository.findByBoardId(3L).size();
+        int size = commentsRepository.findByBoard_IdInWithMemberOrderByCreatedAtAsc(List.of(board.getId())).size();
 
         //THEN
-
         Assertions.assertThat(size).isEqualTo(1);
 
     }
@@ -48,28 +65,42 @@ class JdbcTemplateCommentsRepositoryTest {
     @Test
     void 제약조건위반댓글_대댓글(){
         // GIVEN
+        Member member = Member.builder()
+                .name("dsdsd")
+                .email("sdasd")
+                .password("DSad")
+                .build();
+        Board board = Board.builder()
+                .title("sds")
+                .contents("sdsdsd")
+                .member(member)
+                .build();
         Comments comments = Comments.builder()
-                .boardId(3L)
-                .parentId(null)
+                .board(board)
+                .member(member)
+//                .comments(null)
                 .contents("hello world")
-                .author(83L)
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        Long id1 = jdbcTemplateCommentsRepository.save(comments);
+        member.setId(memberRepository.save(member).getId());
+        board.setId(boardRepository.save(board).getId());
+        comments.setId(commentsRepository.save(comments).getId());
 
+
+        // WHEN
         Comments comments1 = Comments.builder()
-                .boardId(3L)
-                .parentId(id1+100) //id <- parent_id(refenences, foreign key) 존재하지않는 id값 push
+                .member(member)
+                .board(board)
+                .comments(Comments.builder().id(comments.getId()+100).build()) //id <- parent_id(refenences, foreign key) 존재하지않는 id값 push
                 .contents("hello world")
-                .author(83L)
                 .createdAt(LocalDateTime.now())
                 .build();
 
 
-        //WHEN THEN
+        // THEN
         try{
-            jdbcTemplateCommentsRepository.save(comments1);
+            commentsRepository.save(comments1);
         }catch(Exception e){
             return;
         }
@@ -82,17 +113,35 @@ class JdbcTemplateCommentsRepositoryTest {
     @Test
     void 제약조건위반댓글_존재하지않는유저(){
         // GIVEN
+        Member member = Member.builder()
+                .name("dsdsd")
+                .email("sdasd")
+                .password("DSad")
+                .build();
+        Board board = Board.builder()
+                .title("sds")
+                .contents("sdsdsd")
+                .member(member)
+                .build();
         Comments comments = Comments.builder()
-                .boardId(3L)
-                .parentId(null)
+                .board(board)
+                .member(member)
+//                .comments(null)
                 .contents("hello world")
-                .author(100L)
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        //WHEN THEN
+
+        Long id = memberRepository.save(member).getId();
+
+
+        // WHEN
+        member.setId(id + 100);
+
+        // THEN
         try{
-            jdbcTemplateCommentsRepository.save(comments);
+            boardRepository.save(board);
+            // commentsRepository.save(comments);
         }catch(Exception e){
             return;
         }
@@ -106,18 +155,33 @@ class JdbcTemplateCommentsRepositoryTest {
     @Test
     void 제약조건위반댓글_존재하지않는게시글(){
         // GIVEN
+        Member member = Member.builder()
+                .name("dsdsd")
+                .email("sdasd")
+                .password("DSad")
+                .build();
+        Board board = Board.builder()
+                .title("sds")
+                .contents("sdsdsd")
+                .member(member)
+                .build();
         Comments comments = Comments.builder()
-                .boardId(100L)
-                .parentId(null)
+                .board(board)
+                .member(member)
+//                .comments(null)
                 .contents("hello world")
-                .author(100L)
                 .createdAt(LocalDateTime.now())
                 .build();
 
+        member.setId(memberRepository.save(member).getId());
+        board.setId(boardRepository.save(board).getId());
 
-        //WHEN THEN
+        // WHEN
+        board.setId(board.getId() + 100);
+
+        // THEN
         try{
-            jdbcTemplateCommentsRepository.save(comments);
+            commentsRepository.save(comments);
         }catch(Exception e){
             return;
         }
@@ -132,39 +196,52 @@ class JdbcTemplateCommentsRepositoryTest {
     @Test
     void 제약조건위반하지않는댓글(){
         // GIVEN
+        Member member = Member.builder()
+                .name("dsdsd")
+                .email("sdasd")
+                .password("DSad")
+                .build();
+        Board board = Board.builder()
+                .title("sds")
+                .contents("sdsdsd")
+                .member(member)
+                .build();
         Comments comments = Comments.builder()
-                .boardId(3L)
-                .parentId(null)
+                .board(board)
+                .member(member)
+//                .comments(null)
                 .contents("hello world")
-                .author(83L)
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        Long save = jdbcTemplateCommentsRepository.save(comments);
+
+        member.setId(memberRepository.save(member).getId());
+        board.setId(boardRepository.save(board).getId());
+        comments.setId(commentsRepository.save(comments).getId());
 
 
-        Comments comments1 = Comments.builder()
-                .boardId(3L)
-                .parentId(save)
+
+        Comments reply1 = Comments.builder()
+                .board(board)
+                .member(member)
+                .comments(comments)
                 .contents("hello world")
-                .author(83L)
                 .createdAt(LocalDateTime.now())
                 .build();
-
-        Comments comments2 = Comments.builder()
-                .boardId(3L)
-                .parentId(save)
+        Comments reply2 = Comments.builder()
+                .board(board)
+                .member(member)
+                .comments(comments)
                 .contents("hello world")
-                .author(83L)
                 .createdAt(LocalDateTime.now())
                 .build();
 
         // WHEN
-        jdbcTemplateCommentsRepository.save(comments1);
-        jdbcTemplateCommentsRepository.save(comments2);
+        commentsRepository.save(reply1);
+        commentsRepository.save(reply2);
 
         // THEN
-        int size = jdbcTemplateCommentsRepository.findByBoardId(3L).size();
+        int size = commentsRepository.findByBoard_IdInWithMemberOrderByCreatedAtAsc(List.of(board.getId())).size();
 
         Assertions.assertThat(size).isEqualTo(3);
 
@@ -173,39 +250,51 @@ class JdbcTemplateCommentsRepositoryTest {
     @Test
     void 댓삭시제약조건_하위댓글모두삭제(){
         // GIVEN
+        Member member = Member.builder()
+                .name("dsdsd")
+                .email("sdasd")
+                .password("DSad")
+                .build();
+        Board board = Board.builder()
+                .title("sds")
+                .contents("sdsdsd")
+                .member(member)
+                .build();
         Comments comments = Comments.builder()
-                .boardId(3L)
-                .parentId(null)
+                .board(board)
+                .member(member)
+//                .comments(null)
                 .contents("hello world")
-                .author(83L)
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        Long id = jdbcTemplateCommentsRepository.save(comments);
 
 
-        Comments comments1 = Comments.builder()
-                .boardId(3L)
-                .parentId(id)
-                .contents("hello world")
-                .author(83L)
-                .createdAt(LocalDateTime.now())
+        member.setId(memberRepository.save(member).getId());
+        board.setId(boardRepository.save(board).getId());
+        comments.setId(commentsRepository.save(comments).getId());
+
+
+        Comments reply = Comments.builder()
+                .board(board)
+                .member(member)
+                .comments(comments)
+                .contents("SDads")
                 .build();
 
-        Long id1 = jdbcTemplateCommentsRepository.save(comments1);
-
+        reply.setId(commentsRepository.save(reply).getId());
 
         // WHEN
-        jdbcTemplateCommentsRepository.delete(id);
+        commentsRepository.deleteById(comments.getId());
 
 
 
         // THEN
         // 무결성제약조건으로 인해 하위 댓글 자동 삭제 처리
-        jdbcTemplateCommentsRepository.findById(id).ifPresent(comment ->
+        commentsRepository.findById(comments.getId()).ifPresent(comment ->
                 Assertions.fail("댓글 삭제 오류입니다")
         );
-        jdbcTemplateCommentsRepository.findById(id1).ifPresent(comment ->
+        commentsRepository.findById(reply.getId()).ifPresent(comment ->
                 Assertions.fail("댓글 삭제 오류입니다")
         );
 

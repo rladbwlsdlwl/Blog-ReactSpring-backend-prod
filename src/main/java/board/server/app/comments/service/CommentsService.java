@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -28,26 +30,31 @@ public class CommentsService {
 
 
     // 댓글 읽기
-    public Map<Long, List> getComments(List<Long> boardIdList){
-        Map<Long, List> commentsMapList = new HashMap<>();
+    public Map<Long, List<CommentsResponseDto>> getComments(List<Long> boardIdList){
+        if(boardIdList.isEmpty()) return new HashMap<>();
 
-        for(Long boardId: boardIdList){
-            List<CommentsResponseDto> responseDtoList = commentsRepository.findByBoardId(boardId)
-                    .stream()
-                    .map(CommentsResponseDto::new)
-                    .toList();
+        List<CommentsResponseDto> commentsList = commentsRepository.findByBoard_IdInWithMemberOrderByCreatedAtAsc(boardIdList)
+                .stream()
+                .map(CommentsResponseDto::new)
+                .toList();
 
-            commentsMapList.put(boardId, responseDtoList);
-        }
+
+        Map<Long, List<CommentsResponseDto>> commentsMapList = boardIdList
+                .stream()
+                .collect(Collectors.toMap(id -> id,
+                        id -> commentsList.stream()
+                                .filter(c -> c.getBoard_id() == id)
+                                .toList()
+                ));
 
         return commentsMapList;
     }
 
     // 댓글 추가
     public Comments setComments(Comments comments){
-        validatePresentBoardId(comments.getBoardId());
-        validatePresentMemberId(comments.getAuthor());
-        validatePresentId(comments.getParentId());
+        validatePresentBoardId(comments.getBoard().getId());
+        validatePresentMemberId(comments.getMember().getId());
+        validatePresentId(comments.getComments() != null ? comments.getComments().getId(): null);
 
         return commentsRepository.save(comments);
     }
@@ -63,15 +70,15 @@ public class CommentsService {
     public void removeComments(Long commentsId, Long userId){
         validatePresentMemberId(userId);
         Comments comments = validatePresentId(commentsId);
-        Long boardId = comments.getBoardId(), commentsAuthor = comments.getAuthor();
-        Long author = validatePresentBoardId(boardId).getAuthor();
+        Long boardId = comments.getBoard().getId(), commentsAuthor = comments.getMember().getId();
+        Long author = validatePresentBoardId(boardId).getMember().getId();
 
         // 댓글 작성자 또는 게시글 작성자만 허용
         if(author != userId && commentsAuthor != userId)
             throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);
 
 
-        commentsRepository.delete(commentsId);
+        commentsRepository.deleteById(commentsId);
     }
 
 
