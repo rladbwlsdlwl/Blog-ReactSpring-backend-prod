@@ -27,21 +27,16 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         jdbcInsert.withTableName("BOARD_TABLE").usingGeneratedKeyColumns("id");
 
-        LocalDateTime currentTime = LocalDateTime.now();
-
         Map<String, Object> params = new HashMap<>();
         params.put("title", board.getTitle());
         params.put("contents", board.getContents());
         params.put("member_id", board.getMember().getId()); // author to member_id
-        params.put("views", 0L);
-        params.put("created_at", currentTime);
+        params.put("views", board.getViews());
+        params.put("created_at", board.getCreated_at());
 
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
 
         board.setId(key.longValue());
-        board.setViews(0L);
-        board.setCreated_at(currentTime);
-
 
         return board;
     }

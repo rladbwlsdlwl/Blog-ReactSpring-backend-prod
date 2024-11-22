@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -65,6 +66,8 @@ public class BoardController {
         Board board = Board.builder()
                 .title(title)
                 .contents(contents)
+                .views(0L)
+                .created_at(LocalDateTime.now())
                 .member(member)
                 .build();
 
