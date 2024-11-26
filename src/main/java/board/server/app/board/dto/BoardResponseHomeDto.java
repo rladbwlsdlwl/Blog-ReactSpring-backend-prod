@@ -27,7 +27,7 @@ public class BoardResponseHomeDto {
         this.title = board.getTitle();
         this.contents = board.getContents();
         this.views = board.getViews();
-        this.created_at = dateFormatter(board.getCreated_at());
+        this.created_at = dateFormatter(board.getCreatedAt());
         this.memberId = board.getMember().getId();
         this.username = board.getMember().getName();
     }

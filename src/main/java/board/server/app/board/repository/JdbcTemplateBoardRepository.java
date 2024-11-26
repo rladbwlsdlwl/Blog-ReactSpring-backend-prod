@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Repository
+//@Repository
 public class JdbcTemplateBoardRepository implements BoardRepository{
     @Autowired JdbcTemplate jdbcTemplate;
 
@@ -32,7 +32,7 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
         params.put("contents", board.getContents());
         params.put("member_id", board.getMember().getId()); // author to member_id
         params.put("views", board.getViews());
-        params.put("created_at", board.getCreated_at());
+        params.put("created_at", board.getCreatedAt());
 
         Number key = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
 
@@ -95,7 +95,7 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
                     .title(rs.getString("title"))
                     .contents(rs.getString("contents"))
                     .views(rs.getLong("views"))
-                    .created_at(rs.getTimestamp("created_at").toLocalDateTime())
+                    .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
                     .member(member)
                     .build();
 
@@ -114,7 +114,7 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
                     .title(rs.getString("title"))
                     .contents(rs.getString("contents"))
                     .views(rs.getLong("views"))
-                    .created_at(rs.getTimestamp("created_at").toLocalDateTime())
+                    .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
                     .member(member)
                     .build();
 

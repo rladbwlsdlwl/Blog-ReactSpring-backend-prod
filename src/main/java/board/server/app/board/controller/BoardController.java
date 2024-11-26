@@ -67,7 +67,7 @@ public class BoardController {
                 .title(title)
                 .contents(contents)
                 .views(0L)
-                .created_at(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
                 .member(member)
                 .build();
 

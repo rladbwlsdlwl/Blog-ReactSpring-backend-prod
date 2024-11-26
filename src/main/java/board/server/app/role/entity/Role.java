@@ -19,7 +19,7 @@ public class Role {
     @Column(name = "role")
     private RoleType roleType;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 }

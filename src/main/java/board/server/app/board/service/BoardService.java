@@ -41,9 +41,10 @@ public class BoardService {
         );
 
         // 조회수 올리기
+        // dirty checking
         Long views = board.getViews();
         board.setViews(views + 1);
-        setBoard(board);
+        // setBoard(board);
 
         return board;
     }
@@ -65,7 +66,13 @@ public class BoardService {
     public Long setBoard(Board board){
         validatePresentMemberId(board.getMember().getId());
 
-        return boardRepository.update(board);
+        Board findBoard = boardRepository.findById(board.getId()).orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.BOARD_NOT_FOUND));
+
+        findBoard.setTitle(board.getTitle());
+        findBoard.setContents(board.getContents());
+
+        return findBoard.getId();
+        // return boardRepository.update(board);
     }
 
     // 게시글 삭제
