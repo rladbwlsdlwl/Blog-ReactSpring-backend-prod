@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class CommentsRequestPatchDto {
@@ -25,6 +27,7 @@ public class CommentsRequestPatchDto {
                 .id(commentsRequestPatchDto.getId())
                 .member(member)
                 .contents(commentsRequestPatchDto.getContents())
+                .createdAt(LocalDateTime.now()) // 수정일
                 .build();
     }
 }

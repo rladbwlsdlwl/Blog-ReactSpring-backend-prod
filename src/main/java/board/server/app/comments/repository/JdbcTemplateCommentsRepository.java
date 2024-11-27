@@ -65,9 +65,9 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
 
     @Override
     public void update(Comments comments) {
-        String sql = "update COMMENT_TABLE set comments = ? where id = ?";
+        String sql = "update COMMENT_TABLE set comments = ?, created_at = ? where id = ?";
 
-        jdbcTemplate.update(sql, comments.getContents(), comments.getId());
+        jdbcTemplate.update(sql, comments.getContents(), comments.getCreatedAt(), comments.getId());
     }
 
     @Override
@@ -75,6 +75,11 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
         String sql = "delete from COMMENT_TABLE where id = ?";
 
         jdbcTemplate.update(sql, id);
+    }
+
+    @Override
+    public void delete(Comments comments) {
+        deleteById(comments.getId());
     }
 
     private RowMapper<Comments> CommentsMapper() {

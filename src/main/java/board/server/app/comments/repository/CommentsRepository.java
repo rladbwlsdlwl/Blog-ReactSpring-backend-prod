@@ -12,4 +12,5 @@ public interface CommentsRepository {
     Comments save(Comments comments);
     void update(Comments comments);
     void deleteById(Long id);
+    void delete(Comments comments);
 }

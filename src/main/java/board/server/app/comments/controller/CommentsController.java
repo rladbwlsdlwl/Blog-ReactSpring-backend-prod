@@ -3,6 +3,7 @@ package board.server.app.comments.controller;
 import board.server.app.comments.dto.CommentsRequestDto;
 import board.server.app.comments.dto.CommentsRequestPatchDto;
 import board.server.app.comments.dto.CommentsResponseDto;
+import board.server.app.comments.dto.CommentsResponsePatchDto;
 import board.server.app.comments.entity.Comments;
 import board.server.app.comments.service.CommentsService;
 import board.server.config.jwt.CustomUserDetail;
@@ -69,7 +70,8 @@ public class CommentsController {
 
         commentsService.updateComments(comments);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        CommentsResponsePatchDto commentsResponsePatchDto = CommentsResponsePatchDto.of(comments);
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentsResponsePatchDto);
     }
     @DeleteMapping("/{commentId}")
     public ResponseEntity<?> deleteComments(@PathVariable("commentId") Long commentId,
