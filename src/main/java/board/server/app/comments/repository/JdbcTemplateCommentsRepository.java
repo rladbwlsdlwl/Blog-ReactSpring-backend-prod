@@ -48,17 +48,15 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
 
         Map<String, Object> param = new HashMap<>();
 
-        LocalDateTime date = LocalDateTime.now();
         param.put("parent_id", comments.getComments() != null ? comments.getComments().getId(): null);
         param.put("board_id", comments.getBoard().getId());
         param.put("member_id", comments.getMember().getId());
         param.put("comments", comments.getContents());
-        param.put("created_at", date);
+        param.put("created_at", comments.getCreatedAt());
 
         Number number = simpleJdbcInsert.executeAndReturnKey(new MapSqlParameterSource(param));
 
         comments.setId(number.longValue());
-        comments.setCreatedAt(date);
 
         return comments;
     }

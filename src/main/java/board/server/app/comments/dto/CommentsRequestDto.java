@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -42,6 +44,7 @@ public class CommentsRequestDto {
                 .member(member)
                 .comments(commentsRequestDto.getParentId() != 0? comments: null)
                 .contents(commentsRequestDto.getContents())
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 }
