@@ -1,8 +1,11 @@
 package board.server.app.likes.controller;
 
+import board.server.app.board.entity.Board;
 import board.server.app.likes.dto.LikesRequestDto;
+import board.server.app.likes.dto.LikesResponseDto;
 import board.server.app.likes.entity.Likes;
 import board.server.app.likes.service.LikesService;
+import board.server.app.member.entity.Member;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
@@ -29,7 +32,7 @@ public class LikesController {
         // 홈 화면, 회원 홈 게시판
         boardIdList = boardIdList == null ? new ArrayList<>() : boardIdList;
 
-        Map<Long, List<Likes>> likesList = likesService.getLikesList(boardIdList);
+        Map<Long, List<LikesResponseDto>> likesList = likesService.getLikesList(boardIdList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(likesList);
     }
@@ -39,12 +42,14 @@ public class LikesController {
     public ResponseEntity<?> saveLike(@RequestBody @Valid LikesRequestDto likesRequestDto,
                                       @PathVariable("boardId") Long boardId){
         // 게시판 좋아요 작성
+        Board board = Board.builder().id(likesRequestDto.getBoardId()).build();
+        Member member = Member.builder().id(likesRequestDto.getAuthor()).build();
         Likes likes = Likes.builder()
-                .postId(likesRequestDto.getBoardId())
-                .author(likesRequestDto.getAuthor())
+                .board(board)
+                .member(member)
                 .build();
 
-        Likes savedLikes = likesService.setLikes(likes);
+        LikesResponseDto savedLikes = LikesResponseDto.of(likesService.setLikes(likes));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(savedLikes);
     }
@@ -53,9 +58,11 @@ public class LikesController {
     public ResponseEntity<?> deleteLike(@PathVariable("boardId") Long boardId,
                                         @RequestParam("userId") Long liked_userId){
         // 게시판 좋아요 삭제
+        Board board = Board.builder().id(boardId).build();
+        Member member = Member.builder().id(liked_userId).build();
         Likes likes = Likes.builder()
-                .author(liked_userId)
-                .postId(boardId)
+                .board(board)
+                .member(member)
                 .build();
 
         likesService.removeLikes(likes);
