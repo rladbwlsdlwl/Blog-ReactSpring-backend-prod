@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-@Repository
+//@Repository
 public class JdbcTemplateCommentsRepository implements CommentsRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;

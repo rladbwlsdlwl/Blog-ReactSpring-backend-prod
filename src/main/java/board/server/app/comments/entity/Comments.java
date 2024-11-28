@@ -3,9 +3,7 @@ package board.server.app.comments.entity;
 import board.server.app.board.entity.Board;
 import board.server.app.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,10 +12,13 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "COMMENTS_TABLE")
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "COMMENT_TABLE")
 public class Comments {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "comments")
     private String contents;
     @Column(name = "created_at")
     private LocalDateTime createdAt; // 작성일

@@ -61,9 +61,12 @@ public class CommentsService {
 
     // 댓글 수정
     public void updateComments(Comments comments){
-        validatePresentId(comments.getId());
+        Comments findComments = validatePresentId(comments.getId());
 
-        commentsRepository.update(comments);
+        findComments.setContents(comments.getContents());
+        findComments.setCreatedAt(comments.getCreatedAt());
+
+//        commentsRepository.update(comments);
     }
 
     // 댓글 삭제

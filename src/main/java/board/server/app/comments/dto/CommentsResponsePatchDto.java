@@ -27,7 +27,7 @@ public class CommentsResponsePatchDto {
                 .build();
     }
 
-    private static String dateFormatter(LocalDateTime localDateTime) {
+    public static String dateFormatter(LocalDateTime localDateTime) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         return localDateTime.format(dateTimeFormatter);
     }
