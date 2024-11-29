@@ -1,6 +1,5 @@
 package board.server.app.likes.service;
 
-import board.server.app.likes.dto.LikesRequestDto;
 import board.server.app.likes.dto.LikesResponseDto;
 import board.server.app.likes.entity.Likes;
 import board.server.app.likes.repository.LikesRepository;
@@ -11,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -62,9 +59,9 @@ public class LikesService {
 
     // 좋아요 삭제
     public void removeLikes(Likes likes){
-        validatePresentLikes(likes.getMember().getId(), likes.getBoard().getId());
+        Likes findLikes = validatePresentLikes(likes.getMember().getId(), likes.getBoard().getId());
 
-        likesRepository.delete(likes);
+        likesRepository.delete(findLikes);
     }
 
     // 좋아요 작성
@@ -76,8 +73,8 @@ public class LikesService {
     }
 
     // 좋아요 삭제
-    private void validatePresentLikes(Long author, Long postId) {
-        likesRepository.findByBoard_IdAndMember_Id(postId, author).orElseThrow(() ->
+    private Likes validatePresentLikes(Long author, Long postId) {
+        return likesRepository.findByBoard_IdAndMember_Id(postId, author).orElseThrow(() ->
                 new BusinessLogicException(CustomExceptionCode.LIKES_NO_PERMISSION)
         );
     }

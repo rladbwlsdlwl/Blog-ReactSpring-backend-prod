@@ -73,6 +73,9 @@ class LikesServiceTest {
         board2.setId(boardRepository.save(board2).getId());
 
 
+        em.flush();
+        em.clear();
+
         // WHEN
         // query 3
         Likes likes1 = Likes.builder()
@@ -93,6 +96,7 @@ class LikesServiceTest {
         likes3.setId(likesRepository.save(likes3).getId());
 
 
+        // query 1
         Map<Long, List<LikesResponseDto>> likeslist = likesService.getLikesList(List.of(board1.getId(), board2.getId()));
 
 
@@ -123,8 +127,9 @@ class LikesServiceTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        // query 3
+        // query 5
         member1.setId(memberRepository.save(member1).getId());
+        memberRepository.save(member2);
         board1.setId(boardRepository.save(board1).getId());
 
 
@@ -140,11 +145,17 @@ class LikesServiceTest {
                 .build();
 
 
+        // query 4(select 2, insert 2)
         likesService.setLikes(likes1);
         likesService.setLikes(likes2);
 
 
+
+        em.flush();
+        em.clear();
+
         // THEN
+        // query 1
         List<Likes> likeslist = likesRepository.findByBoard_Id(board1.getId());
 
         Assertions.assertThat(likeslist.size()).isEqualTo(2);
@@ -173,11 +184,14 @@ class LikesServiceTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        // query 3
+        // query 5
         member1.setId(memberRepository.save(member1).getId());
+        memberRepository.save(member2);
         board1.setId(boardRepository.save(board1).getId());
 
 
+        em.flush();
+        em.clear();
 
         // WHEN
         Likes likes1 = Likes.builder()
@@ -190,14 +204,21 @@ class LikesServiceTest {
                 .build();
 
 
+        // query 2
         likes1.setId(likesRepository.save(likes1).getId());
         likes2.setId(likesRepository.save(likes2).getId());
 
 
+        // query 2
         likesService.removeLikes(likes1);
 
 
+        em.flush();
+        em.clear();
+
+
         // THEN
+        // query 1
         List<Likes> likeslist = likesRepository.findByBoard_Id(board1.getId());
 
         Assertions.assertThat(likeslist.size()).isEqualTo(1);
