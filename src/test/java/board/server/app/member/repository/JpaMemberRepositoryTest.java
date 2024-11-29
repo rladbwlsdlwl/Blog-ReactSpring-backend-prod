@@ -21,6 +21,7 @@ class JpaMemberRepositoryTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
@@ -35,16 +36,29 @@ class JpaMemberRepositoryTest {
                 .password("zzzzzzzzzz")
                 .build();
 
+        Role role = Role.builder()
+                .roleType(RoleType.MEMBER)
+                .member(member)
+                .build();
+
+
         // insert query 2, 객체 영속화
-        Member saved = memberRepository.save(member);
+        memberRepository.save(member);
+        roleRepository.save(role);
+
+
+        em.flush();
+        em.clear();
+
 
         // WHEN
-        // query 0
-        Member m = memberRepository.findById(saved.getId()).orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND));
+        // query 1
+        Member findMember = memberRepository.findById(member.getId()).orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND));
+
 
         // THEN
-        Assertions.assertThat(m.getId()).isEqualTo(saved.getId());
-        Assertions.assertThat(m.getRole().getRoleType().toString()).isEqualTo("MEMBER");
+        Assertions.assertThat(findMember.getId()).isEqualTo(member.getId());
+        Assertions.assertThat(findMember.getRole().getRoleType().toString()).isEqualTo("MEMBER");
     }
 
     @Test

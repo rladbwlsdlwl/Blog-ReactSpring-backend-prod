@@ -15,33 +15,17 @@ import java.util.Optional;
 public class JpaMemberRepository implements MemberRepository{
 
     private final EntityManager em;
-    private final RoleRepository roleRepository;
 
     @Autowired
-    public JpaMemberRepository(EntityManager em, RoleRepository roleRepository) {
+    public JpaMemberRepository(EntityManager em) {
         this.em = em;
-        this.roleRepository = roleRepository;
     }
 
     @Override
     public Member save(Member member) {
         em.persist(member);
 
-        Role role = Role.builder()
-                .roleType(RoleType.MEMBER)
-                .member(member)
-                .build();
-
-        Role savedRole = roleRepository.save(role);
-        member.setRole(savedRole);
-
         return member;
-    }
-
-//    내부적으로 변경감지 (dirty checking)
-    @Override
-    public void update(Member member) {
-
     }
 
     @Override

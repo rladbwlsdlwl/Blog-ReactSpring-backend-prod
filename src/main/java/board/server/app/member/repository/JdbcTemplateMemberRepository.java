@@ -40,28 +40,10 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
         Number key = ji.executeAndReturnKey(new MapSqlParameterSource(params));
         member.setId(key.longValue());
 
-
-        /* insert role table */
-        /* default role = "MEMBER" */
-        ji = new SimpleJdbcInsert(jdbcTemplate);
-        ji.withTableName("ROLE_TABLE").usingGeneratedKeyColumns("id");
-
-        Map<String, Object> param = new HashMap<>();
-        param.put("role", "MEMBER");
-        param.put("member_id", key);
-
-        key = ji.executeAndReturnKey(new MapSqlParameterSource(param));
-        member.setRole(Role.builder()
-                .id(key.longValue())
-                .roleType(RoleType.MEMBER)
-                .build());
-
-
         return member;
     }
 
     // spring data JPA, update -> save
-    @Override
     public void update(Member member) {
         String sql = "update MEMBER_TABLE set name = ?, password = ?, email = ? where id = ?";
         jdbcTemplate.update(sql, member.getName(), member.getPassword(), member.getEmail(), member.getId());

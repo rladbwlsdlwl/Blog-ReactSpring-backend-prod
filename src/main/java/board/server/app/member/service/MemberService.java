@@ -1,9 +1,12 @@
 package board.server.app.member.service;
 
+import board.server.app.enums.RoleType;
 import board.server.app.member.dto.request.MemberRequestUpdateDto;
 import board.server.app.member.entity.Member;
 import board.server.app.member.repository.JdbcTemplateMemberRepository;
 import board.server.app.member.repository.MemberRepository;
+import board.server.app.role.entity.Role;
+import board.server.app.role.repository.RoleRepository;
 import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +20,13 @@ import java.util.List;
 @Transactional
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
+    public MemberService(MemberRepository memberRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
+        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -32,16 +37,21 @@ public class MemberService {
         validateDuplicateUsername(member.getName());
         validateDuplicateEmail(member.getEmail());
 
-        String name = member.getName(), email = member.getEmail(), password = member.getPassword();
-        password = passwordEncoder.encode(password);
+        // 패스워드 암호화
+        member.setPassword(passwordEncoder.encode(member.getPassword()));
 
-        Member member1 = Member.builder()
-                .name(name)
-                .password(password)
-                .email(email)
+        Role role = Role.builder()
+                .roleType(RoleType.MEMBER)
+                .member(member)
                 .build();
+        member.setRole(role);
+        
+        memberRepository.save(member);
+        roleRepository.save(role);
 
-        return memberRepository.save(member1).getId();
+
+
+        return member.getId();
     }
 
     public void update(List<String> mode, MemberRequestUpdateDto memberRequestUpdateDto, Member member) {
