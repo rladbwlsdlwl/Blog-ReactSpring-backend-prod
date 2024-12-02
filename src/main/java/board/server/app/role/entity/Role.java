@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 @Entity
 @Table(name = "ROLE_TABLE")
 public class Role {
@@ -22,4 +22,14 @@ public class Role {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+
+    @Builder
+    public Role(Long id, RoleType roleType, Member member){
+        this.id = id;
+        this.roleType = roleType;
+        this.member = member;
+        
+        member.setRole(this); // 양방향 연관관계 설정
+    }
 }

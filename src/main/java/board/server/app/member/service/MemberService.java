@@ -44,7 +44,7 @@ public class MemberService {
                 .roleType(RoleType.MEMBER)
                 .member(member)
                 .build();
-        member.setRole(role);
+       // member.setRole(role);
         
         memberRepository.save(member);
         roleRepository.save(role);

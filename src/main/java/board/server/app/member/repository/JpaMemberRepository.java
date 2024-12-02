@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+//@Repository
 public class JpaMemberRepository implements MemberRepository{
 
     private final EntityManager em;
