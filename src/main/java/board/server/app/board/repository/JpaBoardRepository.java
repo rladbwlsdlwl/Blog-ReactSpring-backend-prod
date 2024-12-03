@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+//@Repository
 public class JpaBoardRepository implements BoardRepository{
 
     @Autowired
@@ -39,12 +39,6 @@ public class JpaBoardRepository implements BoardRepository{
                 .getResultList();
 
         return boardList;
-    }
-
-    // 내부적으로 변경감지(dirty checking)
-    @Override
-    public Long update(Board board) {
-        return board.getId();
     }
 
     @Override

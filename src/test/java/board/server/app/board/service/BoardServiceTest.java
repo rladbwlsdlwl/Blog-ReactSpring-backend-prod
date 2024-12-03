@@ -2,8 +2,11 @@ package board.server.app.board.service;
 
 import board.server.app.board.entity.Board;
 import board.server.app.board.repository.BoardRepository;
+import board.server.app.enums.RoleType;
 import board.server.app.member.entity.Member;
 import board.server.app.member.repository.MemberRepository;
+import board.server.app.role.entity.Role;
+import board.server.app.role.repository.RoleRepository;
 import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
 import jakarta.persistence.EntityManager;
@@ -26,6 +29,8 @@ class BoardServiceTest {
     private BoardService boardService;
 
     @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
     private MemberRepository memberRepository;
     @Autowired
     private BoardRepository boardRepository;
@@ -40,6 +45,11 @@ class BoardServiceTest {
                 .email("dsfdsfds")
                 .name("user111")
                 .build();
+        Role role = Role.builder()
+                .roleType(RoleType.MEMBER)
+                .member(member)
+                .build();
+
         Board board = Board.builder()
                 .views(0L)
                 .createdAt(LocalDateTime.now())
@@ -50,6 +60,7 @@ class BoardServiceTest {
 
         // insert query 2
         memberRepository.save(member);
+        roleRepository.save(role);
 
         em.flush();
         em.clear();
@@ -58,12 +69,13 @@ class BoardServiceTest {
 
         // WHEN
         // select 1(서비스 내부적 검사), insert query 1
-        Board user111 = boardService.join(board, "user111");
+        Board user111 = boardService.join(board, member.getName());
+
 
         // THEN
         // query 0
         Assertions.assertThat(user111.getMember().getId()).isEqualTo(member.getId());
-
+        Assertions.assertThat(user111.getMember().getName()).isEqualTo(member.getName());
     }
 
     @Test
@@ -74,6 +86,11 @@ class BoardServiceTest {
                 .email("dsfdsfds")
                 .name("user111")
                 .build();
+        Role role = Role.builder()
+                .roleType(RoleType.MEMBER)
+                .member(member)
+                .build();
+
         Board board = Board.builder()
                 .views(0L)
                 .createdAt(LocalDateTime.now())
@@ -84,6 +101,8 @@ class BoardServiceTest {
 
         // insert query 2
         memberRepository.save(member);
+        roleRepository.save(role);
+
         // insert query 1
         boardRepository.save(board);
 
@@ -112,6 +131,11 @@ class BoardServiceTest {
                 .email("dsfdsfds")
                 .name("user111")
                 .build();
+        Role role = Role.builder()
+                .roleType(RoleType.MEMBER)
+                .member(member)
+                .build();
+
         Board board1 = Board.builder()
                 .views(0L)
                 .createdAt(LocalDateTime.now())
@@ -136,6 +160,7 @@ class BoardServiceTest {
 
         // insert query 5
         memberRepository.save(member);
+        roleRepository.save(role);
         boardRepository.save(board1);
         boardRepository.save(board2);
         boardRepository.save(board3);
@@ -162,9 +187,15 @@ class BoardServiceTest {
                 .email("dsfdsfds")
                 .name("user111")
                 .build();
+        Role role = Role.builder()
+                .roleType(RoleType.MEMBER)
+                .member(member)
+                .build();
 
         // insert query 2
         memberRepository.save(member);
+        roleRepository.save(role);
+
 
         // insert query 15
         for(var i=0; i<15; i++){
@@ -198,6 +229,11 @@ class BoardServiceTest {
                 .email("dsfdsfds")
                 .name("user111")
                 .build();
+        Role role = Role.builder()
+                .roleType(RoleType.MEMBER)
+                .member(member)
+                .build();
+
         Board board = Board.builder()
                 .views(0L)
                 .createdAt(LocalDateTime.now())
@@ -208,6 +244,8 @@ class BoardServiceTest {
 
         // insert query 2
         memberRepository.save(member);
+        roleRepository.save(role);
+
         // insert query 1
         boardRepository.save(board);
 
@@ -224,8 +262,8 @@ class BoardServiceTest {
                 .build();
 
         // WHEN
-        // query 5(select 2, update 1)
-        // findById는 em.find를 사용하기 때문에(jpql이 아님, 표준메서드) 조인한 결과를 가져오기 때문에 role이 영속된 상태이므로 별도로 추가 쿼리가 발생하지 않음
+        // query 3(select 2, update 1)
+        // member의 findById는 role과 일대일 양방향 관계로 강제 로드(eager fetch)
         boardService.setBoard(updateBoard);
 
         em.flush();
@@ -239,7 +277,8 @@ class BoardServiceTest {
         Assertions.assertThat(updateBoard.getContents()).isEqualTo(isUpdatedBoard.getContents());
 
 
-        // => 일대일 양방향 관계에서 연관관계 주인이 아닌 쪽에서 값을 조회할 경우 lazy가 안먹고 jpql을 사용할 경우 쿼리를 2번 전송, find(findById)를 사용할 경우 조인한 쿼리를 1번 전송
+        // => 일대일 양방향 관계에서 연관관계 주인이 아닌 쪽에서 값을 조회할 경우 lazy가 안먹고 쿼리를 2번 전송, find(findById)를 사용할 경우 조인한 쿼리를 1번 전송
+        // => 강제 조인(eager fetch)이므로 연관관계에 있는 엔티티 모두 영속화
     }
 
     @Test
@@ -250,6 +289,11 @@ class BoardServiceTest {
                 .email("dsfdsfds")
                 .name("user111")
                 .build();
+        Role role = Role.builder()
+                .roleType(RoleType.MEMBER)
+                .member(member)
+                .build();
+
         Board board = Board.builder()
                 .views(0L)
                 .createdAt(LocalDateTime.now())
@@ -260,6 +304,8 @@ class BoardServiceTest {
 
         // insert query 2
         memberRepository.save(member);
+        roleRepository.save(role);
+
         // insert query 1
         boardRepository.save(board);
 

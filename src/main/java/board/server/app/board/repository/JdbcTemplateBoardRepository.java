@@ -55,7 +55,6 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
         return jdbcTemplate.query(sql, BoardNameMapper(), name);
     }
 
-    @Override
     public Long update(Board board) {
         String sql = "update BOARD_TABLE set title = ?, contents = ?, views = ? where id = ?";
 
