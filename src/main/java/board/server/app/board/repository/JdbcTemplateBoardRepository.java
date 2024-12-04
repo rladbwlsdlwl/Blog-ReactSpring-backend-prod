@@ -3,6 +3,7 @@ package board.server.app.board.repository;
 import board.server.app.board.entity.Board;
 import board.server.app.member.entity.Member;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -80,6 +81,11 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
         String sql = "select * from BOARD_TABLE b left join MEMBER_TABLE m on b.member_id = m.id limit 10";
 
         return jdbcTemplate.query(sql, BoardNameMapper());
+    }
+
+    @Override
+    public List<Board> findTop10ByOrderByCreatedAtDescWithMember(Pageable pageable) {
+        return null;
     }
 
     private RowMapper<Board> BoardNameMapper() {

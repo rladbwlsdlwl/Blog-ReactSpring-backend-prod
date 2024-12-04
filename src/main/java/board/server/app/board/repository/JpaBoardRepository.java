@@ -4,6 +4,7 @@ package board.server.app.board.repository;
 import board.server.app.board.entity.Board;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -56,12 +57,17 @@ public class JpaBoardRepository implements BoardRepository{
 
     @Override
     public List<Board> findTop10ByOrderByCreatedAtDesc() {
-        String sql = "select b from Board b order by b.createdAt desc";
+        String sql = "select b from Board b join fetch b.member order by b.createdAt desc";
         List<Board> boardList = em.createQuery(sql, Board.class)
                 .setFirstResult(0)
                 .setMaxResults(10)
                 .getResultList();
 
         return boardList;
+    }
+
+    @Override
+    public List<Board> findTop10ByOrderByCreatedAtDescWithMember(Pageable pageable) {
+        return null;
     }
 }
