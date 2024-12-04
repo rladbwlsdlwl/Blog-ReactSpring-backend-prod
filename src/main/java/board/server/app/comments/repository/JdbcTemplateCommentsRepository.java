@@ -61,7 +61,7 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
         return comments;
     }
 
-    @Override
+
     public void update(Comments comments) {
         String sql = "update COMMENT_TABLE set comments = ?, created_at = ? where id = ?";
 

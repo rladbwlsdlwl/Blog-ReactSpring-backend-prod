@@ -43,7 +43,7 @@ public class CommentsService {
                 .stream()
                 .collect(Collectors.toMap(id -> id,
                         id -> commentsList.stream()
-                                .filter(c -> c.getBoard_id() == id)
+                                .filter(c -> c.getBoard_id().equals(id))
                                 .toList()
                 ));
 

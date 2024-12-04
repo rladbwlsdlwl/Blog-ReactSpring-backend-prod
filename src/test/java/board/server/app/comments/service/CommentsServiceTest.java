@@ -6,8 +6,11 @@ import board.server.app.comments.dto.CommentsResponseDto;
 import board.server.app.comments.dto.CommentsResponsePatchDto;
 import board.server.app.comments.entity.Comments;
 import board.server.app.comments.repository.CommentsRepository;
+import board.server.app.enums.RoleType;
 import board.server.app.member.entity.Member;
 import board.server.app.member.repository.MemberRepository;
+import board.server.app.role.entity.Role;
+import board.server.app.role.repository.RoleRepository;
 import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
 import jakarta.persistence.EntityManager;
@@ -36,6 +39,8 @@ class CommentsServiceTest {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
     private BoardRepository boardRepository;
     @Autowired
     private EntityManager em;
@@ -49,6 +54,10 @@ class CommentsServiceTest {
                 .email("DASda")
                 .name("SAdas")
                 .build();
+        Role role = Role.builder()
+                .member(member)
+                .roleType(RoleType.MEMBER)
+                .build();
         Board board = Board.builder()
                 .member(member)
                 .title("SAdasd")
@@ -59,6 +68,7 @@ class CommentsServiceTest {
 
         // query 3
         member.setId(memberRepository.save(member).getId());
+        roleRepository.save(role);
         board.setId(boardRepository.save(board).getId());
 
 
@@ -84,6 +94,10 @@ class CommentsServiceTest {
                 .email("DASda")
                 .name("SAdas")
                 .build();
+        Role role = Role.builder()
+                .member(member)
+                .roleType(RoleType.MEMBER)
+                .build();
         Board board = Board.builder()
                 .member(member)
                 .title("SAdasd")
@@ -108,6 +122,7 @@ class CommentsServiceTest {
 
         // query 5
         member.setId(memberRepository.save(member).getId());
+        roleRepository.save(role);
         board.setId(boardRepository.save(board).getId());
         comments.setId(commentsRepository.save(comments).getId());
         reply.setId(commentsRepository.save(reply).getId());
@@ -134,6 +149,10 @@ class CommentsServiceTest {
                 .email("DASda")
                 .name("SAdas")
                 .build();
+        Role role = Role.builder()
+                .member(member)
+                .roleType(RoleType.MEMBER)
+                .build();
         Board board = Board.builder()
                 .member(member)
                 .title("SAdasd")
@@ -151,6 +170,7 @@ class CommentsServiceTest {
 
         // query 3
         member.setId(memberRepository.save(member).getId());
+        roleRepository.save(role);
         board.setId(boardRepository.save(board).getId());
 
 
@@ -178,6 +198,10 @@ class CommentsServiceTest {
                 .email("DASda")
                 .name("SAdas")
                 .build();
+        Role role = Role.builder()
+                .member(member)
+                .roleType(RoleType.MEMBER)
+                .build();
         Board board = Board.builder()
                 .member(member)
                 .title("SAdasd")
@@ -195,6 +219,7 @@ class CommentsServiceTest {
 
         // query 4
         member.setId(memberRepository.save(member).getId());
+        roleRepository.save(role);
         board.setId(boardRepository.save(board).getId());
         commentsRepository.save(comments);
 
@@ -234,6 +259,10 @@ class CommentsServiceTest {
                 .email("DASda")
                 .name("SAdas")
                 .build();
+        Role role = Role.builder()
+                .member(member)
+                .roleType(RoleType.MEMBER)
+                .build();
         Board board = Board.builder()
                 .member(member)
                 .title("SAdasd")
@@ -251,6 +280,7 @@ class CommentsServiceTest {
 
         // query 4
         member.setId(memberRepository.save(member).getId());
+        roleRepository.save(role);
         board.setId(boardRepository.save(board).getId());
         commentsRepository.save(comments);
 

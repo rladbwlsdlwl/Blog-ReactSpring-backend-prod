@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+//@Repository
 public class JpaCommentsRepository implements CommentsRepository{
 
     @Autowired
@@ -39,11 +39,6 @@ public class JpaCommentsRepository implements CommentsRepository{
         return comments;
     }
 
-    // 변경 감지 (dirty checking)
-    @Override
-    public void update(Comments comments) {
-        return ;
-    }
 
     @Override
     public void deleteById(Long id) {

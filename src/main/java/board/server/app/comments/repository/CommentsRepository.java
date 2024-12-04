@@ -10,7 +10,6 @@ public interface CommentsRepository {
     Optional<Comments> findById(Long id);
     List<Comments> findByBoard_IdInWithMemberOrderByCreatedAtAsc(List<Long> idList);
     Comments save(Comments comments);
-    void update(Comments comments);
     void deleteById(Long id);
     void delete(Comments comments);
 }
