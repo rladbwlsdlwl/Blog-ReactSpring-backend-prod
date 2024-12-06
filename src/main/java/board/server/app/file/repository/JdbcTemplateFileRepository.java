@@ -1,5 +1,6 @@
 package board.server.app.file.repository;
 
+import board.server.app.board.entity.Board;
 import board.server.app.file.entity.FileEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -9,10 +10,9 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.sql.Blob;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class JdbcTemplateFileRepository implements FileRepository{
@@ -23,41 +23,51 @@ public class JdbcTemplateFileRepository implements FileRepository{
 
     @Override
     public List<FileEntity> saveAll(List<FileEntity> fileEntities) {
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+        String sql = "insert into FILE_TABLE(originalFilename, currentFilename, data, board_id) values (?, ?, ?, ?)";
 
-        simpleJdbcInsert.withTableName("FILE_TABLE").usingGeneratedKeyColumns("id");
+        List<Object[]> batchQuery = fileEntities.stream().map(file -> new Object[]{
+                file.getOriginalFilename(),
+                file.getCurrentFilename(),
+                file.getData(),
+                file.getBoard().getId()
+        }).collect(Collectors.toList());
 
+        jdbcTemplate.batchUpdate(sql, batchQuery);
 
-        for (FileEntity fileEntity : fileEntities) {
-            Map<String, Object> params = new HashMap<>();
-
-            params.put("board_id", fileEntity.getPostId());
-            params.put("originalFilename", fileEntity.getOriginalFilename());
-            params.put("currentFilename", fileEntity.getCurrentFilename());
-
-            Number number = simpleJdbcInsert.executeAndReturnKey(new MapSqlParameterSource(params));
-
-            fileEntity.setId(number.longValue());
-        }
-
-
+        // id는 초기화되지 않음
         return fileEntities;
     }
 
     @Override
-    public List<FileEntity> findByPostId(Long postId) {
+    public List<FileEntity> findByBoard_Id(Long boardId) {
         String sql = "select * from FILE_TABLE where board_id = ?";
 
-        List<FileEntity> query = jdbcTemplate.query(sql, FileMapper(), postId);
+        List<FileEntity> query = jdbcTemplate.query(sql, FileMapper(), boardId);
 
         return query;
     }
 
     @Override
-    public Optional<FileEntity> findByPostIdOne(Long postId) {
+    public Optional<FileEntity> findTop1ByBoard_Id(Long postId) {
         String sql = "select * from FILE_TABLE where board_id = ? limit 1";
 
         return jdbcTemplate.query(sql, FileMapper(), postId).stream().findAny();
+    }
+
+    @Override
+    public List<FileEntity> findFirstImageByBoardIdIn(List<Long> boardIdList) {
+        String sqlfilter = "select min(id) as id from FILE_TABLE where board_id in (FILTER) group by board_id";
+        String sql = "select * from FILE_TABLE where id in (" + sqlfilter + ")";
+
+
+        sql = sql.replace("FILTER", boardIdList.stream()
+                .map(id -> "?")
+                .collect(Collectors.joining(", ")));
+
+        List<FileEntity> fileList = jdbcTemplate.query(sql, FileMapper(), boardIdList.toArray());
+
+
+        return fileList;
     }
 
     @Override
@@ -68,12 +78,21 @@ public class JdbcTemplateFileRepository implements FileRepository{
     }
 
     @Override
-    public void deleteAll(List<FileEntity> fileEntities) {
-        String sql = "delete from FILE_TABLE where currentFilename = ?";
+    public void deleteByCurrentFilenameIn(List<String> currentFilename) {
+        String sql = "delete from FILE_TABLE where currentFilename in (FILTER)";
 
-        for(FileEntity fileEntity : fileEntities){
-            jdbcTemplate.update(sql, fileEntity.getCurrentFilename());
-        }
+        sql = sql.replace("FILTER", currentFilename.stream()
+                        .map(name -> "?")
+                        .collect(Collectors.joining(", ")));
+
+        jdbcTemplate.update(sql, currentFilename.toArray());
+    }
+
+    @Override
+    public void deleteByBoard_Id(Long boardId) {
+        String sql = "delete from FILE_TABLE where board_id = ?";
+
+        jdbcTemplate.update(sql, boardId);
     }
 
     private RowMapper<FileEntity> FileMapper() {
@@ -82,10 +101,17 @@ public class JdbcTemplateFileRepository implements FileRepository{
             Long postId = rs.getLong("board_id");
             String originalFilename = rs.getString("originalFilename");
             String currentFilename = rs.getString("currentFilename");
+            Blob blob = rs.getBlob("data");
+            byte[] data = blob.getBytes(1, (int) blob.length());
+
+            Board board = Board.builder()
+                    .id(postId)
+                    .build();
 
             FileEntity fileEntity = FileEntity.builder()
                     .id(id)
-                    .postId(postId)
+                    .data(data)
+                    .board(board)
                     .originalFilename(originalFilename)
                     .currentFilename(currentFilename)
                     .build();

@@ -1,60 +1,89 @@
 package board.server.app.file.repository;
 
+import board.server.app.board.entity.Board;
+import board.server.app.board.repository.BoardRepository;
+import board.server.app.enums.RoleType;
 import board.server.app.file.entity.FileEntity;
-import org.junit.jupiter.api.Assertions;
+import board.server.app.member.entity.Member;
+import board.server.app.member.repository.MemberRepository;
+import board.server.app.role.entity.Role;
+import board.server.app.role.repository.RoleRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Transactional
+
 @SpringBootTest
+@Transactional
 class JdbcTemplateFileRepositoryTest {
 
     @Autowired
-    JdbcTemplateFileRepository jdbcTemplateFileRepository;
+    private FileRepository fileRepository;
+    @Autowired
+    private BoardRepository boardRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private RoleRepository roleRepository;
+
+
 
     @Test
-    void save() {
+    void saveAll() {
         // GIVEN
-        Long postId = 61L;
-        FileEntity fileEntity1 = FileEntity.builder()
-                .postId(postId)
-                .originalFilename("hello")
-                .currentFilename("world")
+        Member member = Member.builder()
+                .email("dasaasdas")
+                .name("Dadsada")
+                .password("dasdas")
+                .build();
+        Role role = Role.builder()
+                .roleType(RoleType.MEMBER)
+                .member(member)
+                .build();
+        Board board = Board.builder()
+                .title("Dasda")
+                .contents("dsada")
+                .views(0L)
+                .createdAt(LocalDateTime.now())
+                .member(member)
                 .build();
 
-        FileEntity fileEntity2 = FileEntity.builder()
-                .postId(postId)
-                .originalFilename("hello1")
-                .currentFilename("world1")
-                .build();
+        member.setId(memberRepository.save(member).getId());
+        role.setId(roleRepository.save(role).getId());
+        board.setId(boardRepository.save(board).getId());
 
-        List<FileEntity> fileEntityList = new ArrayList<>();
-        fileEntityList.add(fileEntity1);
-        fileEntityList.add(fileEntity2);
 
         // WHEN
-        List<FileEntity> fileEntities = jdbcTemplateFileRepository.saveAll(fileEntityList);
-
-
-        // THEN
-        for (FileEntity fileEntity : fileEntities){
-            Assertions.assertEquals(postId, fileEntity.getPostId(), "error - not equal post id");
-            Assertions.assertNotEquals(null, fileEntity.getId());
-        }
 
     }
 
     @Test
-    void findByPostId() {
+    void findByBoard_Id() {
+    }
 
+    @Test
+    void findTop1ByBoard_Id() {
+    }
 
+    @Test
+    void findFirstImageByBoardIdIn() {
+    }
 
+    @Test
+    void findByOriginalFilenameAndCurrentFilename() {
+    }
+
+    @Test
+    void deleteByCurrentFilenameIn() {
+    }
+
+    @Test
+    void deleteByBoard_Id() {
     }
 }

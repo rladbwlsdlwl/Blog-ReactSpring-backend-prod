@@ -28,9 +28,10 @@ public class FileController {
                                          @RequestParam(value = "file", required = false) List<MultipartFile> multipartFileList) throws IOException {
         // 회원 게시판 - 최초 게시글 작성
         List<MultipartFile> filelist = multipartFileList == null ? new ArrayList<>() : multipartFileList;
-        List<FileEntity> fileEntities = fileService.upload(filelist, boardId, username);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(fileEntities);
+        fileService.upload(filelist, boardId, username);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/file/{boardId}")
@@ -67,6 +68,7 @@ public class FileController {
         List<MultipartFile> filelist = multipartFileList == null ? new ArrayList<>() : multipartFileList;
         List<MultipartFile> beforefilelist = beforeFilenameList == null ? new ArrayList<>() : beforeFilenameList;
 
+        // beforeFilename은 currentFilename과 동일
         List<String> beforeFilename = new ArrayList<>();
         for(MultipartFile filename : beforefilelist){
             beforeFilename.add(new String(filename.getBytes()));
