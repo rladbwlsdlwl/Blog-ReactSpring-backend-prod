@@ -1,9 +1,12 @@
 package board.server.config.oauth;
 
+import board.server.app.enums.RoleType;
 import board.server.app.member.dto.response.CustomMemberResponseDto;
 import board.server.app.member.entity.Member;
 import board.server.app.member.repository.JdbcTemplateMemberRepository;
 import board.server.app.member.repository.MemberRepository;
+import board.server.app.role.entity.Role;
+import board.server.app.role.repository.RoleRepository;
 import board.server.config.jwt.JwtTokenProvider;
 import io.jsonwebtoken.Jwt;
 import jakarta.servlet.ServletException;
@@ -23,11 +26,13 @@ import java.util.UUID;
 @Slf4j
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private final MemberRepository memberRepository;
+    private final RoleRepository roleRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    public OAuth2AuthenticationSuccessHandler(MemberRepository memberRepository, JwtTokenProvider jwtTokenProvider) {
+    public OAuth2AuthenticationSuccessHandler(MemberRepository memberRepository, RoleRepository roleRepository, JwtTokenProvider jwtTokenProvider) {
         this.memberRepository = memberRepository;
+        this.roleRepository = roleRepository;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
@@ -59,8 +64,13 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                     .email(email)
                     .name(name)
                     .build();
+            Role role = Role.builder()
+                    .member(member)
+                    .roleType(RoleType.MEMBER)
+                    .build();
 
             memberRepository.save(member);
+            roleRepository.save(role);
 
             token[0] = jwtTokenProvider.generateToken(new CustomMemberResponseDto(member.getName()));
         });
