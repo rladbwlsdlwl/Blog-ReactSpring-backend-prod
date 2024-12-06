@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface FileRepository {
     List<FileEntity> saveAll(List<FileEntity> fileEntities);
-    List<FileEntity> findByBoard_Id(Long Id);
+    List<FileEntity> findByBoard_Id(Long id);
     Optional<FileEntity> findTop1ByBoard_Id(Long boardId);
     List<FileEntity> findFirstImageByBoardIdIn(List<Long> boardIdList);
     Optional<FileEntity> findByOriginalFilenameAndCurrentFilename(String originalFilename, String currentFilename);

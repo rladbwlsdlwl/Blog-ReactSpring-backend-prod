@@ -34,11 +34,11 @@ CREATE TABLE ROLE_TABLE (
 CREATE TABLE FILE_TABLE (
     id BIGINT AUTO_INCREMENT,
     board_id BIGINT NOT NULL,
-    originalFilename VARCHAR(255) NOT NULL,
-    currentFilename VARCHAR(255) NOT NULL,
+    original_filename VARCHAR(255) NOT NULL,
+    current_filename VARCHAR(255) NOT NULL,
     data MEDIUMBLOB NOT NULL,
 
-    UNIQUE(currentFilename)
+    UNIQUE(current_filename)
     PRIMARY KEY (id),
     FOREIGN KEY (board_id) REFERENCES BOARD_TABLE(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;

@@ -14,7 +14,7 @@ import java.sql.Blob;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository
+//@Repository
 public class JdbcTemplateFileRepository implements FileRepository{
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -23,7 +23,7 @@ public class JdbcTemplateFileRepository implements FileRepository{
 
     @Override
     public List<FileEntity> saveAll(List<FileEntity> fileEntities) {
-        String sql = "insert into FILE_TABLE(originalFilename, currentFilename, data, board_id) values (?, ?, ?, ?)";
+        String sql = "insert into FILE_TABLE(original_filename, current_filename, data, board_id) values (?, ?, ?, ?)";
 
         List<Object[]> batchQuery = fileEntities.stream().map(file -> new Object[]{
                 file.getOriginalFilename(),
@@ -72,14 +72,14 @@ public class JdbcTemplateFileRepository implements FileRepository{
 
     @Override
     public Optional<FileEntity> findByOriginalFilenameAndCurrentFilename(String originalFilename, String currentFilename) {
-        String sql = "select * from FILE_TABLE where originalFilename = ? and currentFilename = ?";
+        String sql = "select * from FILE_TABLE where original_filename = ? and current_filename = ?";
 
         return jdbcTemplate.query(sql, FileMapper(), originalFilename, currentFilename).stream().findAny();
     }
 
     @Override
     public void deleteByCurrentFilenameIn(List<String> currentFilename) {
-        String sql = "delete from FILE_TABLE where currentFilename in (FILTER)";
+        String sql = "delete from FILE_TABLE where current_filename in (FILTER)";
 
         sql = sql.replace("FILTER", currentFilename.stream()
                         .map(name -> "?")
@@ -99,8 +99,8 @@ public class JdbcTemplateFileRepository implements FileRepository{
         return (rs, rowNum) -> {
             Long id = rs.getLong("id");
             Long postId = rs.getLong("board_id");
-            String originalFilename = rs.getString("originalFilename");
-            String currentFilename = rs.getString("currentFilename");
+            String originalFilename = rs.getString("original_filename");
+            String currentFilename = rs.getString("current_filename");
             Blob blob = rs.getBlob("data");
             byte[] data = blob.getBytes(1, (int) blob.length());
 
