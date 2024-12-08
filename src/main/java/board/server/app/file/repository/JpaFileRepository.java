@@ -10,32 +10,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Repository
+//@Repository
 public class JpaFileRepository implements FileRepository{
 
     @Autowired
     private EntityManager em;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
-
-    // 성능 최적화를 위해 jdbc template을 활용한 배치 처리
-    @Override
-    public List<FileEntity> saveAll(List<FileEntity> fileEntities) {
-        String sql = "insert FILE_TABLE (original_filename, current_filename, data, board_id) values (?, ?, ?, ?)";
-
-        List<Object[]> params = fileEntities.stream().map(file -> new Object[]{
-                file.getOriginalFilename(),
-                file.getCurrentFilename(),
-                file.getData(),
-                file.getBoard().getId()
-        }).collect(Collectors.toList());
-
-        jdbcTemplate.batchUpdate(sql, params);
-
-        // id X
-        return fileEntities;
-    }
 
     @Override
     public List<FileEntity> findByBoard_Id(Long id) {

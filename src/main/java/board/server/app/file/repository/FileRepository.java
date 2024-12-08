@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FileRepository {
-    List<FileEntity> saveAll(List<FileEntity> fileEntities);
     List<FileEntity> findByBoard_Id(Long id);
     Optional<FileEntity> findTop1ByBoard_Id(Long boardId);
     List<FileEntity> findFirstImageByBoardIdIn(List<Long> boardIdList);

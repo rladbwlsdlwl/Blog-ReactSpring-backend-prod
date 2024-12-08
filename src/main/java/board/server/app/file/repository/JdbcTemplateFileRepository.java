@@ -19,25 +19,6 @@ public class JdbcTemplateFileRepository implements FileRepository{
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-
-
-    @Override
-    public List<FileEntity> saveAll(List<FileEntity> fileEntities) {
-        String sql = "insert into FILE_TABLE(original_filename, current_filename, data, board_id) values (?, ?, ?, ?)";
-
-        List<Object[]> batchQuery = fileEntities.stream().map(file -> new Object[]{
-                file.getOriginalFilename(),
-                file.getCurrentFilename(),
-                file.getData(),
-                file.getBoard().getId()
-        }).collect(Collectors.toList());
-
-        jdbcTemplate.batchUpdate(sql, batchQuery);
-
-        // id는 초기화되지 않음
-        return fileEntities;
-    }
-
     @Override
     public List<FileEntity> findByBoard_Id(Long boardId) {
         String sql = "select * from FILE_TABLE where board_id = ?";

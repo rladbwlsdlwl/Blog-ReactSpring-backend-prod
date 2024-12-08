@@ -3,6 +3,7 @@ package board.server.app.file.service;
 import board.server.app.board.entity.Board;
 import board.server.app.file.dto.FileResponseDto;
 import board.server.app.file.entity.FileEntity;
+import board.server.app.file.repository.CustomFileRepository;
 import board.server.app.file.repository.FileRepository;
 import board.server.app.member.entity.Member;
 import board.server.error.errorcode.CommonExceptionCode;
@@ -33,6 +34,9 @@ public class FileService {
     private String uploadDirectory;
     @Autowired
     private FileRepository fileRepository;
+    @Autowired
+    private CustomFileRepository customFileRepository;
+
 
     // 파일 작성
     public void upload(List<MultipartFile> multipartFileList, Long boardId, String username) throws IOException {
@@ -76,7 +80,7 @@ public class FileService {
             */
         }
 
-        fileRepository.saveAll(fileEntityList);
+        customFileRepository.saveAll(fileEntityList);
     }
 
     // 게시글에 해당하는 모든 파일 읽기
@@ -211,7 +215,7 @@ public class FileService {
 
         // 파일 생성
         if(!uploadFileList.isEmpty())
-            fileRepository.saveAll(uploadFileList);
+            customFileRepository.saveAll(uploadFileList);
 
 
         // 파일 삭제
