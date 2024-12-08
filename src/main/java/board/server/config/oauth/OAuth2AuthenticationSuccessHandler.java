@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -43,6 +44,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 //    }
 
     @Override
+    @Transactional
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         // 처음 가입한 유저는 최소한의 회원 정보로 회원가입 처리
         // 이미 가입한 유저 포함하여 토큰 발급 후 홈화면으로 리다이렉트
