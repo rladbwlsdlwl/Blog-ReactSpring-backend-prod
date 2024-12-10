@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ import java.util.Random;
 import java.util.UUID;
 
 @Slf4j
+@Component
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private final MemberRepository memberRepository;
     private final RoleRepository roleRepository;
