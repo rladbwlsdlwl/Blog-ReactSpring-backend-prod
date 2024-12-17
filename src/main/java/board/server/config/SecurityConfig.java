@@ -26,17 +26,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final CustomUserDetailService customUserDetailService;
+    private final CustomOAuth2UserService customOAuth2UserService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final MemberRepository memberRepository;
-    private final RoleRepository roleRepository;
     private final JwtTokenBlacklist jwtTokenBlacklist;
 
-    public SecurityConfig(PasswordEncoder passwordEncoder, CustomUserDetailService customUserDetailService, JwtTokenProvider jwtTokenProvider, MemberRepository memberRepository, RoleRepository roleRepository, JwtTokenBlacklist jwtTokenBlacklist) {
+    public SecurityConfig(PasswordEncoder passwordEncoder, CustomUserDetailService customUserDetailService, CustomOAuth2UserService customOAuth2UserService, JwtTokenProvider jwtTokenProvider, MemberRepository memberRepository, RoleRepository roleRepository, JwtTokenBlacklist jwtTokenBlacklist) {
         this.passwordEncoder = passwordEncoder;
         this.customUserDetailService = customUserDetailService;
+        this.customOAuth2UserService = customOAuth2UserService;
         this.jwtTokenProvider = jwtTokenProvider;
-        this.memberRepository = memberRepository;
-        this.roleRepository = roleRepository;
         this.jwtTokenBlacklist = jwtTokenBlacklist;
     }
 
@@ -45,7 +43,7 @@ public class SecurityConfig {
         JwtAccessDeniedHandler jwtAccessDeniedHandler = new JwtAccessDeniedHandler();
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenProvider);
         JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenProvider, customUserDetailService, jwtAccessDeniedHandler, jwtTokenBlacklist);
-        OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler = new OAuth2AuthenticationSuccessHandler(memberRepository, roleRepository, jwtTokenProvider);
+        OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler = new OAuth2AuthenticationSuccessHandler(customOAuth2UserService, jwtTokenProvider);
 
         jwtAuthenticationFilter.setFilterProcessesUrl("/api/signin");
 
