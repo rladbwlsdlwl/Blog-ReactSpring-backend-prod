@@ -258,7 +258,7 @@ public class FileService {
         for(MultipartFile multipartFile: multipartFileList){
             String filename = multipartFile.getOriginalFilename();
 
-            if(!(filename.endsWith(".png") || filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".heif"))){
+            if(!(filename.toLowerCase().endsWith(".png") || filename.toLowerCase().endsWith(".jpg") || filename.toLowerCase().endsWith(".jpeg") || filename.toLowerCase().endsWith(".heif"))){
                 throw new BusinessLogicException(CommonExceptionCode.FILE_TYPE_NOT_VALID);
             }
         }
