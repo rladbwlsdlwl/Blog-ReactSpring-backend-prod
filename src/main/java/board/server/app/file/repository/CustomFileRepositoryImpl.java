@@ -18,7 +18,7 @@ public class CustomFileRepositoryImpl implements CustomFileRepository{
     // 쿼리 최적화 - 배치 업데이트
     @Override
     public List<FileEntity> saveAll(List<FileEntity> fileEntities) {
-        String sql = "insert into FILE_TABLE(original_filename, current_filename, data, board_id) values (?, ?, ?, ?)";
+        String sql = "insert into file_table(original_filename, current_filename, data, board_id) values (?, ?, ?, ?)";
 
         List<Object[]> batchQuery = fileEntities.stream().map(file -> new Object[]{
                 file.getOriginalFilename(),

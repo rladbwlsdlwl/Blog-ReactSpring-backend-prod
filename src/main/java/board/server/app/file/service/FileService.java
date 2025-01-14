@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Getter
 public class FileService {
-    @Value("${images.upload.directory}")
-    private String uploadDirectory;
+//    @Value("${images.upload.directory}")
+//    private String uploadDirectory;
     @Autowired
     private FileRepository fileRepository;
     @Autowired
@@ -271,9 +271,9 @@ public class FileService {
 
      */
     // 파일 업로드 경로
-    private String getMemberUploadPath(String username, String filename) {
-        return uploadDirectory + File.separator + username + File.separator + filename;
-    }
+//    private String getMemberUploadPath(String username, String filename) {
+//        return uploadDirectory + File.separator + username + File.separator + filename;
+//    }
 
     // 파일 이름
     private String createCurrentFilename(Long boardId, String originalFilename) {

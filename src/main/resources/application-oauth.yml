@@ -9,7 +9,7 @@ spring:
           # GOOGLE
           google:
             client-id: 370272984771-vb7c047faamqm7etmrekk4kpeerbqerc.apps.googleusercontent.com
-            client-secret: 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
+            client-secret: ${BLOG_GOOGLE_KEY}
             scope:
               - email
               - profile
@@ -17,7 +17,7 @@ spring:
           # NAVER
           naver:
             client-id: r7eLYhYj_c6FCrlF_ghM
-            client-secret: yETFgqpJAp
+            client-secret: ${BLOG_NAVER_KEY}
             scope:
               - email
             client-name: Naver

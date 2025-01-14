@@ -38,7 +38,7 @@ CREATE TABLE FILE_TABLE (
     current_filename VARCHAR(255) NOT NULL,
     data MEDIUMBLOB NOT NULL,
 
-    UNIQUE(current_filename)
+    UNIQUE(current_filename),
     PRIMARY KEY (id),
     FOREIGN KEY (board_id) REFERENCES BOARD_TABLE(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
