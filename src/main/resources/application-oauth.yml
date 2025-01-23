@@ -13,6 +13,7 @@ spring:
             scope:
               - email
               - profile
+            redirect-uri: https://blogcloudserver.duckdns.org/login/oauth2/code/google
 
           # NAVER
           naver:
@@ -22,7 +23,7 @@ spring:
               - email
             client-name: Naver
             authorization-grant-type: authorization_code
-            redirect-uri: https://port-0-blog-reactspring-backend-prod-m2k9xlt5e613b758.sel4.cloudtype.app/login/oauth2/code/naver
+            redirect-uri: https://blogcloudserver.duckdns.org/login/oauth2/code/naver
 
         provider:
           naver:
