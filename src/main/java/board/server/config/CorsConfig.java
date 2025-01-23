@@ -9,9 +9,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+/*
+
+// CORS 확인은 NGINX
 @Configuration
 public class CorsConfig {
-    /* CORS */
     @Bean
     CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration corsConfiguration = new CorsConfiguration();
@@ -26,3 +28,4 @@ public class CorsConfig {
         return source;
     }
 }
+*/
