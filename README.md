@@ -49,7 +49,6 @@ React와 Spring Boot를 활용한 SPA 방식의 간단한 게시판 CRUD 프로�
 
 # 트러블 슈팅
 - N+1
-- JPA의 saveAll
 - 보상 트랜잭션
 - 리소스 최적화 (Base64 to Blob)
 - 네트워크 최적화 (PromiseAll)
