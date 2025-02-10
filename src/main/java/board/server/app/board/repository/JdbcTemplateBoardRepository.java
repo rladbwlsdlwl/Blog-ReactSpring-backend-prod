@@ -26,7 +26,7 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
     @Override
     public Board save(Board board) {
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-        jdbcInsert.withTableName("BOARD_TABLE").usingGeneratedKeyColumns("id");
+        jdbcInsert.withTableName("board_table").usingGeneratedKeyColumns("id");
 
         Map<String, Object> params = new HashMap<>();
         params.put("title", board.getTitle());
@@ -44,20 +44,20 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
 
     @Override
     public Optional<Board> findById(Long id) {
-        String sql = "select * from BOARD_TABLE where id = ?";
+        String sql = "select * from board_table where id = ?";
 
         return jdbcTemplate.query(sql, BoardMapper(), id).stream().findAny();
     }
 
     @Override
     public List<Board> findByMember_name(String name) {
-        String sql = "select * from BOARD_TABLE b left join MEMBER_TABLE m on b.member_id = m.id where m.name = ?";
+        String sql = "select * from board_table b left join member_table m on b.member_id = m.id where m.name = ?";
 
         return jdbcTemplate.query(sql, BoardNameMapper(), name);
     }
 
     public Long update(Board board) {
-        String sql = "update BOARD_TABLE set title = ?, contents = ?, views = ? where id = ?";
+        String sql = "update board_table set title = ?, contents = ?, views = ? where id = ?";
 
         jdbcTemplate.update(sql, board.getTitle(), board.getContents(), board.getViews(), board.getId());
 
@@ -66,7 +66,7 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
 
     @Override
     public void deleteById(Long id) {
-        String sql = "delete from BOARD_TABLE where id = ?";
+        String sql = "delete from board_table where id = ?";
 
         jdbcTemplate.update(sql, id);
     }
@@ -78,7 +78,7 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
 
     @Override
     public List<Board> findTop10ByOrderByCreatedAtDesc() {
-        String sql = "select * from BOARD_TABLE b left join MEMBER_TABLE m on b.member_id = m.id limit 10";
+        String sql = "select * from board_table b left join member_table m on b.member_id = m.id limit 10";
 
         return jdbcTemplate.query(sql, BoardNameMapper());
     }

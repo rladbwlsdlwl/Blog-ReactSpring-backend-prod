@@ -22,17 +22,17 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
 
     @Override
     public Optional<Comments> findById(Long id) {
-        String sql = "select * from COMMENT_TABLE where id = ?";
+        String sql = "select * from comment_table where id = ?";
 
         return jdbcTemplate.query(sql, CommentsMapper(), id).stream().findAny();
     }
 
     @Override
     public List<Comments> findByBoard_IdInWithMemberOrderByCreatedAtAsc(List<Long> idList) {
-//        String sql = "select * from COMMENT_TABLE c left join MEMBER_TABLE m on c.member_id = m.id where c.board_id = ? order by created_at";
+//        String sql = "select * from comment_table c left join member_table m on c.member_id = m.id where c.board_id = ? order by created_at";
 //        return jdbcTemplate.query(sql, CommentsNameMapper(), boardId);
 
-        String sql = "select * from COMMENT_TABLE c join MEMBER_TABLE m on c.member_id = m.id where c.board_id in ";
+        String sql = "select * from comment_table c join member_table m on c.member_id = m.id where c.board_id in ";
         String sqlIdFilter = idList.stream().map(id -> "?").collect(Collectors.joining(", "));
         String sqlOrderby = " order by created_at asc";
 
@@ -44,7 +44,7 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
     public Comments save(Comments comments) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
 
-        simpleJdbcInsert.withTableName("COMMENT_TABLE").usingGeneratedKeyColumns("id");
+        simpleJdbcInsert.withTableName("comment_table").usingGeneratedKeyColumns("id");
 
         Map<String, Object> param = new HashMap<>();
 
@@ -63,14 +63,14 @@ public class JdbcTemplateCommentsRepository implements CommentsRepository {
 
 
     public void update(Comments comments) {
-        String sql = "update COMMENT_TABLE set comments = ?, created_at = ? where id = ?";
+        String sql = "update comment_table set comments = ?, created_at = ? where id = ?";
 
         jdbcTemplate.update(sql, comments.getContents(), comments.getCreatedAt(), comments.getId());
     }
 
     @Override
     public void deleteById(Long id) {
-        String sql = "delete from COMMENT_TABLE where id = ?";
+        String sql = "delete from comment_table where id = ?";
 
         jdbcTemplate.update(sql, id);
     }

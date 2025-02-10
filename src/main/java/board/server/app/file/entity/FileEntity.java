@@ -11,7 +11,7 @@ import lombok.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "FILE_TABLE")
+@Table(name = "file_table")
 public class FileEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

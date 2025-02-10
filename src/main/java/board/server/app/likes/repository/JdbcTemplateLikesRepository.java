@@ -22,7 +22,7 @@ public class JdbcTemplateLikesRepository implements LikesRepository{
 
     @Override
     public List<Likes> findByBoard_Id(Long id) {
-        String sql = "select * from LIKES_TABLE where board_id = ?";
+        String sql = "select * from likes_table where board_id = ?";
 
         List<Likes> likesList = jdbcTemplate.query(sql, LikesMapper(), id);
 
@@ -31,7 +31,7 @@ public class JdbcTemplateLikesRepository implements LikesRepository{
 
     @Override
     public List<Likes> findByBoard_IdIn(List<Long> idList) {
-        String sql = "select * from LIKES_TABLE where board_id in ";
+        String sql = "select * from likes_table where board_id in ";
         String sqlIdFilter = idList.stream().map(id -> "?").collect(Collectors.joining(", "));
         String SQL = sql + "(" + sqlIdFilter + ")";
 
@@ -42,7 +42,7 @@ public class JdbcTemplateLikesRepository implements LikesRepository{
 
     @Override
     public Optional<Likes> findByBoard_IdAndMember_Id(Long boardId, Long memberId) {
-        String sql = "select * from LIKES_TABLE where board_id = ? and member_id = ?";
+        String sql = "select * from likes_table where board_id = ? and member_id = ?";
 
         List<Likes> likesList = jdbcTemplate.query(sql, LikesMapper(), boardId, memberId);
 
@@ -53,7 +53,7 @@ public class JdbcTemplateLikesRepository implements LikesRepository{
     public Likes save(Likes likes) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
 
-        simpleJdbcInsert.withTableName("LIKES_TABLE").usingGeneratedKeyColumns("id");
+        simpleJdbcInsert.withTableName("likes_table").usingGeneratedKeyColumns("id");
 
         Map<String, Object> param = new HashMap<>();
         param.put("board_id", likes.getBoard().getId());
@@ -68,14 +68,14 @@ public class JdbcTemplateLikesRepository implements LikesRepository{
 
     @Override
     public void delete(Likes likes) {
-        String sql = "delete from LIKES_TABLE where member_id = ? and board_id = ?";
+        String sql = "delete from likes_table where member_id = ? and board_id = ?";
 
         jdbcTemplate.update(sql, likes.getMember().getId(), likes.getBoard().getId());
     }
 
     @Override
     public void deleteById(Long id) {
-        String sql = "delete from LIKES_TABLE where id = ?";
+        String sql = "delete from likes_table where id = ?";
 
         jdbcTemplate.update(sql, id);
     }

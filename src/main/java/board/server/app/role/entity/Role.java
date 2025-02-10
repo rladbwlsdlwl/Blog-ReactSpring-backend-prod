@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 //@AllArgsConstructor
 @Entity
-@Table(name = "ROLE_TABLE")
+@Table(name = "role_table")
 public class Role {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

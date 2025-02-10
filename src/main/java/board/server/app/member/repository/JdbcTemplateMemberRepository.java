@@ -30,7 +30,7 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
         SimpleJdbcInsert ji = new SimpleJdbcInsert(jdbcTemplate);
 
         /* insert member table */
-        ji.withTableName("MEMBER_TABLE").usingGeneratedKeyColumns("id");
+        ji.withTableName("member_table").usingGeneratedKeyColumns("id");
 
         Map<String, Object> params = new HashMap<>();
         params.put("name", member.getName());
@@ -45,13 +45,13 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
 
     // spring data JPA, update -> save
     public void update(Member member) {
-        String sql = "update MEMBER_TABLE set name = ?, password = ?, email = ? where id = ?";
+        String sql = "update member_table set name = ?, password = ?, email = ? where id = ?";
         jdbcTemplate.update(sql, member.getName(), member.getPassword(), member.getEmail(), member.getId());
     }
 
     @Override
     public Optional<Member> findById(Long id) {
-        String sql = "select * from MEMBER_TABLE where id = ?";
+        String sql = "select * from member_table where id = ?";
         List<Member> member = jdbcTemplate.query(sql, MemberMapper(), id);
 
         return member.stream().findAny();
@@ -59,7 +59,7 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
 
     @Override
     public Optional<Member> findByName(String name) {
-        String sql = "select * from MEMBER_TABLE where name = ?";
+        String sql = "select * from member_table where name = ?";
         List<Member> query = jdbcTemplate.query(sql, MemberMapper(), name);
 
         return query.stream().findAny();
@@ -67,7 +67,7 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
 
     @Override
     public Optional<Member> findByEmail(String email) {
-        String sql = "select * from MEMBER_TABLE where email = ?";
+        String sql = "select * from member_table where email = ?";
         List<Member> query = jdbcTemplate.query(sql, MemberMapper(), email);
 
         return query.stream().findAny();
@@ -75,7 +75,7 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
 
     @Override
     public Optional<Member> findByIdAndName(Long id, String name) {
-        String sql = "select * from MEMBER_TABLE where id = ? and name = ?";
+        String sql = "select * from member_table where id = ? and name = ?";
         List<Member> query = jdbcTemplate.query(sql, MemberMapper(), id, name);
 
         return query.stream().findAny();
@@ -84,7 +84,7 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
     @Override
     public Optional<Member> findByNameWithRole(String name) {
         //m.id, m.name, m.email, m.password, r.role
-        String sql = "select m.id, m.name, m.email, m.password, r.role from MEMBER_TABLE m join ROLE_TABLE r on m.id = r.member_id where m.name = ?";
+        String sql = "select m.id, m.name, m.email, m.password, r.role from member_table m join role_table r on m.id = r.member_id where m.name = ?";
         List<Member> query = jdbcTemplate.query(sql, MemberRoleMapper(), name);
 
         return query.stream().findAny();
@@ -97,13 +97,13 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
 
     @Override
     public void deleteById(Long id) {
-        String query = "delete from MEMBER_TABLE where id = ?";
+        String query = "delete from member_table where id = ?";
         jdbcTemplate.update(query, id);
     }
 
     @Override
     public List<Member> findAll() {
-        String sql = "select * from MEMBER_TABLE";
+        String sql = "select * from member_table";
         return jdbcTemplate.query(sql, MemberMapper());
     }
 

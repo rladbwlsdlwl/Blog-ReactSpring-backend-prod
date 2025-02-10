@@ -21,7 +21,7 @@ public class JdbcTemplateFileRepository implements FileRepository{
 
     @Override
     public List<FileEntity> findByBoard_Id(Long boardId) {
-        String sql = "select * from FILE_TABLE where board_id = ?";
+        String sql = "select * from file_table where board_id = ?";
 
         List<FileEntity> query = jdbcTemplate.query(sql, FileMapper(), boardId);
 
@@ -30,15 +30,15 @@ public class JdbcTemplateFileRepository implements FileRepository{
 
     @Override
     public Optional<FileEntity> findTop1ByBoard_Id(Long postId) {
-        String sql = "select * from FILE_TABLE where board_id = ? limit 1";
+        String sql = "select * from file_table where board_id = ? limit 1";
 
         return jdbcTemplate.query(sql, FileMapper(), postId).stream().findAny();
     }
 
     @Override
     public List<FileEntity> findFirstImageByBoardIdIn(List<Long> boardIdList) {
-        String sqlfilter = "select min(id) as id from FILE_TABLE where board_id in (FILTER) group by board_id";
-        String sql = "select * from FILE_TABLE where id in (" + sqlfilter + ")";
+        String sqlfilter = "select min(id) as id from file_table where board_id in (FILTER) group by board_id";
+        String sql = "select * from file_table where id in (" + sqlfilter + ")";
 
 
         sql = sql.replace("FILTER", boardIdList.stream()
@@ -53,14 +53,14 @@ public class JdbcTemplateFileRepository implements FileRepository{
 
     @Override
     public Optional<FileEntity> findByOriginalFilenameAndCurrentFilename(String originalFilename, String currentFilename) {
-        String sql = "select * from FILE_TABLE where original_filename = ? and current_filename = ?";
+        String sql = "select * from file_table where original_filename = ? and current_filename = ?";
 
         return jdbcTemplate.query(sql, FileMapper(), originalFilename, currentFilename).stream().findAny();
     }
 
     @Override
     public void deleteByCurrentFilenameIn(List<String> currentFilename) {
-        String sql = "delete from FILE_TABLE where current_filename in (FILTER)";
+        String sql = "delete from file_table where current_filename in (FILTER)";
 
         sql = sql.replace("FILTER", currentFilename.stream()
                         .map(name -> "?")
@@ -71,7 +71,7 @@ public class JdbcTemplateFileRepository implements FileRepository{
 
     @Override
     public void deleteByBoard_Id(Long boardId) {
-        String sql = "delete from FILE_TABLE where board_id = ?";
+        String sql = "delete from file_table where board_id = ?";
 
         jdbcTemplate.update(sql, boardId);
     }
