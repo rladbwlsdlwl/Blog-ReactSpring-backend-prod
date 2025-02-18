@@ -84,10 +84,19 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
     @Override
     public Optional<Member> findByNameWithRole(String name) {
         //m.id, m.name, m.email, m.password, r.role
-        String sql = "select m.id, m.name, m.email, m.password, r.role from member_table m join role_table r on m.id = r.member_id where m.name = ?";
+        String sql = "select m.id, m.name, m.email, m.password, m.role_id, r.role from member_table m join role_table r on m.id = r.member_id where m.name = ?";
         List<Member> query = jdbcTemplate.query(sql, MemberRoleMapper(), name);
 
         return query.stream().findAny();
+    }
+
+    @Override
+    public Optional<Member> findByIdWithRole(Long id) {
+        String sql = "select m.id, m.name, m.email, m.password, m.role_id, r.role from member_table m left join role_table on m.role_id = r.id where m.id = ?";
+
+        List<Member> memberList = jdbcTemplate.query(sql, MemberRoleMapper(), id);
+
+        return memberList.stream().findAny();
     }
 
     @Override
@@ -115,12 +124,19 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
             String email = rs.getString("email");
             String password = rs.getString("password");
             Long id = rs.getLong("id");
+            Long role_id = rs.getLong("role_id");
+            RoleType roleType = rs.getString("role").equals("MEMBER") ? RoleType.MEMBER : RoleType.ADMIN;
+            Role role = Role.builder()
+                    .id(role_id)
+                    .roleType(roleType)
+                    .build();
 
             return Member.builder()
                     .name(username)
                     .email(email)
                     .password(password)
                     .id(id)
+                    .role(role)
                     .build();
         });
     }
@@ -130,8 +146,10 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
             String email = rs.getString("email");
             String password = rs.getString("password");
             Long id = rs.getLong("id");
+            Long role_id = rs.getLong("role_id");
             RoleType roleType = rs.getString("role").equals("MEMBER") ? RoleType.MEMBER : RoleType.ADMIN;
             Role role = Role.builder()
+                    .id(role_id)
                     .roleType(roleType)
                     .build();
 

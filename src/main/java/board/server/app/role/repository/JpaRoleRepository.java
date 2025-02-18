@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
+//@Repository
 public class JpaRoleRepository implements RoleRepository{
 
     private final EntityManager em;

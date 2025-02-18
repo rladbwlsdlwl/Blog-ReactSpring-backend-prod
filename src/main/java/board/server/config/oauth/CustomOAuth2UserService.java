@@ -60,17 +60,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private Member createMember(String email) {
         // 회원가입 후 토큰 발행
         // 패스워드 NULL
+        Role role = Role.builder()
+                .roleType(RoleType.MEMBER)
+                .build();
         Member member = Member.builder()
                 .email(email)
                 .name(getRandomUsername())
-                .build();
-        Role role = Role.builder()
-                .member(member)
-                .roleType(RoleType.MEMBER)
+                .role(role)
                 .build();
 
-        memberRepository.save(member);
         roleRepository.save(role);
+        memberRepository.save(member);
 
         return member;
     }

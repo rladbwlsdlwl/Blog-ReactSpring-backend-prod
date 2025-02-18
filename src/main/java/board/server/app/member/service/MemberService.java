@@ -44,12 +44,10 @@ public class MemberService {
                 .roleType(RoleType.MEMBER)
                 .member(member)
                 .build();
-       // member.setRole(role);
-        
-        memberRepository.save(member);
+        member.setRole(role);
+
         roleRepository.save(role);
-
-
+        memberRepository.save(member);
 
         return member.getId();
     }
@@ -69,7 +67,14 @@ public class MemberService {
 
     // 계정 삭제
     public void delete(Long id){
-        memberRepository.deleteById(id);
+//        memberRepository.deleteById(id);
+
+        // Role 삭제
+        roleRepository.delete(
+                memberRepository.findByIdWithRole(id)
+                .map(Member::getRole)
+                .orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND))
+        );
     }
 
     // 닉네임 변경

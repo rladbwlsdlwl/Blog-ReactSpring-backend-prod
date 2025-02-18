@@ -20,7 +20,8 @@ public class Member {
     private String email;
     private String password;
 
-    @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id")
     private Role role;
 
     @Builder
@@ -30,7 +31,12 @@ public class Member {
         this.email = email;
         this.password = password;
         this.role = role;
+
+        // 양방향 연관관계 설정
+        if(role != null) role.setMember(this);
     }
+
+
 
     @Builder
     public Member(Long id, String name, String email, String password){

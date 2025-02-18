@@ -78,6 +78,17 @@ public class JpaMemberRepository implements MemberRepository{
     }
 
     @Override
+    public Optional<Member> findByIdWithRole(Long id) {
+        String sql = "select from Member m fetch join m.role r where m.id = :role_id";
+
+        List<Member> memberList = em.createQuery(sql, Member.class)
+                .setParameter("id", id)
+                .getResultList();
+
+        return memberList.stream().findAny();
+    }
+
+    @Override
     public void delete(Member member) {
         em.remove(member);
     }

@@ -19,8 +19,7 @@ public class Role {
     @Column(name = "role")
     private RoleType roleType;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @OneToOne(mappedBy = "role", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private Member member;
 
 
@@ -29,7 +28,5 @@ public class Role {
         this.id = id;
         this.roleType = roleType;
         this.member = member;
-        
-        member.setRole(this); // 양방향 연관관계 설정
     }
 }

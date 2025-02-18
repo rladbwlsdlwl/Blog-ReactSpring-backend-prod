@@ -10,4 +10,8 @@ public interface SpringDataJpaMemberRepository extends JpaRepository<Member, Lon
     @Override
     @Query("select m from Member m join fetch m.role where m.name = :name")
     Optional<Member> findByNameWithRole(@Param("name") String name);
+
+    @Override
+    @Query("select m from Member m join fetch m.role where m.id = :role_id")
+    Optional<Member> findByIdWithRole(@Param("role_id") Long id);
 }
