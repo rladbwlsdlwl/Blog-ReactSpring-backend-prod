@@ -29,7 +29,7 @@ React와 Spring Boot를 활용한 SPA 방식의 간단한 게시판 CRUD 프로�
 ![blog-architecture](https://github.com/user-attachments/assets/8ec042f3-902d-4299-8d1c-0a26423a8c2d)
 
 # 도메인 정의 (ERD)
-![blog-erd](https://github.com/user-attachments/assets/124238c2-6199-47e7-a5ea-2362ef1f6d02)
+![blog-erd-curr](https://github.com/user-attachments/assets/9b04e341-250f-4358-a810-5c12e6f22b0f)
 
 # API 명세서
 회원 명세서
@@ -48,7 +48,7 @@ React와 Spring Boot를 활용한 SPA 방식의 간단한 게시판 CRUD 프로�
 ![스크린샷 2024-12-26 175632](https://github.com/user-attachments/assets/a5270732-bbda-4099-878c-d43a41c5a984)
 
 # 트러블 슈팅
-- N+1
-- 보상 트랜잭션
-- 리소스 최적화 (Base64 to Blob)
-- 네트워크 최적화 (PromiseAll)
+- [N+1](https://proximal-paint-99f.notion.site/N-1-972a5ec80b9442b19d9d3731aa0e3e14)
+- [보상 트랜잭션](https://proximal-paint-99f.notion.site/75f1afe815484e8eaac765674e652efd)
+- [리소스 최적화](https://proximal-paint-99f.notion.site/Base64-Blob-ca716948251847fea3f75ed269b84bb1?pvs=73) (Base64 to Blob)
+- [네트워크 최적화](https://proximal-paint-99f.notion.site/PromiseAll-16f006cea10180308ddcfb1cab27ae7a?pvs=73) (PromiseAll)
