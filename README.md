@@ -1,5 +1,7 @@
 # 게시판 프로젝트
-React와 Spring Boot를 활용한 SPA 방식의 간단한 게시판 CRUD 프로젝트입니다. <br/>
+React와 Spring Boot를 활용한 SPA 방식의 간단한 게시판 CRUD 프로젝트입니다. <br/> <br/>
+frontend Repository: https://github.com/rladbwlsdlwl/Blog-ReactSpring-frontend <br/>
+backend Repository: https://github.com/rladbwlsdlwl/Blog-ReactSpring-backend-prod <br/>
 
 # 프로젝트 소개
 본 프로젝트는 기본적인 게시글 작성 기능과 이미지 파일 업로드 기능을 제공합니다.<br/>  
