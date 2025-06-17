@@ -9,15 +9,18 @@ import board.server.app.role.entity.Role;
 import board.server.app.role.repository.RoleRepository;
 import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.util.List;
 
 @Service
 @Transactional
+@Slf4j
 public class MemberService {
     private final MemberRepository memberRepository;
     private final RoleRepository roleRepository;
@@ -50,6 +53,33 @@ public class MemberService {
         memberRepository.save(member);
 
         return member.getId();
+    }
+
+    // 회원 찾기 - 아이디
+    public String findId(String email){
+        checkAvailableEmail(email);
+
+        // 이메일 확인
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND));
+
+        // 아이디 반환
+        return member.getName();
+    }
+
+    // 회원 찾지 - 패스워드
+    public String findPw(String name){
+        checkAvailableNickname(name);
+
+        // 닉네임 확인
+        Member member = memberRepository.findByName(name).orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND));
+
+        // 패스워드 랜덤 발급
+        String pwd = generatePassword();
+
+        // 패스워드 초기화
+        updatePassword(member, pwd);
+
+        return pwd;
     }
 
     public void update(List<String> mode, MemberRequestUpdateDto memberRequestUpdateDto, Member member) {
@@ -176,5 +206,22 @@ public class MemberService {
         memberRepository.findByEmail(email).ifPresent(e -> {
             throw new BusinessLogicException(CustomExceptionCode.MEMBER_DUPLICATE_EMAIL);
         });
+    }
+
+    // 난수를 활용한 패스워드 발급
+    private String generatePassword(){
+        final int SIZE = 10;
+        final String CHAR_SET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        final SecureRandom random = new SecureRandom();
+
+        StringBuilder pwd = new StringBuilder();
+        for (int i =0; i<SIZE; i++){
+            int rd = random.nextInt(CHAR_SET.length());
+
+            pwd.append(CHAR_SET.charAt(rd));
+        }
+
+        log.info(pwd.toString());
+        return pwd.toString();
     }
 }

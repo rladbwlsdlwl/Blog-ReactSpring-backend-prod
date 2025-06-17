@@ -1,7 +1,9 @@
 package board.server.app.member.controller;
 
+import board.server.app.member.dto.request.MemberRequestFindoutDto;
 import board.server.app.member.dto.request.MemberRequestUpdateDto;
 import board.server.app.member.dto.response.CustomMemberResponseDto;
+import board.server.app.member.dto.response.MemberResponseFindoutDto;
 import board.server.app.member.dto.response.MemberResponseMeDto;
 import board.server.app.member.entity.Member;
 import board.server.app.member.service.MemberService;
@@ -77,6 +79,32 @@ public class MemberController {
 
         Long id = memberService.join(member);
         return ResponseEntity.status(HttpStatus.CREATED).body(id);
+    }
+
+    @PostMapping("/findInfo/id")
+    public ResponseEntity<?> findUserId(@RequestBody @Valid MemberRequestFindoutDto memberRequestFindoutDto){
+        String email = memberRequestFindoutDto.getEmail();
+
+        String username = memberService.findId(email);
+
+        MemberResponseFindoutDto memberResponseFindoutDto = MemberResponseFindoutDto.builder()
+                .username(username)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberResponseFindoutDto);
+    }
+
+    @PatchMapping("/findInfo/pw")
+    public ResponseEntity<?> findUserPw(@RequestBody @Valid MemberRequestFindoutDto memberRequestFindoutDto){
+        String name = memberRequestFindoutDto.getName();
+
+        String password = memberService.findPw(name);
+
+        MemberResponseFindoutDto memberResponseFindoutDto = MemberResponseFindoutDto.builder()
+                .password(password)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberResponseFindoutDto);
     }
 
     @PatchMapping("/{username}/setting")
