@@ -35,7 +35,7 @@ backend Repository: https://github.com/rladbwlsdlwl/Blog-ReactSpring-backend-pro
 
 # API 명세서
 회원 명세서
-![스크린샷 2024-12-26 174548](https://github.com/user-attachments/assets/55df03ab-6b96-445f-b868-6cff315ce830)
+<img width="1107" height="892" alt="image" src="https://github.com/user-attachments/assets/5fea7212-0e21-4cc8-8a3f-642403a5ed8f" />
 
 게시글 명세서
 ![스크린샷 2024-12-26 175121](https://github.com/user-attachments/assets/0f1d0920-d98d-4bc0-92bb-9b045fa1859f)
