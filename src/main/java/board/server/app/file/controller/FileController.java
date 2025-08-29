@@ -22,6 +22,15 @@ public class FileController {
     @Autowired
     public FileService fileService;
 
+//    이미지 마이그레이션 - 1회성
+//    운영자만 접근 가능
+    @GetMapping("/file/restore")
+    public ResponseEntity<?> restoreFileData(){
+         fileService.migrationImage();
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
     @PostMapping("/file/{boardId}")
     public ResponseEntity<?> uploadFiles(@PathVariable("username") String username,
                                          @PathVariable("boardId") Long boardId,

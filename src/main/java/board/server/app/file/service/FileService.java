@@ -1,6 +1,7 @@
 package board.server.app.file.service;
 
 import board.server.app.board.entity.Board;
+import board.server.app.board.repository.BoardRepository;
 import board.server.app.file.dto.FileResponseDto;
 import board.server.app.file.entity.FileEntity;
 import board.server.app.file.repository.CustomFileRepository;
@@ -30,12 +31,14 @@ import java.util.stream.Collectors;
 @Slf4j
 @Getter
 public class FileService {
-//    @Value("${images.upload.directory}")
-//    private String uploadDirectory;
+    @Value("${images.upload.directory}")
+    private String uploadDirectory;
     @Autowired
     private FileRepository fileRepository;
     @Autowired
     private CustomFileRepository customFileRepository;
+    @Autowired
+    private BoardRepository boardRepository;
 
 
     // 파일 작성
@@ -253,6 +256,45 @@ public class FileService {
         */
     }
 
+    public void migrationImage(){
+        try{
+            migrationImageFromMysqlToServer();
+        }catch(IOException e){
+            log.warn("파일 작성 실패! " + e.getStackTrace());
+        }catch(Exception e){
+            log.warn("파일 작성 실패! " + e.getStackTrace());
+        }
+    }
+    
+    
+    
+    // 파일 레포지토리 마이그레이션
+    private void migrationImageFromMysqlToServer() throws IOException {
+        // 모든 게시글 id 리스트
+        List<Board> boardList = boardRepository.findTop10ByOrderByCreatedAtDesc();
+
+        // 게시글 id에 대한 파일 리스트 찾아 파일 생성하기
+        for (Board board: boardList){
+            List<FileEntity> fileList = fileRepository.findByBoard_Id(board.getId());
+
+            for(FileEntity fileEntity: fileList){
+                // 파일 경로
+                // uploads/{username}/{currentFilename}.png
+
+                String pathDir = getUploadMemberDir(fileEntity.getBoard().getMember().getName());
+                File file = new File(pathDir);
+                if(!file.exists()){
+                    file.mkdirs();
+                }
+
+                String path = getMemberUploadPath(fileEntity.getBoard().getMember().getName(), fileEntity.getCurrentFilename());
+
+                Files.write(Path.of(path), fileEntity.getData());
+            }
+        }
+    }
+
+
     // 파일 타입 확인
     private void validateFilesType(List<MultipartFile> multipartFileList) {
         for(MultipartFile multipartFile: multipartFileList){
@@ -264,16 +306,15 @@ public class FileService {
         }
     }
 
-    /*
+    // 파일 업로드 디렉토리 경로
+    private String getUploadMemberDir(String username) {
+        return uploadDirectory + File.separator + username;
+    }
 
-        배포환경에서는 서버 측에 이미지를 저장하지 않음
-        현재 RDBMS인 mysql에 Blob(16mb) 타입(바이트 단위)으로 저장
-
-     */
     // 파일 업로드 경로
-//    private String getMemberUploadPath(String username, String filename) {
-//        return uploadDirectory + File.separator + username + File.separator + filename;
-//    }
+    private String getMemberUploadPath(String username, String filename) {
+        return getUploadMemberDir(username) + File.separator + filename;
+    }
 
     // 파일 이름
     private String createCurrentFilename(Long boardId, String originalFilename) {

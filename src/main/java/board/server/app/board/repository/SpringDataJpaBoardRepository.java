@@ -12,4 +12,8 @@ public interface SpringDataJpaBoardRepository extends JpaRepository<Board, Long>
     @Override
     @Query("select b from Board b join fetch b.member order by b.createdAt desc")
     List<Board> findTop10ByOrderByCreatedAtDescWithMember(Pageable pageable);
+
+    @Override
+    @Query("select b from Board b join fetch b.member order by b.createdAt desc")
+    List<Board> findTop10ByOrderByCreatedAtDesc();
 }
