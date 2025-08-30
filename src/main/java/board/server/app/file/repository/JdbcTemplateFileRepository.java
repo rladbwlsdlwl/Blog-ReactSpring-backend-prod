@@ -91,7 +91,6 @@ public class JdbcTemplateFileRepository implements FileRepository{
 
             FileEntity fileEntity = FileEntity.builder()
                     .id(id)
-                    .data(data)
                     .board(board)
                     .originalFilename(originalFilename)
                     .currentFilename(currentFilename)

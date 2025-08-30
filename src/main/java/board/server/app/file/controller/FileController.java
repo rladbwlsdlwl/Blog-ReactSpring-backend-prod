@@ -24,12 +24,14 @@ public class FileController {
 
 //    이미지 마이그레이션 - 1회성
 //    운영자만 접근 가능
+
     @GetMapping("/file/restore")
     public ResponseEntity<?> restoreFileData(){
-         fileService.migrationImage();
+        // fileService.migrationImage();
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
 
     @PostMapping("/file/{boardId}")
     public ResponseEntity<?> uploadFiles(@PathVariable("username") String username,

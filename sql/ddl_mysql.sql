@@ -36,7 +36,7 @@ CREATE TABLE file_table (
     board_id BIGINT NOT NULL,
     original_filename VARCHAR(255) NOT NULL,
     current_filename VARCHAR(255) NOT NULL,
-    data MEDIUMBLOB NOT NULL,
+--    data MEDIUMBLOB NOT NULL,
 
     UNIQUE(current_filename),
     PRIMARY KEY (id),

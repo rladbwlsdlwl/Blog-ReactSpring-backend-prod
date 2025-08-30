@@ -11,14 +11,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FileResponseDto {
-    private byte[] file;
+    private String file; // url
     private String originalFilename;
     private String currentFilename;
     private Long postId;
 
     public static FileResponseDto of(FileEntity fileEntity){
         return FileResponseDto.builder()
-                .file(fileEntity.getData())
                 .originalFilename(fileEntity.getOriginalFilename())
                 .currentFilename(fileEntity.getCurrentFilename())
                 .postId(fileEntity.getBoard().getId())

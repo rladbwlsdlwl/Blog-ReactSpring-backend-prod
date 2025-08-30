@@ -19,8 +19,9 @@ public class FileEntity {
     private String originalFilename;
     @Column(name = "current_filename")
     private String currentFilename;
-    @Lob
-    private byte[] data; // blob 타입의 이미지 파일 데이터
+
+//    @Lob
+//    private byte[] data; // blob 타입의 이미지 파일 데이터
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
