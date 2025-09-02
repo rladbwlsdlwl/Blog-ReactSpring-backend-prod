@@ -28,29 +28,29 @@ backend Repository: https://github.com/rladbwlsdlwl/Blog-ReactSpring-backend-pro
 | MySQL                | 8.3.0     |
 
 # 시스템 아키텍처
-![blog-architecture](https://github.com/user-attachments/assets/8ec042f3-902d-4299-8d1c-0a26423a8c2d)
+![myblog-arc.png](attachment:5f81bba9-4220-4804-a10b-77faca36256e:myblog-arc.png)
 
 # 도메인 정의 (ERD)
-![blog-erd-curr](https://github.com/user-attachments/assets/9b04e341-250f-4358-a810-5c12e6f22b0f)
+![myblogdb-erd.png](attachment:b7d5a3c6-06f6-4574-a5d4-c2a7016fb8df:myblogdb-erd.png)
 
 # API 명세서
 회원 명세서
-<img width="1107" height="892" alt="image" src="https://github.com/user-attachments/assets/5fea7212-0e21-4cc8-8a3f-642403a5ed8f" />
+![image.png](attachment:969a0543-cfe9-46a5-b6da-9ce9cb8e7271:image.png)
 
 게시글 명세서
-![스크린샷 2024-12-26 175121](https://github.com/user-attachments/assets/0f1d0920-d98d-4bc0-92bb-9b045fa1859f)
+![image.png](attachment:34840f15-2144-495f-bafd-35f8c885516e:image.png)
 
 파일 명세서
-![스크린샷 2024-12-26 175400](https://github.com/user-attachments/assets/94921961-c68f-4fe2-9e79-864d64bb92c9)
+![image.png](attachment:4ed6df4a-2e00-4812-8a28-9cf5660ee8b6:image.png)
 
 좋아요 명세서
-![스크린샷 2024-12-26 175516](https://github.com/user-attachments/assets/1011711d-4674-4eae-96da-de8020e5f529)
+![image.png](attachment:0ea67ea8-af88-4c44-8e61-09ca3574cb99:image.png)
 
 댓글 명세서
-![스크린샷 2024-12-26 175632](https://github.com/user-attachments/assets/a5270732-bbda-4099-878c-d43a41c5a984)
+![image.png](attachment:7f100aa0-9936-43c4-8dd2-ebc9e4b5adf5:image.png)
 
 # 트러블 슈팅
 - [N+1](https://proximal-paint-99f.notion.site/N-1-972a5ec80b9442b19d9d3731aa0e3e14)
 - [보상 트랜잭션](https://proximal-paint-99f.notion.site/75f1afe815484e8eaac765674e652efd)
-- [리소스 최적화](https://proximal-paint-99f.notion.site/Base64-Blob-ca716948251847fea3f75ed269b84bb1?pvs=73) (Base64 to Blob)
-- [네트워크 최적화](https://proximal-paint-99f.notion.site/PromiseAll-16f006cea10180308ddcfb1cab27ae7a?pvs=73) (PromiseAll)
+- [이미지 처리 최적화](https://proximal-paint-99f.notion.site/Base64-Blob-ca716948251847fea3f75ed269b84bb1?pvs=73)
+- [네트워크 최적화](https://proximal-paint-99f.notion.site/PromiseAll-16f006cea10180308ddcfb1cab27ae7a?pvs=73)
