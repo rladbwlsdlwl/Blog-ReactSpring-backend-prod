@@ -28,26 +28,31 @@ backend Repository: https://github.com/rladbwlsdlwl/Blog-ReactSpring-backend-pro
 | MySQL                | 8.3.0     |
 
 # 시스템 아키텍처
-![myblog-arc.png](attachment:5f81bba9-4220-4804-a10b-77faca36256e:myblog-arc.png)
+<img width="961" height="329" alt="myblog-arc" src="https://github.com/user-attachments/assets/1d7319f9-972d-4bea-853b-240c24fd2d21" />
 
 # 도메인 정의 (ERD)
-![myblogdb-erd.png](attachment:b7d5a3c6-06f6-4574-a5d4-c2a7016fb8df:myblogdb-erd.png)
+<img width="941" height="750" alt="myblogdb-erd" src="https://github.com/user-attachments/assets/2b78756e-03c1-444f-839e-a2524a6751a8" />
 
 # API 명세서
 회원 명세서
-![image.png](attachment:969a0543-cfe9-46a5-b6da-9ce9cb8e7271:image.png)
+<img width="1111" height="892" alt="Member" src="https://github.com/user-attachments/assets/404bdfc5-72a7-45a5-9a21-587299e210fd" />
+
 
 게시글 명세서
-![image.png](attachment:34840f15-2144-495f-bafd-35f8c885516e:image.png)
+<img width="1100" height="577" alt="Board" src="https://github.com/user-attachments/assets/65cf9c70-a747-45f5-a69c-8f2e0dd44a0a" />
+
 
 파일 명세서
-![image.png](attachment:4ed6df4a-2e00-4812-8a28-9cf5660ee8b6:image.png)
+<img width="1102" height="808" alt="File" src="https://github.com/user-attachments/assets/475605bf-da1b-4ff5-be74-f324cd540d0f" />
+
 
 좋아요 명세서
-![image.png](attachment:0ea67ea8-af88-4c44-8e61-09ca3574cb99:image.png)
+<img width="1102" height="310" alt="Likes" src="https://github.com/user-attachments/assets/d85848b4-6e7d-49c0-a3fc-5a9355a45f88" />
+
 
 댓글 명세서
-![image.png](attachment:7f100aa0-9936-43c4-8dd2-ebc9e4b5adf5:image.png)
+<img width="1102" height="310" alt="image" src="https://github.com/user-attachments/assets/f4cf323c-a027-445c-8744-0045c5d3b02e" />
+
 
 # 트러블 슈팅
 - [N+1](https://proximal-paint-99f.notion.site/N-1-972a5ec80b9442b19d9d3731aa0e3e14)
