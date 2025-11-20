@@ -28,29 +28,34 @@ backend Repository: https://github.com/rladbwlsdlwl/Blog-ReactSpring-backend-pro
 | MySQL                | 8.3.0     |
 
 # 시스템 아키텍처
-![blog-architecture](https://github.com/user-attachments/assets/8ec042f3-902d-4299-8d1c-0a26423a8c2d)
+<img width="961" height="329" alt="myblog-arc" src="https://github.com/user-attachments/assets/1d7319f9-972d-4bea-853b-240c24fd2d21" />
 
 # 도메인 정의 (ERD)
-![blog-erd-curr](https://github.com/user-attachments/assets/9b04e341-250f-4358-a810-5c12e6f22b0f)
+<img width="941" height="750" alt="myblogdb-erd" src="https://github.com/user-attachments/assets/2b78756e-03c1-444f-839e-a2524a6751a8" />
 
 # API 명세서
 회원 명세서
-<img width="1107" height="892" alt="image" src="https://github.com/user-attachments/assets/5fea7212-0e21-4cc8-8a3f-642403a5ed8f" />
+<img width="1111" height="892" alt="Member" src="https://github.com/user-attachments/assets/404bdfc5-72a7-45a5-9a21-587299e210fd" />
+
 
 게시글 명세서
-![스크린샷 2024-12-26 175121](https://github.com/user-attachments/assets/0f1d0920-d98d-4bc0-92bb-9b045fa1859f)
+<img width="1100" height="577" alt="Board" src="https://github.com/user-attachments/assets/65cf9c70-a747-45f5-a69c-8f2e0dd44a0a" />
+
 
 파일 명세서
-![스크린샷 2024-12-26 175400](https://github.com/user-attachments/assets/94921961-c68f-4fe2-9e79-864d64bb92c9)
+<img width="1102" height="808" alt="File" src="https://github.com/user-attachments/assets/475605bf-da1b-4ff5-be74-f324cd540d0f" />
+
 
 좋아요 명세서
-![스크린샷 2024-12-26 175516](https://github.com/user-attachments/assets/1011711d-4674-4eae-96da-de8020e5f529)
+<img width="1102" height="310" alt="Likes" src="https://github.com/user-attachments/assets/d85848b4-6e7d-49c0-a3fc-5a9355a45f88" />
+
 
 댓글 명세서
-![스크린샷 2024-12-26 175632](https://github.com/user-attachments/assets/a5270732-bbda-4099-878c-d43a41c5a984)
+<img width="1102" height="310" alt="image" src="https://github.com/user-attachments/assets/f4cf323c-a027-445c-8744-0045c5d3b02e" />
+
 
 # 트러블 슈팅
 - [N+1](https://proximal-paint-99f.notion.site/N-1-972a5ec80b9442b19d9d3731aa0e3e14)
 - [보상 트랜잭션](https://proximal-paint-99f.notion.site/75f1afe815484e8eaac765674e652efd)
-- [리소스 최적화](https://proximal-paint-99f.notion.site/Base64-Blob-ca716948251847fea3f75ed269b84bb1?pvs=73) (Base64 to Blob)
-- [네트워크 최적화](https://proximal-paint-99f.notion.site/PromiseAll-16f006cea10180308ddcfb1cab27ae7a?pvs=73) (PromiseAll)
+- [이미지 처리 최적화](https://proximal-paint-99f.notion.site/Base64-Blob-ca716948251847fea3f75ed269b84bb1?pvs=73)
+- [네트워크 최적화](https://proximal-paint-99f.notion.site/PromiseAll-16f006cea10180308ddcfb1cab27ae7a?pvs=73)
