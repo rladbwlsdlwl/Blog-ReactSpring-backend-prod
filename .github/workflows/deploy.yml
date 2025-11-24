@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - dev
 
 env:
   BLOG_JWT_KEY: ${{secrets.BLOG_JWT_KEY}}
