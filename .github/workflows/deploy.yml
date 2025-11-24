@@ -39,9 +39,14 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
+
+      # gradlew 권한 부여
+      - name: Grant gradlew file
+        run: chmod +x gradlew
       # Java 프로그램 빌드
       - name: Build Java
         run: ./gradlew clean build -x test
+
       # Docker Build IMAGE
       - name: Docker Image Build
         run: docker build -t ${{secrets.BLOG_DOCKER_ID}}/${{secrets.BLOG_DOCKER_IMAGE}}:latest .
