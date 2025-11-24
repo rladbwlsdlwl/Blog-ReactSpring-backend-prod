@@ -1,0 +1,44 @@
+services:
+  # mysql server
+  server-db:
+    image: mysql:8.0.43-oraclelinux9
+    ports:
+      - 13306:3306
+    volumes:
+      - ./db/blog-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${BLOG_DB_PASSWORD}
+      MYSQL_DATABASE: ${BLOG_DB_NAME}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping"]
+      interval: 5s
+      retries: 10
+
+
+  # java server
+  server-app:
+    image: rladbwlsdlwl/docker-server-app:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      server-db:
+        condition: service_healthy
+    volumes:
+      - ./uploads:${BLOG_UPLOAD_PATH}
+    environment:
+      BLOG_JWT_KEY: ${BLOG_JWT_KEY}
+      BLOG_JWT_ACCESS_TIME: ${BLOG_JWT_ACCESS_TIME}
+      BLOG_PROFILE: ${BLOG_PROFILE}
+      BLOG_DB_USERNAME: ${BLOG_DB_USERNAME}
+      BLOG_DB_PASSWORD: ${BLOG_DB_PASSWORD}
+      BLOG_DB_NAME: ${BLOG_DB_NAME}
+      BLOG_DB_HOST: ${BLOG_DB_HOST}
+      BLOG_DB_PORT: ${BLOG_DB_PORT}
+      BLOG_GOOGLE_KEY: ${BLOG_GOOGLE_KEY}
+      BLOG_NAVER_KEY: ${BLOG_NAVER_KEY}
+      BLOG_SSL_PASSWORD: ${BLOG_SSL_PASSWORD}
+      BLOG_UPLOAD_PATH: ${BLOG_UPLOAD_PATH}
+      BLOG_SERVER_LINK: ${BLOG_SERVER_LINK}
+
+
+
