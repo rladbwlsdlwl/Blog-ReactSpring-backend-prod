@@ -64,6 +64,25 @@ jobs:
         run: docker push ${{secrets.BLOG_DOCKER_ID}}/${{secrets.BLOG_DOCKER_IMAGE}}:latest
 
 
+      # Get Github Actions Runner IP -> 접근할 IP 얻기
+      - name: Get Github IP
+        id: ip
+        uses: haythem/public-ip@v1.2
+
+      # AWS IAM Grant IP Access -> IAM 유저로 접근 권한 확인
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{secrets.BLOG_IAM_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.BLOG_IAM_SECRET_ACCESS_KEY}}
+          aws-region: ap-northeast-2
+
+      # Add Github IP to AWS EC2 Security group -> 보안그룹 인바운드에 일시적 IP 허용
+      - name: Add Github IP to AWS
+        run: |
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.BLOG_EC2_SG_ID }} 
+          --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
       # AWS SSH
       # Docker Pull && Run
       - name: AWS EC2 Connection and Running
@@ -78,3 +97,9 @@ jobs:
             docker-compose down
             docker-compose pull ${{secrets.BLOG_DOCKER_ID}}/${{secrets.BLOG_DOCKER_IMAGE}}:latest
             docker-compose up -d
+
+      # Delete Github IP to AWS EC2 Security group -> 접속이 끝난 보안그룹 인바운드 IP 삭제
+      - name: Remove IP From Security group
+        run: |
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.BLOG_EC2_SG_ID }}
+          --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
