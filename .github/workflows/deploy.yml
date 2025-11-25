@@ -96,9 +96,9 @@ jobs:
           port: ${{secrets.BLOG_EC2_PORT}}
           script: |
             cd Blog-ReactSpring-backend-prod/
-            docker-compose down
-            docker-compose pull ${{secrets.BLOG_DOCKER_ID}}/${{secrets.BLOG_DOCKER_IMAGE}}:latest
-            docker-compose up -d
+            docker compose down
+            docker compose pull ${{secrets.BLOG_DOCKER_ID}}/${{secrets.BLOG_DOCKER_IMAGE}}:latest
+            docker compose up -d
 
       # Delete Github IP to AWS EC2 Security group -> 접속이 끝난 보안그룹 인바운드 IP 삭제
       - name: Remove IP From Security group
