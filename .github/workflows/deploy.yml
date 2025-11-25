@@ -95,6 +95,7 @@ jobs:
           key: ${{secrets.BLOG_EC2_KEY}}
           port: ${{secrets.BLOG_EC2_PORT}}
           script: |
+            source ~/.bashrc
             cd Blog-ReactSpring-backend-prod/
             docker compose down
             docker compose pull ${{secrets.BLOG_DOCKER_ID}}/${{secrets.BLOG_DOCKER_IMAGE}}:latest
