@@ -80,8 +80,10 @@ jobs:
       # Add Github IP to AWS EC2 Security group -> 보안그룹 인바운드에 일시적 IP 허용
       - name: Add Github IP to AWS
         run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.BLOG_EC2_SG_ID }} 
-          --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          aws ec2 authorize-security-group-ingress \
+          --group-id ${{ secrets.BLOG_EC2_SG_ID }} \
+          --protocol tcp --port 22 \
+          --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
       # AWS SSH
       # Docker Pull && Run
@@ -101,5 +103,7 @@ jobs:
       # Delete Github IP to AWS EC2 Security group -> 접속이 끝난 보안그룹 인바운드 IP 삭제
       - name: Remove IP From Security group
         run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.BLOG_EC2_SG_ID }}
-          --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          aws ec2 revoke-security-group-ingress \
+          --group-id ${{ secrets.BLOG_EC2_SG_ID }} \
+          --protocol tcp --port 22 \
+          --cidr ${{ steps.ip.outputs.ipv4 }}/32
