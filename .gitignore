@@ -38,8 +38,6 @@ out/
 .vscode/
 
 # 사용자 설정
-Dockerfile
-compose.yml
 backup.sql
 db/
 uploads/
