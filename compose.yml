@@ -5,7 +5,7 @@ services:
     ports:
       - 13306:3306
     volumes:
-      - ./db/blog-data:/var/lib/mysql
+      - ${BLOG_DB_VOLUME_PATH}:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${BLOG_DB_PASSWORD}
       MYSQL_DATABASE: ${BLOG_DB_NAME}
@@ -24,7 +24,7 @@ services:
       server-db:
         condition: service_healthy
     volumes:
-      - ./uploads:${BLOG_UPLOAD_PATH}
+      - ${BLOG_UPLOAD_VOLUME_PATH}:${BLOG_UPLOAD_PATH}
     environment:
       BLOG_JWT_KEY: ${BLOG_JWT_KEY}
       BLOG_JWT_ACCESS_TIME: ${BLOG_JWT_ACCESS_TIME}
@@ -39,6 +39,3 @@ services:
       BLOG_SSL_PASSWORD: ${BLOG_SSL_PASSWORD}
       BLOG_UPLOAD_PATH: ${BLOG_UPLOAD_PATH}
       BLOG_SERVER_LINK: ${BLOG_SERVER_LINK}
-
-
-

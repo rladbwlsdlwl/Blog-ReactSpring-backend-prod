@@ -7,22 +7,6 @@ on:
       - main
       - dev
 
-env:
-  BLOG_JWT_KEY: ${{secrets.BLOG_JWT_KEY}}
-  BLOG_JWT_ACCESS_TIME: ${{secrets.BLOG_JWT_ACCESS_TIME}}
-  BLOG_PROFILE: ${{secrets.BLOG_PROFILE}}
-  BLOG_DB_USERNAME: ${{secrets.BLOG_DB_USERNAME}}
-  BLOG_DB_PASSWORD: ${{secrets.BLOG_DB_PASSWORD}}
-  BLOG_DB_NAME: ${{secrets.BLOG_DB_NAME}}
-  BLOG_DB_HOST: ${{secrets.BLOG_DB_HOST}}
-  BLOG_DB_PORT: ${{secrets.BLOG_DB_PORT}}
-  BLOG_GOOGLE_KEY: ${{secrets.BLOG_GOOGLE_KEY}}
-  BLOG_NAVER_KEY: ${{secrets.BLOG_NAVER_KEY}}
-  BLOG_SSL_PASSWORD: ${{secrets.BLOG_SSL_PASSWORD}}
-  BLOG_UPLOAD_PATH: ${{secrets.BLOG_UPLOAD_PATH}}
-  BLOG_SERVER_LINK: ${{secrets.BLOG_SERVER_LINK}}
-
-
 # STEP 별로 ACTION 선언
 jobs:
   build:
