@@ -30,6 +30,9 @@ backend Repository: https://github.com/rladbwlsdlwl/Blog-ReactSpring-backend-pro
 # 시스템 아키텍처
 <img width="961" height="329" alt="myblog-arc" src="https://github.com/user-attachments/assets/1d7319f9-972d-4bea-853b-240c24fd2d21" />
 
+# CI/CD 아키텍처
+<img width="1614" height="695" alt="BLOG_SYS_ARC" src="https://github.com/user-attachments/assets/e23e9c12-66f3-4cb0-a367-d646c79a701e" />
+
 # 도메인 정의 (ERD)
 <img width="941" height="750" alt="myblogdb-erd" src="https://github.com/user-attachments/assets/2b78756e-03c1-444f-839e-a2524a6751a8" />
 
