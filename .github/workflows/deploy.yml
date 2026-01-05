@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - main
-      - dev
+#      - dev
 
 # STEP 별로 ACTION 선언
 jobs:
