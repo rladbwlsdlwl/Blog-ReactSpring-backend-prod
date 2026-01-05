@@ -2,6 +2,7 @@ package board.server.app.file.repository;
 
 import board.server.app.board.entity.Board;
 import board.server.app.file.entity.FileEntity;
+import board.server.app.member.entity.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -29,6 +30,16 @@ public class JdbcTemplateFileRepository implements FileRepository{
     }
 
     @Override
+    public List<FileEntity> findByBoard_IdWithBoard(Long boardId) {
+        String sql = "select f.id as id, current_filename, original_filename, f.board_id as board_id, b.member_id as member_id" +
+                " from file_table f join board_table b on f.board_id = b.id where board_id = ?";
+
+        List<FileEntity> query = jdbcTemplate.query(sql, FileWithBoardMapper(), boardId);
+
+        return query;
+    }
+
+    @Override
     public Optional<FileEntity> findTop1ByBoard_Id(Long postId) {
         String sql = "select * from file_table where board_id = ? limit 1";
 
@@ -36,16 +47,17 @@ public class JdbcTemplateFileRepository implements FileRepository{
     }
 
     @Override
-    public List<FileEntity> findFirstImageByBoardIdIn(List<Long> boardIdList) {
+    public List<FileEntity> findFirstImageByBoardIdInWithBoard(List<Long> boardIdList) {
         String sqlfilter = "select min(id) as id from file_table where board_id in (FILTER) group by board_id";
-        String sql = "select * from file_table where id in (" + sqlfilter + ")";
+        String sql = "select f.id as id, current_filename, original_filename, f.board_id as board_id, b.member_id as member_id" +
+                " from file_table f join board_table b on f.board_id = b.id where f.id in (" + sqlfilter + ")";
 
 
         sql = sql.replace("FILTER", boardIdList.stream()
                 .map(id -> "?")
                 .collect(Collectors.joining(", ")));
 
-        List<FileEntity> fileList = jdbcTemplate.query(sql, FileMapper(), boardIdList.toArray());
+        List<FileEntity> fileList = jdbcTemplate.query(sql, FileWithBoardMapper(), boardIdList.toArray());
 
 
         return fileList;
@@ -76,17 +88,45 @@ public class JdbcTemplateFileRepository implements FileRepository{
         jdbcTemplate.update(sql, boardId);
     }
 
+
     private RowMapper<FileEntity> FileMapper() {
         return (rs, rowNum) -> {
             Long id = rs.getLong("id");
             Long postId = rs.getLong("board_id");
             String originalFilename = rs.getString("original_filename");
             String currentFilename = rs.getString("current_filename");
-            Blob blob = rs.getBlob("data");
-            byte[] data = blob.getBytes(1, (int) blob.length());
 
             Board board = Board.builder()
                     .id(postId)
+                    .build();
+
+            FileEntity fileEntity = FileEntity.builder()
+                    .id(id)
+                    .board(board)
+                    .originalFilename(originalFilename)
+                    .currentFilename(currentFilename)
+                    .build();
+
+            return fileEntity;
+        };
+    }
+
+    private RowMapper<FileEntity> FileWithBoardMapper() {
+        return (rs, rowNum) -> {
+            Long id = rs.getLong("id");
+            Long postId = rs.getLong("board_id");
+            String originalFilename = rs.getString("original_filename");
+            String currentFilename = rs.getString("current_filename");
+
+            Long member_id = rs.getLong("member_id");
+
+            Member member = Member.builder()
+                    .id(member_id)
+                    .build();
+
+            Board board = Board.builder()
+                    .id(postId)
+                    .member(member)
                     .build();
 
             FileEntity fileEntity = FileEntity.builder()

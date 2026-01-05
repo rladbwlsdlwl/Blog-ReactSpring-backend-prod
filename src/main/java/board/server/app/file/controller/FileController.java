@@ -3,10 +3,12 @@ package board.server.app.file.controller;
 import board.server.app.file.dto.FileResponseDto;
 import board.server.app.file.entity.FileEntity;
 import board.server.app.file.service.FileService;
+import board.server.config.jwt.CustomUserDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,11 +38,13 @@ public class FileController {
     @PostMapping("/file/{boardId}")
     public ResponseEntity<?> uploadFiles(@PathVariable("username") String username,
                                          @PathVariable("boardId") Long boardId,
+                                         @AuthenticationPrincipal CustomUserDetail userDetail,
                                          @RequestParam(value = "file", required = false) List<MultipartFile> multipartFileList) throws IOException {
         // 회원 게시판 - 최초 게시글 작성
         List<MultipartFile> filelist = multipartFileList == null ? new ArrayList<>() : multipartFileList;
 
-        fileService.upload(filelist, boardId, username);
+        Long memberId = userDetail.getId();
+        fileService.upload(filelist, boardId, memberId);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -49,23 +53,21 @@ public class FileController {
     public ResponseEntity<List<FileResponseDto>> readFiles(@PathVariable("username") String username,
                                                      @PathVariable("boardId") Long boardId) throws IOException {
         // 회원 게시판 - id에 해당하는 파일 모두 읽어오기
-        List<FileResponseDto> fileResponseDtoList = fileService.readAll(boardId, username);
+        List<FileResponseDto> fileResponseDtoList = fileService.readAll(boardId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(fileResponseDtoList);
     }
 
     @GetMapping("/file")
     public ResponseEntity<List<FileResponseDto>> readFile(@PathVariable String username,
-                                                    @RequestParam(name = "postIdList", required = false) List<Long> postIdList,
-                                                    @RequestParam(name = "usernameList", required = false) List<String> usernameList){
+                                                    @RequestParam(name = "postIdList", required = false) List<Long> postIdList){
         // 회원 게시판 - id에 해당하는 파일 1개씩 읽어오기
         // 홈 화면 - id에 해당하는 파일 1개씩 읽어오기
-        usernameList = usernameList == null ? new ArrayList<>() : usernameList;
         postIdList = postIdList == null ? new ArrayList<>() : postIdList;
 
 
 
-        List<FileResponseDto> fileEntityList = fileService.read(postIdList, usernameList);
+        List<FileResponseDto> fileEntityList = fileService.read(postIdList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(fileEntityList);
     }
@@ -73,6 +75,7 @@ public class FileController {
     @PatchMapping("/file/{boardId}")
     public ResponseEntity<?> changeFiles(@PathVariable("username") String username,
                                          @PathVariable("boardId") Long boardId,
+                                         @AuthenticationPrincipal CustomUserDetail userDetail,
                                          @RequestParam(value = "file", required = false) List<MultipartFile> multipartFileList,
                                          @RequestParam(value = "beforeFilenameList", required = false) List<MultipartFile> beforeFilenameList) throws IOException {
         // 회원 게시판 - 게시글 수정
@@ -85,15 +88,17 @@ public class FileController {
             beforeFilename.add(new String(filename.getBytes()));
         }
 
-        fileService.update(beforeFilename, filelist, boardId, username);
+        fileService.update(beforeFilename, filelist, boardId, userDetail.getId());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/file/{boardId}")
     public ResponseEntity<?> deleteFile(@PathVariable("username") String username,
-                                        @PathVariable("boardId") Long boardId) throws IOException {
-        fileService.delete(username, boardId);
+                                        @PathVariable("boardId") Long boardId,
+                                        @AuthenticationPrincipal CustomUserDetail userDetail) throws IOException {
+
+        fileService.delete(userDetail.getId(), boardId);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

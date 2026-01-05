@@ -42,7 +42,7 @@ public class FileService {
 
 
     // 파일 작성
-    public void upload(List<MultipartFile> multipartFileList, Long boardId, String username) throws IOException {
+    public void upload(List<MultipartFile> multipartFileList, Long boardId, Long memberId) throws IOException {
 
         validateFilesType(multipartFileList);
 
@@ -67,15 +67,15 @@ public class FileService {
 
 
             // 서버 저장 - 파일
-            String pathDir = getUploadDirectory();
+            String pathDir = getUploadMemberDir(memberId);
             File file = new File(pathDir);
 
-            if(!file.exists()){
+            if (!file.exists()) {
                 file.mkdir();
             }
 
 
-            String path = getUploadMemberPath(username, currentFilename);
+            String path = getUploadMemberPath(memberId, currentFilename);
             Files.copy(multipartFile.getInputStream(), Path.of(path));
         }
 
@@ -83,13 +83,14 @@ public class FileService {
     }
 
     // 게시글에 해당하는 모든 파일 읽기
-    public List<FileResponseDto> readAll(Long boardId, String username) throws IOException {
-        List<FileResponseDto> fileList = fileRepository.findByBoard_Id(boardId).stream()
+    public List<FileResponseDto> readAll(Long boardId) throws IOException {
+        List<FileResponseDto> fileList = fileRepository.findByBoard_IdWithBoard(boardId).stream()
                 .map(fileEntity -> {
                     FileResponseDto fileResponseDto = FileResponseDto.of(fileEntity);
 
                     //setter url
-                    String url = getFileReadPath(username, fileResponseDto.getCurrentFilename());
+                    Long memberId = fileEntity.getBoard().getMember().getId();
+                    String url = getFileReadPath(memberId, fileResponseDto.getCurrentFilename());
                     fileResponseDto.setFile(url);
 
                     return fileResponseDto;
@@ -99,24 +100,18 @@ public class FileService {
     }
 
     // 게시글에 해당하는 파일 1개씩 읽기
-    public List<FileResponseDto> read(List<Long> boardIdList, List<String> usernameList){
+    public List<FileResponseDto> read(List<Long> boardIdList){
         if(boardIdList.isEmpty()) return new ArrayList<>();
 
 
-        // {boardId: username, ...}
-        Map<Long, String> boardUserMap = new HashMap<>();
-        for(int i=0; i< boardIdList.size(); i++)
-            boardUserMap.put(boardIdList.get(i), usernameList.get(i));
-
-
-        List<FileResponseDto> fileList = fileRepository.findFirstImageByBoardIdIn(boardIdList).stream()
+        List<FileResponseDto> fileList = fileRepository.findFirstImageByBoardIdInWithBoard(boardIdList).stream()
                 .map(fileEntity -> {
                     // init
                     FileResponseDto fileResponseDto = FileResponseDto.of(fileEntity);
 
                     // setter url
-                    String username = boardUserMap.get(fileResponseDto.getPostId());
-                    String url = getFileReadPath(username, fileResponseDto.getCurrentFilename());
+                    Long memberId = fileEntity.getBoard().getMember().getId();
+                    String url = getFileReadPath(memberId, fileResponseDto.getCurrentFilename());
                     fileResponseDto.setFile(url);
 
                     return fileResponseDto;
@@ -130,7 +125,7 @@ public class FileService {
     // beforeFilenameList: 변경 전, 파일 업데이트 (비교 후 없어진 파일 삭제)
     // afterFileList: 새로 추가된 파일 (생성)
     @Transactional
-    public Long update(List<String> beforeFilenameList, List<MultipartFile> afterFileList, Long boardId, String username) throws IOException {
+    public Long update(List<String> beforeFilenameList, List<MultipartFile> afterFileList, Long boardId, Long userId) throws IOException {
 
         validateFilesType(afterFileList);
 
@@ -138,7 +133,7 @@ public class FileService {
 
         List<FileEntity> uploadFileList = new ArrayList<>();
        for(MultipartFile multipartFile: afterFileList){
-           String dir = getUploadMemberDir(username);
+           String dir = getUploadMemberDir(userId);
            File file = new File(dir);
 
            if(!file.exists()){
@@ -148,7 +143,7 @@ public class FileService {
            // 서버 파일 생성
            String originalFilename = multipartFile.getOriginalFilename();
            String currentFilename = createCurrentFilename(boardId, originalFilename);
-           String path = getUploadMemberPath(username, currentFilename);
+           String path = getUploadMemberPath(userId, currentFilename);
 
            Files.copy(multipartFile.getInputStream(), Path.of(path));
 
@@ -195,7 +190,7 @@ public class FileService {
 
         // 서버 삭제
         for(String removeFileName : removeFileList){
-            String path = getUploadMemberPath(username, removeFileName);
+            String path = getUploadMemberPath(userId, removeFileName);
 
             Files.delete(Path.of(path));
             log.info("파일 삭제 " + removeFileName);
@@ -206,10 +201,10 @@ public class FileService {
 
     // 게시글 삭제
     // 게시글에 해당하는 모든파일 삭제
-    public void delete(String username, Long boardId) throws IOException {
+    public void delete(Long userId, Long boardId) throws IOException {
         fileRepository.deleteByBoard_Id(boardId);
 
-        String pathDir = getUploadDirectory();
+        String pathDir = getUploadMemberDir(userId);
 
         for (Path path : Files.newDirectoryStream(Path.of(pathDir), boardId + "_*")) {
             log.info("삭제: " + path.getFileName());
@@ -274,20 +269,20 @@ public class FileService {
     }
 
     // 파일 업로드 디렉토리 경로
-    // uploads/{user}
-    private String getUploadMemberDir(String username) {
-        return uploadDirectory + File.separator + username;
+    // uploads/{user_id}
+    private String getUploadMemberDir(Long member_id) {
+        return uploadDirectory + File.separator + member_id;
     }
 
     // 파일 업로드 경로
-    // uploads/{user}/{currentFilename}
-    private String getUploadMemberPath(String username, String filename) {
-        return getUploadMemberDir(username) + File.separator + filename;
+    // uploads/{user_id}/{currentFilename}
+    private String getUploadMemberPath(Long member_id, String filename) {
+        return getUploadMemberDir(member_id) + File.separator + filename;
     }
 
     // 파일 READ 경로
-    private String getFileReadPath(String username, String filename){
-        return linkServer + File.separator + username + File.separator + filename;
+    private String getFileReadPath(Long member_id, String filename){
+        return linkServer + File.separator + member_id + File.separator + filename;
     }
 
     // 파일 이름

@@ -29,6 +29,17 @@ public class JpaFileRepository implements FileRepository{
     }
 
     @Override
+    public List<FileEntity> findByBoard_IdWithBoard(Long id) {
+        String sql = "select f from FileEntity f join fetch f.board b where f.board.id = :id";
+
+        List<FileEntity> fileList = em.createQuery(sql, FileEntity.class)
+                .setParameter("id", id)
+                .getResultList();
+
+        return fileList;
+    }
+
+    @Override
     public Optional<FileEntity> findTop1ByBoard_Id(Long boardId) {
         String sql = "select f from FileEntity f where f.board.id = :id";
 
@@ -42,11 +53,11 @@ public class JpaFileRepository implements FileRepository{
     }
 
     @Override
-    public List<FileEntity> findFirstImageByBoardIdIn(List<Long> boardIdList) {
+    public List<FileEntity> findFirstImageByBoardIdInWithBoard(List<Long> boardIdList) {
         // 게시글에 해당하는 파일 찾기
         // 파일을 게시글 별로 묶어서 대표이미지 1개씩 뽑기
         String sqlFilter = "select min(f.id) id from FileEntity f where f.board.id in :FILTER group by f.board.id";
-        String sql = "select file from FileEntity file where file.id in (" + sqlFilter + ")";
+        String sql = "select file from FileEntity file join fetch file.board where file.id in (" + sqlFilter + ")";
 
 
         List<FileEntity> fileList = em.createQuery(sql, FileEntity.class)
