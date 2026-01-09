@@ -100,6 +100,7 @@ public class BoardController {
                 .build();
 
         Board board = Board.builder()
+                .member(member)
                 .title(title)
                 .contents(contents)
                 .build();
