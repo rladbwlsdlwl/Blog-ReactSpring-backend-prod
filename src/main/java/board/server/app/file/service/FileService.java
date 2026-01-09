@@ -282,7 +282,7 @@ public class FileService {
 
     // 파일 READ 경로
     private String getFileReadPath(Long member_id, String filename){
-        return linkServer + File.separator + member_id + File.separator + filename;
+        return linkServer + '/' + member_id + '/' + filename;
     }
 
     // 파일 이름
