@@ -56,6 +56,7 @@ public class CommentsController {
         Comments comments = Comments.builder()
                 .contents(commentsRequestDto.getContents())
                 .member(member)
+                .createdAt(LocalDateTime.now())
                 .build();
 
 
