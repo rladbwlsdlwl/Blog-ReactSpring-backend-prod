@@ -1,11 +1,13 @@
 package board.server.app.comments.controller;
 
+import board.server.app.board.entity.Board;
 import board.server.app.comments.dto.CommentsRequestDto;
 import board.server.app.comments.dto.CommentsRequestPatchDto;
 import board.server.app.comments.dto.CommentsResponseDto;
 import board.server.app.comments.dto.CommentsResponsePatchDto;
 import board.server.app.comments.entity.Comments;
 import board.server.app.comments.service.CommentsService;
+import board.server.app.member.entity.Member;
 import board.server.config.jwt.CustomUserDetail;
 import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
@@ -17,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,16 +47,21 @@ public class CommentsController {
                                             @AuthenticationPrincipal CustomUserDetail userDetail){
 
         Long userId = userDetail.getId();
-        Long reqUserId = commentsRequestDto.getAuthor();
-        String username = userDetail.getUsername();
-        String reqUsername = commentsRequestDto.getAuthorName();
-        if(!userId.equals(reqUserId) || !username.equals(reqUsername)) throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);
+        Long parentId = commentsRequestDto.getParentId() == 0 ? null : commentsRequestDto.getParentId();
+
+        Member member = Member.builder()
+                .id(userId)
+                .build();
+
+        Comments comments = Comments.builder()
+                .contents(commentsRequestDto.getContents())
+                .member(member)
+                .build();
 
 
-        Comments comments = commentsService.setComments(CommentsRequestDto.of(commentsRequestDto));
-        CommentsResponseDto commentsResponseDto = new CommentsResponseDto(comments);
+        Comments savedComments = commentsService.setComments(comments, boardId, parentId);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentsResponseDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommentsResponseDto.of(savedComments));
     }
 
     @PatchMapping("/{commentId}")
@@ -61,14 +69,18 @@ public class CommentsController {
                                             @RequestBody @Valid CommentsRequestPatchDto commentsRequestPatchDto,
                                             @AuthenticationPrincipal CustomUserDetail customUserDetail){
 
-        // 댓글 작성자만 수정할 수 있음
-        if(customUserDetail.getId() != commentsRequestPatchDto.getAuthor())
-            throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);
+        Long userId = customUserDetail.getId();
+        Member member = Member.builder()
+                .id(userId)
+                .build();
 
-        commentsRequestPatchDto.setId(commentId);
-        Comments comments = CommentsRequestPatchDto.of(commentsRequestPatchDto);
+        Comments comments = Comments.builder()
+                .member(member)
+                .createdAt(LocalDateTime.now()) // 수정일 반영
+                .contents(commentsRequestPatchDto.getContents())
+                .build();
 
-        commentsService.updateComments(comments);
+        commentsService.updateComments(comments, commentId);
 
         CommentsResponsePatchDto commentsResponsePatchDto = CommentsResponsePatchDto.of(comments);
         return ResponseEntity.status(HttpStatus.CREATED).body(commentsResponsePatchDto);

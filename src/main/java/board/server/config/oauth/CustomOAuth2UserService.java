@@ -1,13 +1,8 @@
 package board.server.config.oauth;
 
 import board.server.app.enums.RoleType;
-import board.server.app.member.dto.response.CustomMemberResponseDto;
 import board.server.app.member.entity.Member;
-import board.server.app.member.repository.JdbcTemplateMemberRepository;
 import board.server.app.member.repository.MemberRepository;
-import board.server.app.member.service.MemberService;
-import board.server.app.role.entity.Role;
-import board.server.app.role.repository.RoleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -28,8 +23,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Autowired
     private MemberRepository memberRepository;
-    @Autowired
-    private RoleRepository roleRepository;
 
     // 소셜 로그인 인증 완료
     @Override
@@ -60,16 +53,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private Member createMember(String email) {
         // 회원가입 후 토큰 발행
         // 패스워드 NULL
-        Role role = Role.builder()
-                .roleType(RoleType.MEMBER)
-                .build();
+
         Member member = Member.builder()
                 .email(email)
                 .name(getRandomUsername())
-                .role(role)
+                .roleType(RoleType.MEMBER)
                 .build();
 
-        roleRepository.save(role);
         memberRepository.save(member);
 
         return member;

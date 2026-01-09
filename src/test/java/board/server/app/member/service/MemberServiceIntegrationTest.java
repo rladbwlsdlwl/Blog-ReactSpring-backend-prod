@@ -15,19 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 
 @SpringBootTest
 @Transactional
-class MemberServiceTest {
+class MemberServiceIntegrationTest {
 
     @Autowired
     private MemberService memberService;
     @Autowired
     private MemberRepository memberRepository;
-    @Autowired
-    private EntityManager em;
+
 
 
     @Test
@@ -41,18 +38,16 @@ class MemberServiceTest {
 
 
         // WHEN
-        // query 4(select 2, insert 2)
+        // query 3(select 2, insert 1)
         memberService.join(member);
 
-
-        em.flush();
-        em.clear();
 
 
         // THEN
         Member findMember = memberRepository.findById(member.getId()).orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
-        Assertions.assertThat(findMember.getRole().getRoleType()).isEqualTo(RoleType.MEMBER);
+        Assertions.assertThat(findMember.getId()).isEqualTo(member.getId());
+        Assertions.assertThat(findMember.getRoleType()).isEqualTo(RoleType.MEMBER);
     }
 
     @Test
@@ -66,26 +61,21 @@ class MemberServiceTest {
         MemberRequestUpdateDto updatedMember = new MemberRequestUpdateDto("zzzzz", "user@aaa.aaaa", "aaaaa", "DSasdas");
 
 
-        // query 4(select 2, insert 2)
+        // query 3(select 2, insert 1)
         memberService.join(member);
 
-        em.flush();
-        em.clear();
 
 
 
         // WHEN
-        // query 6(insert1, select 3)
+        // dirty checking으로 한번에 update
+        // query 3 (update1, select 2: validatePresent Username and Email )
         memberService.update(List.of("changePassword", "changeNickname", "changeEmail"), updatedMember, member);
 
 
 
-        em.flush();
-        em.clear();
-
 
         // THEN
-        // query 1(join role)
         Member findMember = memberRepository.findById(member.getId()).orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND));
 
         Assertions.assertThat(findMember.getName()).isEqualTo(updatedMember.getName());
@@ -104,23 +94,16 @@ class MemberServiceTest {
 
         
         
-        // query 4(select 2, insert 2)
+        // query 3(select 2, insert 1)
         memberService.join(member);
 
-        em.flush();
-        em.clear();
-        
         
         // WHEN
-        // query 1
         memberService.delete(member.getId());
 
 
-        em.flush();
-        em.clear();
 
         // THEN
-        // query 1
         try{
             memberRepository.findById(member.getId()).orElseThrow(() -> new RuntimeException(""));
         }catch (RuntimeException e){

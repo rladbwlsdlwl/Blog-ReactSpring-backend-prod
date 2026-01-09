@@ -1,7 +1,6 @@
 package board.server.app.member.entity;
 
 import board.server.app.enums.RoleType;
-import board.server.app.role.entity.Role;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,20 +19,17 @@ public class Member {
     private String email;
     private String password;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id")
-    private Role role;
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "role")
+    private RoleType roleType;
 
     @Builder
-    public Member(Long id, String name, String email, String password, Role role){
+    public Member(Long id, String name, String email, String password, RoleType roleType){
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.role = role;
-
-        // 양방향 연관관계 설정
-        if(role != null) role.setMember(this);
+        this.roleType = roleType;
     }
 
 

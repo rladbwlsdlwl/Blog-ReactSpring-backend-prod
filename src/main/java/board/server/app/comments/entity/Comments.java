@@ -33,5 +33,5 @@ public class Comments {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
-    private Comments comments; // 대댓글 부모 참조
+    private Comments comments; // 대댓글 부모 참조 NULL OR parent's id
 }

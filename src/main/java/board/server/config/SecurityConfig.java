@@ -1,8 +1,5 @@
 package board.server.config;
 
-import board.server.app.member.repository.JdbcTemplateMemberRepository;
-import board.server.app.member.repository.MemberRepository;
-import board.server.app.role.repository.RoleRepository;
 import board.server.config.jwt.*;
 import board.server.config.oauth.CustomOAuth2UserService;
 import board.server.config.oauth.OAuth2AuthenticationSuccessHandler;
@@ -17,7 +14,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -30,7 +26,7 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtTokenBlacklist jwtTokenBlacklist;
 
-    public SecurityConfig(PasswordEncoder passwordEncoder, CustomUserDetailService customUserDetailService, CustomOAuth2UserService customOAuth2UserService, JwtTokenProvider jwtTokenProvider, MemberRepository memberRepository, RoleRepository roleRepository, JwtTokenBlacklist jwtTokenBlacklist) {
+    public SecurityConfig(PasswordEncoder passwordEncoder, CustomUserDetailService customUserDetailService, CustomOAuth2UserService customOAuth2UserService, JwtTokenProvider jwtTokenProvider, JwtTokenBlacklist jwtTokenBlacklist) {
         this.passwordEncoder = passwordEncoder;
         this.customUserDetailService = customUserDetailService;
         this.customOAuth2UserService = customOAuth2UserService;

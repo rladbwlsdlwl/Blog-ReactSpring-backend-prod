@@ -28,9 +28,7 @@ public class BoardService {
     }
 
     // 게시글 작성
-    public Board join(Board board, String name){
-        validatePresentMemberId(board.getMember().getId());
-
+    public Board join(Board board){
         return boardRepository.save(board);
     }
 
@@ -46,7 +44,6 @@ public class BoardService {
         // dirty checking
         Long views = board.getViews();
         board.setViews(views + 1);
-        // setBoard(board);
 
         return board;
     }
@@ -65,10 +62,10 @@ public class BoardService {
 
     
     // 게시글 수정
-    public Long setBoard(Board board){
-        validatePresentMemberId(board.getMember().getId());
+    public Long setBoard(Board board, Long boardId){
 
-        Board findBoard = boardRepository.findById(board.getId()).orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.BOARD_NOT_FOUND));
+        Board findBoard = validateLoginUserAndAuthor(board.getMember().getId(), boardId);
+
 
         findBoard.setTitle(board.getTitle());
         findBoard.setContents(board.getContents());
@@ -77,9 +74,11 @@ public class BoardService {
         // return boardRepository.update(board);
     }
 
+
+
     // 게시글 삭제
-    public Long removeBoard(String username, Long boardId){
-        validatePresentMemberName(username);
+    public Long removeBoard(Long userId, Long boardId){
+        Board findBoard = validateLoginUserAndAuthor(userId, boardId);
 
         boardRepository.deleteById(boardId);
 
@@ -87,12 +86,18 @@ public class BoardService {
     }
 
 
-    // POST, GET - 글 작성 전 or 읽어오기 전, 유효한 계정인지 체크 (Integrity Constraint)
-    private void validatePresentMemberId(Long author) {
-        memberRepository.findById(author).orElseThrow(() ->
-                new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION)
-        );
+    // PATCH, DELETE: 게시글 접근 시 유저 정보와 저자 정보가 일치하는지 검증
+    private Board validateLoginUserAndAuthor(Long userId, Long boardId) {
+        Board findBoard = boardRepository.findById(boardId).orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.BOARD_NOT_FOUND));
+
+        // 게시글 작성자와 로그인 유저와 다른 경우
+        if(findBoard.getMember().getId() != userId) throw new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION);
+
+
+        return findBoard;
     }
+
+    // GET: 게시글 작성자가 존재하는지 검증
     private void validatePresentMemberName(String name) {
         memberRepository.findByName(name).orElseThrow(() ->
                 new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION)

@@ -7,11 +7,13 @@ import board.server.app.board.dto.BoardResponseHomeDto;
 import board.server.app.board.entity.Board;
 import board.server.app.board.service.BoardService;
 import board.server.app.member.entity.Member;
+import board.server.config.jwt.CustomUserDetail;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -38,7 +40,8 @@ public class BoardController {
     }
 
     @GetMapping("/{name}/{boardId}")
-    public ResponseEntity<BoardResponseDto> readBoard(@PathVariable String name, @PathVariable Long boardId){
+    public ResponseEntity<BoardResponseDto> readBoard(@PathVariable String name,
+                                                      @PathVariable Long boardId){
         Board board = boardService.getBoard(boardId, name);
 
         BoardResponseDto boardResponseDto = new BoardResponseDto(board);
@@ -55,14 +58,16 @@ public class BoardController {
     }
 
     @PostMapping("/{name}")
-    public ResponseEntity<Object> saveBoard(@RequestBody @Valid BoardRequestDto boardRequestDto, @PathVariable String name){
-        Long userId = boardRequestDto.getAuthor();
+    public ResponseEntity<Object> saveBoard(@RequestBody @Valid BoardRequestDto boardRequestDto,
+                                            @AuthenticationPrincipal CustomUserDetail customUserDetail,
+                                            @PathVariable String name){
+        Long userId = customUserDetail.getId();
         String title = boardRequestDto.getTitle(), contents = boardRequestDto.getContents();
+
 
         Member member = Member.builder()
                 .id(userId)
                 .build();
-
         Board board = Board.builder()
                 .title(title)
                 .contents(contents)
@@ -71,7 +76,8 @@ public class BoardController {
                 .member(member)
                 .build();
 
-        Board savedBoard = boardService.join(board, name);
+
+        Board savedBoard = boardService.join(board);
 
         BoardResponseDto boardResponseDto = new BoardResponseDto(savedBoard);
 
@@ -80,27 +86,26 @@ public class BoardController {
 
     @PatchMapping("/{name}/{boardId}")
     public ResponseEntity<?> changeBoard(@RequestBody @Valid BoardRequestDto boardRequestDto,
+                                         @AuthenticationPrincipal CustomUserDetail customUserDetail,
                                          @PathVariable("name") String name,
                                          @PathVariable("boardId") Long boardId){
 
+        Long userId = customUserDetail.getId();
+
         String title = boardRequestDto.getTitle();
         String contents = boardRequestDto.getContents();
-        Long views = boardRequestDto.getViews();
 
         Member member = Member.builder()
-                .id(boardRequestDto.getAuthor())
+                .id(userId)
                 .build();
 
         Board board = Board.builder()
-                .id(boardId)
                 .title(title)
                 .contents(contents)
-                .views(views)
-                .member(member)
                 .build();
 
 
-        boardId = boardService.setBoard(board);
+        boardId = boardService.setBoard(board, boardId);
 
         BoardResponseDto boardResponseDto = BoardResponseDto.builder()
                 .id(boardId)
@@ -110,8 +115,12 @@ public class BoardController {
     }
 
     @DeleteMapping("/{name}/{boardId}")
-    public ResponseEntity<?> deleteBoard(@PathVariable("name") String name, @PathVariable("boardId") Long boardId){
-        Long removeBoardId = boardService.removeBoard(name, boardId);
+    public ResponseEntity<?> deleteBoard(@PathVariable("name") String name,
+                                         @AuthenticationPrincipal CustomUserDetail customUserDetail,
+                                         @PathVariable("boardId") Long boardId){
+        Long userId = customUserDetail.getId();
+
+        Long removeBoardId = boardService.removeBoard(userId, boardId);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

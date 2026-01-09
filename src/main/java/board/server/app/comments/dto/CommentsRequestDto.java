@@ -17,34 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CommentsRequestDto {
     @NotNull
-    private Long boardId;
-    @NotNull
-    private Long author;
-    @NotNull
-    private String authorName;
-    @NotNull
-    private Long parentId;
+    private Long parentId; // 0 OR comment's id
     @NotNull
     private String contents;
-
-    public static Comments of(CommentsRequestDto commentsRequestDto){
-        Board board = Board.builder()
-                .id(commentsRequestDto.getBoardId())
-                .build();
-        Member member = Member.builder()
-                .id(commentsRequestDto.getAuthor())
-                .name(commentsRequestDto.getAuthorName())
-                .build();
-        Comments comments = Comments.builder()
-                .id(commentsRequestDto.getParentId())
-                .build();
-
-        return Comments.builder()
-                .board(board)
-                .member(member)
-                .comments(commentsRequestDto.getParentId() != 0? comments: null)
-                .contents(commentsRequestDto.getContents())
-                .createdAt(LocalDateTime.now())
-                .build();
-    }
 }

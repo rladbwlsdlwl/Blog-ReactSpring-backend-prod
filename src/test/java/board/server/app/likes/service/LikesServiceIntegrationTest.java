@@ -18,14 +18,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @Transactional
-class LikesServiceTest {
-
-    @Autowired
-    private EntityManager em;
+class LikesServiceIntegrationTest {
     @Autowired
     private LikesService likesService;
     @Autowired
@@ -66,15 +61,12 @@ class LikesServiceTest {
                 .build();
 
 
-        // query 6
+        // query 4
         member1.setId(memberRepository.save(member1).getId());
         member2.setId(memberRepository.save(member2).getId());
         board1.setId(boardRepository.save(board1).getId());
         board2.setId(boardRepository.save(board2).getId());
 
-
-        em.flush();
-        em.clear();
 
         // WHEN
         // query 3
@@ -127,7 +119,7 @@ class LikesServiceTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        // query 5
+        // query 3
         member1.setId(memberRepository.save(member1).getId());
         memberRepository.save(member2);
         board1.setId(boardRepository.save(board1).getId());
@@ -149,10 +141,6 @@ class LikesServiceTest {
         likesService.setLikes(likes1);
         likesService.setLikes(likes2);
 
-
-
-        em.flush();
-        em.clear();
 
         // THEN
         // query 1
@@ -184,14 +172,11 @@ class LikesServiceTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        // query 5
+        // query 3
         member1.setId(memberRepository.save(member1).getId());
         memberRepository.save(member2);
         board1.setId(boardRepository.save(board1).getId());
 
-
-        em.flush();
-        em.clear();
 
         // WHEN
         Likes likes1 = Likes.builder()
@@ -204,17 +189,15 @@ class LikesServiceTest {
                 .build();
 
 
-        // query 2
+        // query 3 (insert 2, find 1)
         likes1.setId(likesRepository.save(likes1).getId());
         likes2.setId(likesRepository.save(likes2).getId());
 
 
-        // query 2
+        // query 2 (find 1, delete 1)
         likesService.removeLikes(likes1);
 
 
-        em.flush();
-        em.clear();
 
 
         // THEN

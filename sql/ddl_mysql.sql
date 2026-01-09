@@ -1,20 +1,12 @@
-CREATE TABLE role_table (
-    id BIGINT AUTO_INCREMENT,
-    role VARCHAR(10) DEFAULT 'MEMBER',
-
-    PRIMARY KEY (id),
-    CONSTRAINT check_role CHECK (role IN ('MEMBER', 'ADMIN'))
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-
 CREATE TABLE member_table (
 	id BIGINT AUTO_INCREMENT,
 	name VARCHAR(255) NOT NULL,
 	email VARCHAR(255) NOT NULL,
 	password VARCHAR(255),
-	role_id BIGINT NOT NULL,
+	role VARCHAR(10) DEFAULT 'MEMBER'
 
 	PRIMARY KEY (id),
-	FOREIGN KEY (role_id) REFERENCES role_table(id) ON DELETE CASCADE,
+	CONSTRAINT check_role CHECK role IN ('MEMBER', 'ADMIN')
 	UNIQUE(name),
 	UNIQUE(email)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;

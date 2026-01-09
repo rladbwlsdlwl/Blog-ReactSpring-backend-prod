@@ -12,22 +12,5 @@ import java.time.LocalDateTime;
 @Setter
 public class CommentsRequestPatchDto {
     @NotNull
-    private Long author;
-    @NotNull
     private String contents;
-    private Long id;
-
-
-    public static Comments of(CommentsRequestPatchDto commentsRequestPatchDto){
-        Member member = Member.builder()
-                .id(commentsRequestPatchDto.getAuthor())
-                .build();
-
-        return Comments.builder()
-                .id(commentsRequestPatchDto.getId())
-                .member(member)
-                .contents(commentsRequestPatchDto.getContents())
-                .createdAt(LocalDateTime.now()) // 수정일
-                .build();
-    }
 }

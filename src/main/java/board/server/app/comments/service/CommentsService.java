@@ -35,7 +35,7 @@ public class CommentsService {
 
         List<CommentsResponseDto> commentsList = commentsRepository.findByBoard_IdInWithMemberOrderByCreatedAtAsc(boardIdList)
                 .stream()
-                .map(CommentsResponseDto::new)
+                .map(CommentsResponseDto::of)
                 .toList();
 
 
@@ -51,17 +51,19 @@ public class CommentsService {
     }
 
     // 댓글 추가
-    public Comments setComments(Comments comments){
-        validatePresentBoardId(comments.getBoard().getId());
-        validatePresentMemberId(comments.getMember().getId());
-        validatePresentId(comments.getComments() != null ? comments.getComments().getId(): null);
+    public Comments setComments(Comments comments, Long boardId, Long parentId){
+        Board findBoard = validatePresentBoardId(boardId);
+        Comments findComments = validatePresentId(parentId);
+
+        comments.setBoard(findBoard);
+        comments.setComments(findComments);
 
         return commentsRepository.save(comments);
     }
 
     // 댓글 수정
-    public void updateComments(Comments comments){
-        Comments findComments = validatePresentId(comments.getId());
+    public void updateComments(Comments comments, Long commentsId){
+        Comments findComments = validatePresentId(commentsId);
 
         findComments.setContents(comments.getContents());
         findComments.setCreatedAt(comments.getCreatedAt());

@@ -3,10 +3,7 @@ package board.server.app.member.service;
 import board.server.app.enums.RoleType;
 import board.server.app.member.dto.request.MemberRequestUpdateDto;
 import board.server.app.member.entity.Member;
-import board.server.app.member.repository.JdbcTemplateMemberRepository;
 import board.server.app.member.repository.MemberRepository;
-import board.server.app.role.entity.Role;
-import board.server.app.role.repository.RoleRepository;
 import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +20,11 @@ import java.util.List;
 @Slf4j
 public class MemberService {
     private final MemberRepository memberRepository;
-    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public MemberService(MemberRepository memberRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
-        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -43,13 +38,9 @@ public class MemberService {
         // 패스워드 암호화
         member.setPassword(passwordEncoder.encode(member.getPassword()));
 
-        Role role = Role.builder()
-                .roleType(RoleType.MEMBER)
-                .member(member)
-                .build();
-        member.setRole(role);
+        // 회원 권한 설정
+        member.setRoleType(RoleType.MEMBER);
 
-        roleRepository.save(role);
         memberRepository.save(member);
 
         return member.getId();
@@ -97,14 +88,7 @@ public class MemberService {
 
     // 계정 삭제
     public void delete(Long id){
-//        memberRepository.deleteById(id);
-
-        // Role 삭제
-        roleRepository.delete(
-                memberRepository.findByIdWithRole(id)
-                .map(Member::getRole)
-                .orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND))
-        );
+        memberRepository.deleteById(id);
     }
 
     // 닉네임 변경

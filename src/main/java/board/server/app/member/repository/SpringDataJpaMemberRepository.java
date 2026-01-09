@@ -7,11 +7,4 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface SpringDataJpaMemberRepository extends JpaRepository<Member, Long>, MemberRepository{
-    @Override
-    @Query("select m from Member m join fetch m.role where m.name = :name")
-    Optional<Member> findByNameWithRole(@Param("name") String name);
-
-    @Override
-    @Query("select m from Member m join fetch m.role where m.id = :role_id")
-    Optional<Member> findByIdWithRole(@Param("role_id") Long id);
 }

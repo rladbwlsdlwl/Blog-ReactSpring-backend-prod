@@ -21,11 +21,7 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//        return memberRepository.findByName(username)
-//                .map(CustomUserDetail::new)
-//                .orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND));
-
-        return memberRepository.findByNameWithRole(username)
+        return memberRepository.findByName(username)
                 .map(CustomUserDetail:: new)
                 .orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.MEMBER_NOT_FOUND));
     }

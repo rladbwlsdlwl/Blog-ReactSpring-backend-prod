@@ -1,14 +1,8 @@
 package board.server.config.oauth;
 
-import board.server.app.enums.RoleType;
 import board.server.app.member.dto.response.CustomMemberResponseDto;
 import board.server.app.member.entity.Member;
-import board.server.app.member.repository.JdbcTemplateMemberRepository;
-import board.server.app.member.repository.MemberRepository;
-import board.server.app.role.entity.Role;
-import board.server.app.role.repository.RoleRepository;
 import board.server.config.jwt.JwtTokenProvider;
-import io.jsonwebtoken.Jwt;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,15 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
-import java.util.function.Supplier;
 
 @Slf4j
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
