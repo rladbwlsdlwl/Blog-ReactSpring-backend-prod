@@ -47,10 +47,12 @@ public class CommentsController {
                                             @AuthenticationPrincipal CustomUserDetail userDetail){
 
         Long userId = userDetail.getId();
+        String username = userDetail.getUsername();
         Long parentId = commentsRequestDto.getParentId() == 0 ? null : commentsRequestDto.getParentId();
 
         Member member = Member.builder()
                 .id(userId)
+                .name(username)
                 .build();
 
         Comments comments = Comments.builder()
