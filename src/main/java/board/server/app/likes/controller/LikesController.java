@@ -1,19 +1,16 @@
 package board.server.app.likes.controller;
 
 import board.server.app.board.entity.Board;
-import board.server.app.likes.dto.LikesRequestDto;
 import board.server.app.likes.dto.LikesResponseDto;
 import board.server.app.likes.entity.Likes;
 import board.server.app.likes.service.LikesService;
 import board.server.app.member.entity.Member;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.validation.Valid;
+import board.server.config.jwt.CustomUserDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +36,13 @@ public class LikesController {
 
 
     @PostMapping("/{boardId}")
-    public ResponseEntity<?> saveLike(@RequestBody @Valid LikesRequestDto likesRequestDto,
-                                      @PathVariable("boardId") Long boardId){
+    public ResponseEntity<?> saveLike(@PathVariable("boardId") Long boardId,
+                                      @AuthenticationPrincipal CustomUserDetail customUserDetail){
         // 게시판 좋아요 작성
-        Board board = Board.builder().id(likesRequestDto.getBoardId()).build();
-        Member member = Member.builder().id(likesRequestDto.getAuthor()).build();
+        Long userId = customUserDetail.getId();
+
+        Board board = Board.builder().id(boardId).build();
+        Member member = Member.builder().id(userId).build();
         Likes likes = Likes.builder()
                 .board(board)
                 .member(member)
@@ -56,10 +55,12 @@ public class LikesController {
 
     @DeleteMapping("/{boardId}")
     public ResponseEntity<?> deleteLike(@PathVariable("boardId") Long boardId,
-                                        @RequestParam("userId") Long liked_userId){
+                                        @AuthenticationPrincipal CustomUserDetail customUserDetail){
         // 게시판 좋아요 삭제
+        Long userId = customUserDetail.getId();
+
         Board board = Board.builder().id(boardId).build();
-        Member member = Member.builder().id(liked_userId).build();
+        Member member = Member.builder().id(userId).build();
         Likes likes = Likes.builder()
                 .board(board)
                 .member(member)
