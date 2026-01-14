@@ -94,7 +94,7 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body(memberResponseFindoutDto);
     }
 
-    @PatchMapping("/findInfo/pw")
+    @PostMapping("/findInfo/pw")
     public ResponseEntity<?> findUserPw(@RequestBody @Valid MemberRequestFindoutDto memberRequestFindoutDto){
         String name = memberRequestFindoutDto.getName();
 
