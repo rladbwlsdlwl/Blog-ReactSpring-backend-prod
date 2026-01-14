@@ -73,6 +73,15 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
     }
 
     @Override
+    public Optional<Member> findByNameOrEmail(String name, String email) {
+        String sql = "select * from member_table where name = ? or email = ?";
+
+        List<Member> memberList = jdbcTemplate.query(sql, MemberMapper(), name, email);
+
+        return memberList.stream().findAny();
+    }
+
+    @Override
     public void delete(Member member) {
         deleteById(member.getId());
     }

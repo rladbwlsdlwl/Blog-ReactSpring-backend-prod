@@ -32,8 +32,7 @@ public class MemberService {
     public Long join(Member member){
         checkAvailableNickname(member.getName());
         checkAvailablePassword(member.getPassword());
-        validateDuplicateUsername(member.getName());
-        validateDuplicateEmail(member.getEmail());
+        validateDuplicateUsernameOrEmail(member.getName(), member.getEmail());
 
         // 패스워드 암호화
         member.setPassword(passwordEncoder.encode(member.getPassword()));
@@ -181,14 +180,18 @@ public class MemberService {
 
     // 중복 확인 - Integrity Constraint
     private void validateDuplicateUsername(String username) {
-        memberRepository.findByName(username).ifPresent((e) -> {
+        memberRepository.findByName(username).ifPresent(e -> {
             throw new BusinessLogicException(CustomExceptionCode.MEMBER_DUPLICATE_NICKNAME);
         });
     }
-
     private void validateDuplicateEmail(String email) {
         memberRepository.findByEmail(email).ifPresent(e -> {
             throw new BusinessLogicException(CustomExceptionCode.MEMBER_DUPLICATE_EMAIL);
+        });
+    }
+    private void validateDuplicateUsernameOrEmail(String username, String email) {
+        memberRepository.findByNameOrEmail(username, email).ifPresent((e) -> {
+            throw new BusinessLogicException(e.getName() == username ? CustomExceptionCode.MEMBER_DUPLICATE_NICKNAME: CustomExceptionCode.MEMBER_DUPLICATE_EMAIL);
         });
     }
 

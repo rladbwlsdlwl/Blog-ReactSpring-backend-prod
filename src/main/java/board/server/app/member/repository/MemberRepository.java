@@ -10,6 +10,7 @@ public interface MemberRepository {
     Optional<Member> findById(Long id);
     Optional<Member> findByName(String name);
     Optional<Member> findByEmail(String email);
+    Optional<Member> findByNameOrEmail(String name, String email);
     void delete(Member member);
     void deleteById(Long id);
     List<Member> findAll();

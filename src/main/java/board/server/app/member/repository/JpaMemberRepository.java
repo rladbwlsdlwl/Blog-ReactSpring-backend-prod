@@ -3,6 +3,7 @@ package board.server.app.member.repository;
 import board.server.app.member.entity.Member;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,18 @@ public class JpaMemberRepository implements MemberRepository{
     public Optional<Member> findByEmail(String email) {
         String sql = "select m from Member m where m.email = :email";
         List<Member> memberList = em.createQuery(sql, Member.class)
+                .setParameter("email", email)
+                .getResultList();
+
+        return memberList.stream().findAny();
+    }
+
+    @Override
+    public Optional<Member> findByNameOrEmail(String name, String email) {
+        String sql = "select m from Member m where m.name = :name or m.email = :email";
+
+        List<Member> memberList = em.createQuery(sql, Member.class)
+                .setParameter("name", name)
                 .setParameter("email", email)
                 .getResultList();
 
