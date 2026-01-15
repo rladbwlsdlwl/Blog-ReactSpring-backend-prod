@@ -14,7 +14,4 @@ public class BoardRequestDto {
     private final String title;
     @NotEmpty
     private final String contents;
-    @NotNull
-    private final Long author;
-    private final Long views;
 }
