@@ -127,13 +127,14 @@ public class FileService {
     // beforeFilenameList: 변경 전, 파일 업데이트 (비교 후 없어진 파일 삭제)
     // afterFileList: 새로 추가된 파일 (생성)
     @Transactional
-    public Long update(List<String> beforeFilenameList, List<MultipartFile> afterFileList, Long boardId, Long userId) throws IOException {
+    public Long update(List<String> removeFilenameList, List<MultipartFile> afterFileList, Long boardId, Long userId) throws IOException {
 
         validateFilesType(afterFileList);
         validateBoardIdAndAuthor(boardId, userId);
+        validateCurrentFilename(removeFilenameList, boardId);
 
-        List<FileEntity> fileEntityList = fileRepository.findByBoard_Id(boardId);
 
+        // 파일 추가
         List<FileEntity> uploadFileList = new ArrayList<>();
        for(MultipartFile multipartFile: afterFileList){
            String dir = getUploadMemberDir(userId);
@@ -170,29 +171,12 @@ public class FileService {
 
         // 파일 삭제
         // DB 삭제
-        // 기존 파일 리스트
-        List<String> removeFileList = new ArrayList<>();
-        for(FileEntity fileEntity: fileEntityList){
-            String currentFilename = fileEntity.getCurrentFilename();
-
-            boolean stopped = false;
-            for(String filename: beforeFilenameList){
-                if(filename.equals(currentFilename)){
-                    stopped = true;
-                    break;
-                }
-            }
-
-            if(!stopped) removeFileList.add(currentFilename);
-        }
-
-
-        if(!removeFileList.isEmpty())
-            fileRepository.deleteByCurrentFilenameIn(removeFileList);
+        if(!removeFilenameList.isEmpty())
+            fileRepository.deleteByCurrentFilenameIn(removeFilenameList);
 
 
         // 서버 삭제
-        for(String removeFileName : removeFileList){
+        for(String removeFileName : removeFilenameList){
             String path = getUploadMemberPath(userId, removeFileName);
 
             Files.delete(Path.of(path));
@@ -281,6 +265,18 @@ public class FileService {
             throw new BusinessLogicException(CommonExceptionCode.FORBIDDEN);
     }
 
+    // 삭제 요청 파일 검증
+    // 게시글 파일 일치 확인
+    private void validateCurrentFilename(List<String> removeFilenameList, Long boardId) {
+        for(String currentFilename: removeFilenameList){
+            String parse_boardId = currentFilename.split("_")[0];
+
+            if(!boardId.toString().equals(parse_boardId))
+                throw new BusinessLogicException(CommonExceptionCode.FORBIDDEN);
+        }
+
+    }
+    
     // 파일 업로드 디렉토리 경로
     // uploads/{user_id}
     private String getUploadMemberDir(Long member_id) {

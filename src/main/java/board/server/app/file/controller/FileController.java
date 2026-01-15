@@ -77,18 +77,18 @@ public class FileController {
                                          @PathVariable("boardId") Long boardId,
                                          @AuthenticationPrincipal CustomUserDetail userDetail,
                                          @RequestParam(value = "file", required = false) List<MultipartFile> multipartFileList,
-                                         @RequestParam(value = "beforeFilenameList", required = false) List<MultipartFile> beforeFilenameList) throws IOException {
+                                         @RequestParam(value = "removeFilenameList", required = false) List<MultipartFile> removeFilenameList) throws IOException {
         // 회원 게시판 - 게시글 수정
         List<MultipartFile> filelist = multipartFileList == null ? new ArrayList<>() : multipartFileList;
-        List<MultipartFile> beforefilelist = beforeFilenameList == null ? new ArrayList<>() : beforeFilenameList;
+        List<MultipartFile> removefilelist = removeFilenameList == null ? new ArrayList<>() : removeFilenameList;
 
-        // beforeFilename은 currentFilename과 동일
-        List<String> beforeFilename = new ArrayList<>();
-        for(MultipartFile filename : beforefilelist){
-            beforeFilename.add(new String(filename.getBytes()));
+        // filename은 currentFilename과 동일
+        List<String> removeFilename = new ArrayList<>();
+        for(MultipartFile filename : removefilelist){
+            removeFilename.add(new String(filename.getBytes()));
         }
 
-        fileService.update(beforeFilename, filelist, boardId, userDetail.getId());
+        fileService.update(removeFilename, filelist, boardId, userDetail.getId());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
