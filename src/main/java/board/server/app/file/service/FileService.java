@@ -8,6 +8,7 @@ import board.server.app.file.repository.CustomFileRepository;
 import board.server.app.file.repository.FileRepository;
 import board.server.app.member.entity.Member;
 import board.server.error.errorcode.CommonExceptionCode;
+import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,7 @@ public class FileService {
     public void upload(List<MultipartFile> multipartFileList, Long boardId, Long memberId) throws IOException {
 
         validateFilesType(multipartFileList);
+        validateBoardIdAndAuthor(boardId, memberId);
 
         List<FileEntity> fileEntityList = new ArrayList<>();
 
@@ -128,6 +130,7 @@ public class FileService {
     public Long update(List<String> beforeFilenameList, List<MultipartFile> afterFileList, Long boardId, Long userId) throws IOException {
 
         validateFilesType(afterFileList);
+        validateBoardIdAndAuthor(boardId, userId);
 
         List<FileEntity> fileEntityList = fileRepository.findByBoard_Id(boardId);
 
@@ -202,6 +205,8 @@ public class FileService {
     // 게시글 삭제
     // 게시글에 해당하는 모든파일 삭제
     public void delete(Long userId, Long boardId) throws IOException {
+        validateBoardIdAndAuthor(boardId, userId);
+
         fileRepository.deleteByBoard_Id(boardId);
 
         String pathDir = getUploadMemberDir(userId);
@@ -266,6 +271,14 @@ public class FileService {
                 throw new BusinessLogicException(CommonExceptionCode.FILE_TYPE_NOT_VALID);
             }
         }
+    }
+    // 게시글 존재 여부
+    // 게시글 작성자와 로그인 유저 일치 여부
+    private void validateBoardIdAndAuthor(Long boardId, Long memberId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(() -> new BusinessLogicException(CustomExceptionCode.BOARD_NOT_FOUND));
+
+        if(board.getMember().getId() != memberId)
+            throw new BusinessLogicException(CommonExceptionCode.FORBIDDEN);
     }
 
     // 파일 업로드 디렉토리 경로
