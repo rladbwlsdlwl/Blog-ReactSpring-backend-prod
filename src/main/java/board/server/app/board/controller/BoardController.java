@@ -32,8 +32,9 @@ public class BoardController {
 
 
     @GetMapping
-    public ResponseEntity<Object> home(){
-        List<BoardResponseHomeDto> boardList = boardService.getBoardListAll()
+    public ResponseEntity<Object> home(@RequestParam("lastId") int lastId){
+
+        List<BoardResponseHomeDto> boardList = boardService.getBoardListAll(lastId)
                 .stream().map(BoardResponseHomeDto:: new).toList();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(boardList);

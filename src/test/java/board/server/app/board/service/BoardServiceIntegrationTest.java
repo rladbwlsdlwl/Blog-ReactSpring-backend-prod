@@ -154,8 +154,8 @@ class BoardServiceIntegrationTest {
         // insert query 1
         memberRepository.save(member);
 
-        // insert query 15
-        for(var i=0; i<15; i++){
+        // insert query 20
+        for(var i=0; i<20; i++){
             Board board = Board.builder()
                     .views(0L)
                     .createdAt(LocalDateTime.now())
@@ -169,9 +169,19 @@ class BoardServiceIntegrationTest {
 
 
         // query 1
-        List<Board> boardListAll = boardService.getBoardListAll();
+        List<Board> boardListAll1 = boardService.getBoardListAll(0);
+        List<Board> boardListAll2 = boardService.getBoardListAll(1);
 
-        Assertions.assertThat(boardListAll.size()).isEqualTo(10);
+        Assertions.assertThat(boardListAll1.size()).isEqualTo(10);
+        Assertions.assertThat(boardListAll2.size()).isEqualTo(10);
+
+
+        for(int i=0; i<10; i++){
+            Board board1 = boardListAll1.get(i);
+            Board board2 = boardListAll2.get(i);
+
+            Assertions.assertThat(board1.getId()).isNotEqualTo(board2.getId());
+        }
 
     }
 

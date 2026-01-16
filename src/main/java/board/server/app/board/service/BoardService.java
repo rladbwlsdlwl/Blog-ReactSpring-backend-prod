@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -56,8 +57,8 @@ public class BoardService {
     }
 
     // 게시글 리스트 읽기 - 모든 유저
-    public List<Board> getBoardListAll(){
-        return boardRepository.findTop10ByOrderByCreatedAtDescWithMember(PageRequest.of(0, 10, Sort.by("createdAt").descending()));
+    public List<Board> getBoardListAll(Integer lastId){
+        return boardRepository.findTop10ByOrderByCreatedAtDescWithMember(PageRequest.of(lastId, 10, Sort.by("createdAt").descending()));
     }
 
     
