@@ -5,6 +5,7 @@ import board.server.app.board.entity.Board;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -68,6 +69,16 @@ public class JpaBoardRepository implements BoardRepository{
 
     @Override
     public List<Board> findTop10ByOrderByCreatedAtDescWithMember(Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Slice<Board> findByLessThanIdInitOrderByIdDescWithMember(Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Slice<Board> findByLessThanIdOrderByIdDescWithMember(Long lastId, Pageable pageable) {
         return null;
     }
 }

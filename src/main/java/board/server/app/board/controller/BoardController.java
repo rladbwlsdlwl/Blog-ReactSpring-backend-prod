@@ -1,6 +1,7 @@
 package board.server.app.board.controller;
 
 
+import board.server.app.board.dto.BoardDto;
 import board.server.app.board.dto.BoardRequestDto;
 import board.server.app.board.dto.BoardResponseDto;
 import board.server.app.board.dto.BoardResponseHomeDto;
@@ -11,6 +12,7 @@ import board.server.config.jwt.CustomUserDetail;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,12 +34,18 @@ public class BoardController {
 
 
     @GetMapping
-    public ResponseEntity<Object> home(@RequestParam("lastId") int lastId){
+    public ResponseEntity<Object> home(@RequestParam(value = "lastId", required = false) Long lastId){
 
-        List<BoardResponseHomeDto> boardList = boardService.getBoardListAll(lastId)
-                .stream().map(BoardResponseHomeDto:: new).toList();
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(boardList);
+        Slice<Board> boardSlice = boardService.getBoardListAll(lastId);
+        boolean hasNext = boardSlice.hasNext();
+
+        List<BoardDto> data = boardSlice.getContent()
+                .stream().map(BoardDto:: new).toList();
+
+        BoardResponseHomeDto boardResponseDto = new BoardResponseHomeDto(data, hasNext);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDto);
     }
 
     @GetMapping("/{name}/{boardId}")

@@ -3,7 +3,10 @@ package board.server.app.board.repository;
 import board.server.app.board.entity.Board;
 import board.server.app.member.entity.Member;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -86,6 +89,27 @@ public class JdbcTemplateBoardRepository implements BoardRepository{
     @Override
     public List<Board> findTop10ByOrderByCreatedAtDescWithMember(Pageable pageable) {
         return null;
+    }
+
+    @Override
+    public Slice<Board> findByLessThanIdInitOrderByIdDescWithMember(Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Slice<Board> findByLessThanIdOrderByIdDescWithMember(Long lastId, Pageable pageable) {
+        // Pagable: page number, page size
+        int pageSize = pageable.getPageSize();
+        String sql = "select from board_table b join member m on b.member_id = m.id where lastId = ? order by m.id desc limit = ?";
+
+
+        // Slice: contents, Pagable, hasNext
+        List<Board> contents = jdbcTemplate.query(sql, BoardNameMapper(), lastId, pageSize + 1);
+
+        boolean hasNext = contents.size() < pageSize + 1 ? false: true;
+
+
+        return new SliceImpl<>(contents, pageable, hasNext);
     }
 
     private RowMapper<Board> BoardNameMapper() {

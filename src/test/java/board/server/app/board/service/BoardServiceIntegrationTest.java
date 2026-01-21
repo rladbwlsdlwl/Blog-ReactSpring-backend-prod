@@ -154,7 +154,7 @@ class BoardServiceIntegrationTest {
         // insert query 1
         memberRepository.save(member);
 
-        // insert query 20
+        // 게시글 20개 작성
         for(var i=0; i<20; i++){
             Board board = Board.builder()
                     .views(0L)
@@ -168,21 +168,30 @@ class BoardServiceIntegrationTest {
         }
 
 
-        // query 1
-        List<Board> boardListAll1 = boardService.getBoardListAll(0);
-        List<Board> boardListAll2 = boardService.getBoardListAll(1);
 
+        // WHEN
+        List<Board> boardListAll1 = boardService.getBoardListAll(null).getContent();
+
+
+
+
+        Long cursor = boardListAll1.get(boardListAll1.size() - 1).getId();
+        List<Board> boardListAll2 = boardService.getBoardListAll(cursor).getContent();
+
+
+        // 10개 페이징 검증
         Assertions.assertThat(boardListAll1.size()).isEqualTo(10);
         Assertions.assertThat(boardListAll2.size()).isEqualTo(10);
 
 
-        for(int i=0; i<10; i++){
-            Board board1 = boardListAll1.get(i);
-            Board board2 = boardListAll2.get(i);
+        // 리스트 독립된 값 검증
+        Assertions.assertThat(boardListAll1.stream().map(Board::getId).toList()).doesNotHaveDuplicates();
+        Assertions.assertThat(boardListAll2.stream().map(Board::getId).toList()).doesNotHaveDuplicates();
 
-            Assertions.assertThat(board1.getId()).isNotEqualTo(board2.getId());
-        }
 
+
+        // 리스트 간 중복 값 존재 검증
+        Assertions.assertThat(boardListAll1).doesNotContainAnyElementsOf(boardListAll2);
     }
 
     @Test

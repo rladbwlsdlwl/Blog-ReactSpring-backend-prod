@@ -8,6 +8,8 @@ import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,8 +59,14 @@ public class BoardService {
     }
 
     // 게시글 리스트 읽기 - 모든 유저
-    public List<Board> getBoardListAll(Integer lastId){
-        return boardRepository.findTop10ByOrderByCreatedAtDescWithMember(PageRequest.of(lastId, 10, Sort.by("createdAt").descending()));
+    public Slice<Board> getBoardListAll(Long lastId){
+        int pageSize = 10;
+        Pageable pageable = PageRequest.of(0, pageSize);
+
+        if(lastId == null)
+            return boardRepository.findByLessThanIdInitOrderByIdDescWithMember(pageable);
+
+        return boardRepository.findByLessThanIdOrderByIdDescWithMember(lastId, pageable);
     }
 
     
