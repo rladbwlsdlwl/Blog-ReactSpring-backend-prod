@@ -2,6 +2,7 @@ package board.server.app.board.dto;
 
 import board.server.app.board.entity.Board;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class BoardDto {
     private Long id;
     private String title;
@@ -20,6 +22,7 @@ public class BoardDto {
     private Long memberId;
     private String username;
 
+    //  홈 화면
     public BoardDto(Board board){
         this.id = board.getId();
         this.title = board.getTitle();
@@ -28,6 +31,17 @@ public class BoardDto {
         this.created_at = dateFormatter(board.getCreatedAt());
         this.memberId = board.getMember().getId();
         this.username = board.getMember().getName();
+    }
+
+    // 유저 홈 화면
+    public BoardDto(Board board, String username){
+        this.id = board.getId();
+        this.title = board.getTitle();
+        this.contents = board.getContents();
+        this.views = board.getViews();
+        this.created_at = dateFormatter(board.getCreatedAt());
+        this.memberId = board.getMember().getId();
+        this.username = username;
     }
 
     private String dateFormatter(LocalDateTime localDateTime){

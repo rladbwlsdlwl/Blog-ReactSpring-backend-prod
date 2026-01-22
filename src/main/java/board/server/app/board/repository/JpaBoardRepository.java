@@ -4,6 +4,7 @@ package board.server.app.board.repository;
 import board.server.app.board.entity.Board;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
@@ -68,7 +69,7 @@ public class JpaBoardRepository implements BoardRepository{
     }
 
     @Override
-    public List<Board> findTop10ByOrderByCreatedAtDescWithMember(Pageable pageable) {
+    public Page<Board> findAllByMember_IdOrderByIdDesc(Long memberId, Pageable pageable) {
         return null;
     }
 

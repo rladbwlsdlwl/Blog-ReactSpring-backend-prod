@@ -1,6 +1,7 @@
 package board.server.app.board.repository;
 
 import board.server.app.board.entity.Board;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
@@ -13,7 +14,7 @@ public interface BoardRepository {
     void deleteById(Long id);
     void delete(Board board);
     List<Board> findTop10ByOrderByCreatedAtDesc();
-    List<Board> findTop10ByOrderByCreatedAtDescWithMember(Pageable pageable);
+    Page<Board> findAllByMember_IdOrderByIdDesc(Long memberId, Pageable pageable);
     Slice<Board> findByLessThanIdInitOrderByIdDescWithMember(Pageable pageable);
     Slice<Board> findByLessThanIdOrderByIdDescWithMember(Long lastId, Pageable pageable);
 }

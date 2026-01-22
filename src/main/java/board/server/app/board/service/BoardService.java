@@ -3,14 +3,12 @@ package board.server.app.board.service;
 
 import board.server.app.board.entity.Board;
 import board.server.app.board.repository.BoardRepository;
+import board.server.app.member.entity.Member;
 import board.server.app.member.repository.MemberRepository;
 import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,10 +50,12 @@ public class BoardService {
     }
 
     // 게시글 리스트 읽기 - 유저 1명
-    public List<Board> getBoardList(String name){
-        validatePresentMemberName(name);
+    public Page<Board> getBoardList(String name, int pageNum){
+        Member member = validatePresentMemberName(name);
 
-        return boardRepository.findByMember_name(name);
+        Pageable pageable = PageRequest.of(pageNum, 25);
+
+        return boardRepository.findAllByMember_IdOrderByIdDesc(member.getId(), pageable);
     }
 
     // 게시글 리스트 읽기 - 모든 유저
@@ -107,8 +107,8 @@ public class BoardService {
     }
 
     // GET: 게시글 작성자가 존재하는지 검증
-    private void validatePresentMemberName(String name) {
-        memberRepository.findByName(name).orElseThrow(() ->
+    private Member validatePresentMemberName(String name) {
+        return memberRepository.findByName(name).orElseThrow(() ->
                 new BusinessLogicException(CustomExceptionCode.MEMBER_NO_PERMISSION)
         );
     }

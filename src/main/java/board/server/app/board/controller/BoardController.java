@@ -12,6 +12,7 @@ import board.server.config.jwt.CustomUserDetail;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,21 +50,27 @@ public class BoardController {
     }
 
     @GetMapping("/{name}/{boardId}")
-    public ResponseEntity<BoardResponseDto> readBoard(@PathVariable String name,
-                                                      @PathVariable Long boardId){
+    public ResponseEntity<BoardDto> readBoard(@PathVariable String name,
+                                              @PathVariable Long boardId){
         Board board = boardService.getBoard(boardId, name);
 
-        BoardResponseDto boardResponseDto = new BoardResponseDto(board);
+        BoardDto boardDto = new BoardDto(board, name);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(boardDto);
     }
 
     @GetMapping("/{name}")
-    public ResponseEntity<Object> readBoards(@PathVariable String name){
-        List<BoardResponseDto> boardResponseDtoList = boardService.getBoardList(name)
-                .stream().map(BoardResponseDto::new).toList();
+    public ResponseEntity<Object> readBoards(@PathVariable String name,
+                                             @RequestParam int pageNum){
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDtoList);
+        Page<Board> boardPage= boardService.getBoardList(name, pageNum);
+
+        Long totalElement = boardPage.getTotalElements();
+        List<Board> boardList = boardPage.getContent();
+
+        BoardResponseDto boardResponseDto = new BoardResponseDto(boardList, totalElement);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDto);
     }
 
     @PostMapping("/{name}")
@@ -88,7 +95,7 @@ public class BoardController {
 
         Board savedBoard = boardService.join(board);
 
-        BoardResponseDto boardResponseDto = new BoardResponseDto(savedBoard);
+        BoardDto boardResponseDto = new BoardDto(savedBoard, name);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(boardResponseDto);
     }
@@ -117,7 +124,7 @@ public class BoardController {
 
         boardId = boardService.setBoard(board, boardId);
 
-        BoardResponseDto boardResponseDto = BoardResponseDto.builder()
+        BoardDto boardResponseDto = BoardDto.builder()
                 .id(boardId)
                 .build();
 

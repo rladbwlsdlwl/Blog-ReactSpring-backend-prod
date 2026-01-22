@@ -12,9 +12,11 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @SpringBootTest
@@ -102,42 +104,63 @@ class BoardServiceIntegrationTest {
                 .roleType(RoleType.MEMBER)
                 .build();
 
-        Board board1 = Board.builder()
-                .views(0L)
-                .createdAt(LocalDateTime.now())
-                .contents("dasdas")
-                .title("dasdas")
-                .member(member)
-                .build();
-        Board board2 = Board.builder()
-                .views(0L)
-                .createdAt(LocalDateTime.now())
-                .contents("dasdas")
-                .title("dasdas")
-                .member(member)
-                .build();
-        Board board3 = Board.builder()
-                .views(0L)
-                .createdAt(LocalDateTime.now())
-                .contents("dasdas")
-                .title("dasdas")
-                .member(member)
-                .build();
 
-        // insert query 4
+
         memberRepository.save(member);
-        boardRepository.save(board1);
-        boardRepository.save(board2);
-        boardRepository.save(board3);
+
+
+        for(var i=0; i<13; i++){
+            Board board = Board.builder()
+                    .views(0L)
+                    .createdAt(LocalDateTime.now())
+                    .contents("dasdas")
+                    .title("dasdas")
+                    .member(member)
+                    .build();
+
+
+            boardRepository.save(board);
+        }
+
+
 
 
 
         // WHEN
-        List<Board> boardList = boardService.getBoardList(member.getName());
+        int page = 0;
+
+        Page<Board> boardPage = boardService.getBoardList(member.getName(), page);
+        List<Board> boardList = boardPage.getContent();
+
+        Long totalElement = boardPage.getTotalElements();
+        int totalPages = boardPage.getTotalPages();
 
 
         // THEN
+        // 10개 검증
+        Assertions.assertThat(boardList.size()).isEqualTo(10);
+
+        // 페이지 수 검증: 2
+        Assertions.assertThat(totalPages).isEqualTo(2);
+
+        // 총 게시글 길이 검증: 13
+        Assertions.assertThat(totalElement).isEqualTo(13);
+
+        // 내림차순 검증
+        Assertions.assertThat(boardList).isSortedAccordingTo(Comparator.comparing(Board::getId).reversed());
+
+
+        page++;
+
+        boardPage = boardService.getBoardList(member.getName(), page);
+        boardList = boardPage.getContent();
+
+
+        // 3개 검증
         Assertions.assertThat(boardList.size()).isEqualTo(3);
+
+        // 내림차순 검증
+        Assertions.assertThat(boardList).isSortedAccordingTo(Comparator.comparing(Board::getId).reversed());
     }
 
     @Test

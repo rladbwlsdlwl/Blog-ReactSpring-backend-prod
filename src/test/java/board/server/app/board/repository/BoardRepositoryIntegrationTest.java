@@ -12,10 +12,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -112,39 +109,35 @@ class BoardRepositoryIntegrationTest {
     }
 
     @Test
-    void findTop10ByOrderByCreatedAtDesc() {
-        // 게시글 10개 내림차순 정렬 테스트
+    void findAllByMember_IdOrderByIdDesc() {
+        // 게시글 페이지네이션 테스트 (offset)
+        // 게시글 10개 page size, 내림차순 정렬 테스트
+        // 마지막 page number 까지 검증
+
+
 
         // GIVEN
-        List<Member> memberList = new ArrayList<>();
-        List<Board> boardList = new ArrayList<>();
 
 
-        // 2명의 회원
-        Member member1 = Member.builder()
+        // 1명의 회원
+        Member member = Member.builder()
                 .name("aaaaaaaaa")
                 .email("bbbbbb@aaa.aaa")
                 .password("ccc")
                 .build();
-        Member member2 = Member.builder()
-                .name("bbbbbbbbbbb")
-                .email("cccccccccc@aaa.aaa")
-                .password("ddd")
-                .build();
 
 
 
 
 
-        // insert query 2
-        memberRepository.save(member1);
-        memberRepository.save(member2);
+        // insert query 1
+        memberRepository.save(member);
 
 
         // 11개의 게시글
         for(int i =0 ;i<11; i++){
             Board board = Board.builder()
-                    .member(i%2==0 ? member1: member2)
+                    .member(member)
                     .title("hello")
                     .contents("world")
                     .views(0L)
@@ -152,20 +145,48 @@ class BoardRepositoryIntegrationTest {
                     .build();
 
 
-            // insert query 15
-            boardList.add(board);
+            // insert query 11
             boardRepository.save(board);
         }
 
 
 
-
         // WHEN
-        List<Board> findBoardList = boardRepository.findTop10ByOrderByCreatedAtDescWithMember(PageRequest.of(0, 10));
+        int page = 0;
+        boolean stopped = false;
+
+        while (!stopped){
+
+            Pageable pageable = PageRequest.of(page, 10);
 
 
-        // THEN
-        Assertions.assertThat(findBoardList.size()).isEqualTo(10);
+            Page<Board> boardPage = boardRepository.findAllByMember_IdOrderByIdDesc(member.getId(), pageable);
+
+
+            int totalPages = boardPage.getTotalPages();
+
+            if(totalPages-1 == page) stopped = true;
+
+
+            page++;
+
+
+
+            // THEN
+            List<Board> boardList = boardPage.getContent();
+
+            // 10개
+            Assertions.assertThat(boardList.size()).isLessThanOrEqualTo(10);
+            // 내림차순
+            Assertions.assertThat(boardList).isSortedAccordingTo(Comparator.comparing(Board::getId).reversed());
+
+            // 전체 글 11개
+            Assertions.assertThat(boardPage.getTotalElements()).isEqualTo(11);
+            // 전체 페이지 2개
+            Assertions.assertThat(boardPage.getTotalPages()).isEqualTo(2);
+        }
+
+
     }
 
     @Test

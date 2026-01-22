@@ -15,11 +15,11 @@ public interface SpringDataJpaBoardRepository extends JpaRepository<Board, Long>
     @Override
     @Query("select b from Board b join fetch b.member order by b.createdAt desc")
     List<Board> findTop10ByOrderByCreatedAtDesc();
-    // 이동 가능한 버튼식 (createdAt)
+    // 이동 가능한 버튼식 (id)
     // Offset
     @Override
-    @Query("select b from Board b join fetch b.member order by b.createdAt desc")
-    List<Board> findTop10ByOrderByCreatedAtDescWithMember(Pageable pageable);
+    @Query("select b from Board b where b.member.id = :memberId order by b.id desc")
+    Page<Board> findAllByMember_IdOrderByIdDesc(@Param("memberId") Long id, Pageable pageable);
 
     // 무한 스크롤 (id)
     // No Offset
