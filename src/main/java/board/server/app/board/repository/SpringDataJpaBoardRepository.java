@@ -22,6 +22,13 @@ public interface SpringDataJpaBoardRepository extends JpaRepository<Board, Long>
     Page<Board> findAllByMember_IdOrderByIdDesc(@Param("memberId") Long id, Pageable pageable);
 
     // 무한 스크롤 (id)
+    // Offset
+    // 성능 테스트용
+    @Override
+    @Query("select b from Board b join fetch b.member order by b.id desc")
+    Slice<Board> findAllByOrderByIdDescWithMember(Pageable pageable);
+
+    // 무한 스크롤 (id)
     // No Offset
     @Override
     @Query("select b from Board b join fetch b.member order by b.id desc")

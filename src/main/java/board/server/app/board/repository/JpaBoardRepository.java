@@ -74,6 +74,11 @@ public class JpaBoardRepository implements BoardRepository{
     }
 
     @Override
+    public Slice<Board> findAllByOrderByIdDescWithMember(Pageable pageable) {
+        return null;
+    }
+
+    @Override
     public Slice<Board> findByLessThanIdInitOrderByIdDescWithMember(Pageable pageable) {
         return null;
     }

@@ -15,6 +15,7 @@ public interface BoardRepository {
     void delete(Board board);
     List<Board> findTop10ByOrderByCreatedAtDesc();
     Page<Board> findAllByMember_IdOrderByIdDesc(Long memberId, Pageable pageable);
+    Slice<Board> findAllByOrderByIdDescWithMember(Pageable pageable);
     Slice<Board> findByLessThanIdInitOrderByIdDescWithMember(Pageable pageable);
     Slice<Board> findByLessThanIdOrderByIdDescWithMember(Long lastId, Pageable pageable);
 }
