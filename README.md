@@ -1,17 +1,26 @@
-# 게시판 프로젝트
-React와 Spring Boot를 활용한 SPA 방식의 간단한 게시판 CRUD 프로젝트입니다. <br/> <br/>
+# 블로그 프로젝트
+React와 Spring Boot를 활용한 SPA 블로그 CRUD 프로젝트입니다. <br/> <br/>
 frontend Repository: https://github.com/rladbwlsdlwl/Blog-ReactSpring-frontend <br/>
 backend Repository: https://github.com/rladbwlsdlwl/Blog-ReactSpring-backend-prod <br/>
 
 # 프로젝트 소개
-본 프로젝트는 기본적인 게시글 작성 기능과 이미지 파일 업로드 기능을 제공합니다.<br/>  
-프로젝트를 진행하며 다양한 문제를 직면하였고, 이를 해결하기 위해 할 수 있는 범위 내에서 개선 작업을 진행하여 성능 최적화를 이루었습니다.
+본 프로젝트는 기본적인 게시글 CRUD 및 이미지 파일 업로드 기능을 제공하며, <br/>  
+개발 과정에서 발생한 성능 이슈와 구조적 문제를 해결하기 위해
+***쿼리 최적화, 페이징 방식 개선, 파일 처리 최적화*** 등의 리팩토링을 진행했습니다. <br/>  
+단순 기능 구현에 그치지 않고, 안정성과 효율성을 고려한 구조 개선을 지속적으로 수행하고 있습니다.
+
+# 트러블 슈팅
+- [N+1](https://proximal-paint-99f.notion.site/N-1-972a5ec80b9442b19d9d3731aa0e3e14)
+- [이미지 처리 최적화](https://proximal-paint-99f.notion.site/Base64-Blob-ca716948251847fea3f75ed269b84bb1?pvs=73)
+- [대용량 페이징 최적화](https://proximal-paint-99f.notion.site/PromiseAll-16f006cea10180308ddcfb1cab27ae7a?pvs=73)
+- [테이블 관계 최적화](https://proximal-paint-99f.notion.site/2e6006cea1018042a4f3e15567cd2730?pvs=73)
 
 # 주요 기능
 - Spring Security의 JWT를 활용한 회원 인증 및 인가
 - Spring Security의 OAuth2를 활용한 소셜 로그인
 - Spring의 Global Controller Advice를 활용한 예외 처리
 - JdbcTemplate과 Spring Data JPA를 활용한 데이터 처리
+- Mockito와 Spring boot test 활용한 단위테스트 및 통합 테스트
 
 # 개발 환경
 | Package            | Version   |
@@ -34,7 +43,8 @@ backend Repository: https://github.com/rladbwlsdlwl/Blog-ReactSpring-backend-pro
 <img width="1614" height="695" alt="BLOG_SYS_ARC" src="https://github.com/user-attachments/assets/e23e9c12-66f3-4cb0-a367-d646c79a701e" />
 
 # 도메인 정의 (ERD)
-<img width="941" height="750" alt="myblogdb-erd" src="https://github.com/user-attachments/assets/2b78756e-03c1-444f-839e-a2524a6751a8" />
+<img width="1467" height="637" alt="Copy of MY_BLOG_PRJ" src="https://github.com/user-attachments/assets/33563ff9-cc69-4938-accc-95112a5dbbe9" />
+
 
 # API 명세서
 회원 명세서
@@ -42,23 +52,18 @@ backend Repository: https://github.com/rladbwlsdlwl/Blog-ReactSpring-backend-pro
 
 
 게시글 명세서
-<img width="1100" height="577" alt="Board" src="https://github.com/user-attachments/assets/65cf9c70-a747-45f5-a69c-8f2e0dd44a0a" />
+<img width="1170" height="498" alt="image" src="https://github.com/user-attachments/assets/f0c5b6cb-cda7-4547-8291-f9ee22c26917" />
 
 
 파일 명세서
-<img width="1102" height="808" alt="File" src="https://github.com/user-attachments/assets/475605bf-da1b-4ff5-be74-f324cd540d0f" />
+<img width="1227" height="740" alt="image" src="https://github.com/user-attachments/assets/41e47645-19e7-4579-99b6-b949187c697b" />
 
 
 좋아요 명세서
-<img width="1102" height="310" alt="Likes" src="https://github.com/user-attachments/assets/d85848b4-6e7d-49c0-a3fc-5a9355a45f88" />
+<img width="1227" height="257" alt="image" src="https://github.com/user-attachments/assets/473b6e20-3957-4887-908b-019881a8f84d" />
+
 
 
 댓글 명세서
 <img width="1102" height="310" alt="image" src="https://github.com/user-attachments/assets/f4cf323c-a027-445c-8744-0045c5d3b02e" />
 
-
-# 트러블 슈팅
-- [N+1](https://proximal-paint-99f.notion.site/N-1-972a5ec80b9442b19d9d3731aa0e3e14)
-- [보상 트랜잭션](https://proximal-paint-99f.notion.site/75f1afe815484e8eaac765674e652efd)
-- [이미지 처리 최적화](https://proximal-paint-99f.notion.site/Base64-Blob-ca716948251847fea3f75ed269b84bb1?pvs=73)
-- [네트워크 최적화](https://proximal-paint-99f.notion.site/PromiseAll-16f006cea10180308ddcfb1cab27ae7a?pvs=73)
