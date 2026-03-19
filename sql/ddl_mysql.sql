@@ -59,3 +59,24 @@ CREATE TABLE comment_table (
     FOREIGN KEY (member_id) REFERENCES member_table(id) ON DELETE CASCADE,
     FOREIGN KEY (board_id) REFERENCES board_table(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+
+create table tags_table(
+	id bigint AUTO_INCREMENT,
+    name varchar(255) NOT NULL,
+
+    PRIMARY KEY(id),
+    UNIQUE(name)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+create table board_tags_table(
+	id bigint AUTO_INCREMENT,
+    board_id bigint NOT NULL,
+    tags_id bigint NOT NULL,
+
+    PRIMARY KEY(id),
+    FOREIGN KEY(board_id) REFERENCES board_table(id) ON DELETE CASCADE,
+    FOREIGN KEY(tags_id) REFERENCES tags_table(id),
+
+    UNIQUE(board_id, tags_id)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
