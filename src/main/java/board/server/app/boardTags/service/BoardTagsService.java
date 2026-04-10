@@ -3,7 +3,9 @@ package board.server.app.boardTags.service;
 import board.server.app.board.repository.BoardRepository;
 import board.server.app.boardTags.entity.BoardTags;
 import board.server.app.boardTags.repository.BoardTagsRepository;
+import board.server.app.boardTags.repository.CustomBoardTagsRepository;
 import board.server.app.tags.entity.Tags;
+import board.server.app.tags.repository.CustomTagsRepository;
 import board.server.app.tags.repository.TagsRepository;
 import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
@@ -25,7 +27,11 @@ public class BoardTagsService {
     @Autowired
     private BoardTagsRepository boardTagsRepository;
     @Autowired
+    private CustomBoardTagsRepository customBoardTagsRepository;
+    @Autowired
     private TagsRepository tagsRepository;
+    @Autowired
+    private CustomTagsRepository customTagsRepository;
     @Autowired
     private BoardRepository boardRepository;
 
@@ -41,10 +47,8 @@ public class BoardTagsService {
 
 
     // 게시글 작성 (태그 전체 작성)
-    public void join(List<String> tagList, Long boardId, Long memberId){
-        Long author = validatePresentBoard(boardId);
-        checkAuthorAndActiveUser(author, memberId);
-
+    public void join(List<String> tagList, Long boardId){
+        // BoardFacade 단일 진입점으로 관리
         if(tagList == null)
             tagList = new ArrayList<>();
 
@@ -59,10 +63,13 @@ public class BoardTagsService {
                 .map(name -> Tags.of(name))
                 .collect(Collectors.toList());
 
-        if(!savedTaglist.isEmpty())
-            savedTaglist = tagsRepository.saveAll(savedTaglist);
+        if(!savedTaglist.isEmpty()) {
+            savedTaglist = customTagsRepository.saveAll(savedTaglist);
 
-
+            // customTagsRepository.saveAll은 id 값을 저장하지 않음
+            // 재조회하여 저장 확인과 id 찾기
+            savedTaglist = new ArrayList<>(tagsRepository.findByNameIn(savedTaglist.stream().map(Tags::getName).toList()));
+        }
 
         // 게시글 - 해시태그 연결 (board_tags_table)
         List<BoardTags> boardTagsList = Stream.concat(savedTaglist.stream(), tagslist.stream())
@@ -70,15 +77,13 @@ public class BoardTagsService {
                 .collect(Collectors.toList());
 
         if(!boardTagsList.isEmpty())
-            boardTagsRepository.saveAll(boardTagsList);
+            customBoardTagsRepository.saveAll(boardTagsList);
     }
 
 
     // 게시글 업데이트 (태그 생성 및 삭제)
-    public void update(List<String> taglist, Long boardId, Long memberId){
-        Long author = validatePresentBoard(boardId);
-        checkAuthorAndActiveUser(author, memberId);
-
+    public void update(List<String> taglist, Long boardId){
+        // BoardFacade 단일 진입점으로 관리
         if(taglist == null)
             taglist = new ArrayList<>();
 
@@ -121,17 +126,22 @@ public class BoardTagsService {
         List<String> currTaglist = currTagslist.stream().map(Tags:: getName).toList();
         List<Tags> addTagslist = taglist.stream().filter(tagname -> !currTaglist.contains(tagname)).map(Tags:: of).toList();
 
-        if(!addTagslist.isEmpty())
-            addTagslist = tagsRepository.saveAll(addTagslist);
+        if(!addTagslist.isEmpty()) {
+            customTagsRepository.saveAll(addTagslist);
+
+            // customTagsRepository.saveAll은 id 값을 저장하지 않음
+            // 재조회하여 저장 확인과 id 찾기
+            addTagslist = new ArrayList<>(tagsRepository.findByNameIn(addTagslist.stream().map(Tags::getName).toList()));
+        }
 
 
-        // BoardTags 인스턴스 생성
+            // BoardTags 인스턴스 생성
         List<BoardTags> addBoardTagsList = Stream.concat(currTagslist.stream(), addTagslist.stream())
                 .map(tag -> BoardTags.of(boardId, tag.getId(), tag.getName())).toList();
 
         // 기존에 있던 태그와 없던 태그 모두 게시글과 연결하여 생성
         if(!addBoardTagsList.isEmpty())
-            addBoardTagsList = boardTagsRepository.saveAll(addBoardTagsList);
+            addBoardTagsList = customBoardTagsRepository.saveAll(addBoardTagsList);
 
 
         // DB DELETE (A)

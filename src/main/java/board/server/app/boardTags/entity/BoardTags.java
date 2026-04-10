@@ -25,7 +25,7 @@ public class BoardTags {
     private Board board;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tag_id")
+    @JoinColumn(name = "tags_id")
     private Tags tags;
 
     public static BoardTags of(Long boardId, Long tagId) {
