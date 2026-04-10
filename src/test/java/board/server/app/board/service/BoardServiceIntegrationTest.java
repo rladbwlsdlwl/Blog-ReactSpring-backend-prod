@@ -9,6 +9,7 @@ import board.server.error.errorcode.CustomExceptionCode;
 import board.server.error.exception.BusinessLogicException;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -94,6 +95,7 @@ class BoardServiceIntegrationTest {
         Assertions.assertThat(findBoard.getViews()).isEqualTo(1L);
     }
 
+    @DisplayName("성공 - 30개 중 25개씩읽기")
     @Test
     void getBoardList() {
         // GIVEN
@@ -109,7 +111,7 @@ class BoardServiceIntegrationTest {
         memberRepository.save(member);
 
 
-        for(var i=0; i<13; i++){
+        for(var i=0; i<30; i++){
             Board board = Board.builder()
                     .views(0L)
                     .createdAt(LocalDateTime.now())
@@ -137,14 +139,14 @@ class BoardServiceIntegrationTest {
 
 
         // THEN
-        // 10개 검증
-        Assertions.assertThat(boardList.size()).isEqualTo(10);
+        // 25개 검증
+        Assertions.assertThat(boardList.size()).isEqualTo(25);
 
         // 페이지 수 검증: 2
         Assertions.assertThat(totalPages).isEqualTo(2);
 
-        // 총 게시글 길이 검증: 13
-        Assertions.assertThat(totalElement).isEqualTo(13);
+        // 총 게시글 길이 검증: 30
+        Assertions.assertThat(totalElement).isEqualTo(30);
 
         // 내림차순 검증
         Assertions.assertThat(boardList).isSortedAccordingTo(Comparator.comparing(Board::getId).reversed());
@@ -156,8 +158,8 @@ class BoardServiceIntegrationTest {
         boardList = boardPage.getContent();
 
 
-        // 3개 검증
-        Assertions.assertThat(boardList.size()).isEqualTo(3);
+        // 5개 검증
+        Assertions.assertThat(boardList.size()).isEqualTo(5);
 
         // 내림차순 검증
         Assertions.assertThat(boardList).isSortedAccordingTo(Comparator.comparing(Board::getId).reversed());
@@ -249,7 +251,7 @@ class BoardServiceIntegrationTest {
                 .build();
 
         // WHEN
-        boardService.setBoard(updateBoard, updateBoard.getId());
+        boardService.setBoard(board, updateBoard);
         
 
         // THEN
