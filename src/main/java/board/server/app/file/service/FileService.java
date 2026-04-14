@@ -46,7 +46,8 @@ public class FileService {
     public void upload(List<MultipartFile> multipartFileList, Long boardId, Long memberId) throws IOException {
 
         validateFilesType(multipartFileList);
-        validateBoardIdAndAuthor(boardId, memberId);
+        // BoardFacade 단일 진입점으로 관리
+        // validateBoardIdAndAuthor(boardId, memberId);
 
         List<FileEntity> fileEntityList = new ArrayList<>();
 
@@ -130,7 +131,8 @@ public class FileService {
     public Long update(List<String> removeFilenameList, List<MultipartFile> afterFileList, Long boardId, Long userId) throws IOException {
 
         validateFilesType(afterFileList);
-        validateBoardIdAndAuthor(boardId, userId);
+        // BoardFacade 단일 진입점으로 관리
+        // validateBoardIdAndAuthor(boardId, userId);
         validateCurrentFilename(removeFilenameList, boardId);
 
 

@@ -35,28 +35,4 @@ public class BoardTagsController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new BoardTagsResponseDto(taglistDto));
     }
-
-
-    // 게시글에 있는 태그 작성
-    @PostMapping("/tags/{boardId}")
-    public ResponseEntity<?> createTags(@PathVariable Long boardId,
-                                        @RequestBody @Valid BoardTagsRequestDto boardTagsRequestDto,
-                                        @AuthenticationPrincipal CustomUserDetail customUserDetail){
-
-        boardTagsService.join(boardTagsRequestDto.getName(), boardId, customUserDetail.getId());
-
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    
-    // 게시글에 있는 태그 수정
-    @PatchMapping("/tags/{boardId}")
-    public ResponseEntity<?> updateTags(@PathVariable Long boardId,
-                                        @RequestBody @Valid BoardTagsRequestPatchDto boardTagsRequestPatchDto,
-                                        @AuthenticationPrincipal CustomUserDetail customUserDetail){
-
-        boardTagsService.update(boardTagsRequestPatchDto.getTagname(), boardId, customUserDetail.getId());
-
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
 }

@@ -71,9 +71,9 @@ public class BoardService {
 
     
     // 게시글 수정
-    public Long setBoard(Board board, Long boardId){
+    public Long setBoard(Board board, Board findBoard){
 
-        Board findBoard = validateLoginUserAndAuthor(board.getMember().getId(), boardId);
+//        Board findBoard = validateLoginUserAndAuthor(board.getMember().getId(), boardId);
 
 
         findBoard.setTitle(board.getTitle());

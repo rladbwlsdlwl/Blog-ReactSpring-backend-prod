@@ -1,12 +1,12 @@
 package board.server.app.boardTags.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
 public class BoardTagsRequestDto {
-    @NotBlank
-    private List<String> name;
+    private List<@NotBlank String> name;
 }

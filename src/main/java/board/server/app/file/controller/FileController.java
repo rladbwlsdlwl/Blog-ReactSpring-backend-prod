@@ -34,21 +34,6 @@ public class FileController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-
-    @PostMapping("/file/{boardId}")
-    public ResponseEntity<?> uploadFiles(@PathVariable("username") String username,
-                                         @PathVariable("boardId") Long boardId,
-                                         @AuthenticationPrincipal CustomUserDetail userDetail,
-                                         @RequestParam(value = "file", required = false) List<MultipartFile> multipartFileList) throws IOException {
-        // 회원 게시판 - 최초 게시글 작성
-        List<MultipartFile> filelist = multipartFileList == null ? new ArrayList<>() : multipartFileList;
-
-        Long memberId = userDetail.getId();
-        fileService.upload(filelist, boardId, memberId);
-
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
     @GetMapping("/file/{boardId}")
     public ResponseEntity<List<FileResponseDto>> readFiles(@PathVariable("username") String username,
                                                      @PathVariable("boardId") Long boardId) throws IOException {
@@ -70,27 +55,6 @@ public class FileController {
         List<FileResponseDto> fileEntityList = fileService.read(postIdList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(fileEntityList);
-    }
-
-    @PatchMapping("/file/{boardId}")
-    public ResponseEntity<?> changeFiles(@PathVariable("username") String username,
-                                         @PathVariable("boardId") Long boardId,
-                                         @AuthenticationPrincipal CustomUserDetail userDetail,
-                                         @RequestParam(value = "file", required = false) List<MultipartFile> multipartFileList,
-                                         @RequestParam(value = "removeFilenameList", required = false) List<MultipartFile> removeFilenameList) throws IOException {
-        // 회원 게시판 - 게시글 수정
-        List<MultipartFile> filelist = multipartFileList == null ? new ArrayList<>() : multipartFileList;
-        List<MultipartFile> removefilelist = removeFilenameList == null ? new ArrayList<>() : removeFilenameList;
-
-        // filename은 currentFilename과 동일
-        List<String> removeFilename = new ArrayList<>();
-        for(MultipartFile filename : removefilelist){
-            removeFilename.add(new String(filename.getBytes()));
-        }
-
-        fileService.update(removeFilename, filelist, boardId, userDetail.getId());
-
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/file/{boardId}")
