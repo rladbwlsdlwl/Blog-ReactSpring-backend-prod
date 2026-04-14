@@ -43,7 +43,8 @@ backend Repository: https://github.com/rladbwlsdlwl/Blog-ReactSpring-backend-pro
 <img width="1614" height="695" alt="BLOG_SYS_ARC" src="https://github.com/user-attachments/assets/e23e9c12-66f3-4cb0-a367-d646c79a701e" />
 
 # 도메인 정의 (ERD)
-<img width="1467" height="637" alt="Copy of MY_BLOG_PRJ" src="https://github.com/user-attachments/assets/33563ff9-cc69-4938-accc-95112a5dbbe9" />
+<img width="1245" height="737" alt="image" src="https://github.com/user-attachments/assets/8fe8b318-8240-494c-b2ef-e88c1bdb18a2" />
+
 
 
 # API 명세서
@@ -52,11 +53,12 @@ backend Repository: https://github.com/rladbwlsdlwl/Blog-ReactSpring-backend-pro
 
 
 게시글 명세서
-<img width="1170" height="498" alt="image" src="https://github.com/user-attachments/assets/f0c5b6cb-cda7-4547-8291-f9ee22c26917" />
+<img width="1220" height="578" alt="image" src="https://github.com/user-attachments/assets/bd6283af-04cc-4a12-851d-224f05939326" />
+
 
 
 파일 명세서
-<img width="1227" height="740" alt="image" src="https://github.com/user-attachments/assets/41e47645-19e7-4579-99b6-b949187c697b" />
+<img width="1227" height="381" alt="image" src="https://github.com/user-attachments/assets/67904b87-e683-4c20-b398-34371675117e" />
 
 
 좋아요 명세서
@@ -67,3 +69,7 @@ backend Repository: https://github.com/rladbwlsdlwl/Blog-ReactSpring-backend-pro
 댓글 명세서
 <img width="1102" height="310" alt="image" src="https://github.com/user-attachments/assets/f4cf323c-a027-445c-8744-0045c5d3b02e" />
 
+
+
+해시태그 명세서
+<img width="1222" height="90" alt="image" src="https://github.com/user-attachments/assets/2448b6dd-53b2-46f5-bc7c-e570d2e5bf37" />
